@@ -1,0 +1,288 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Pending Payments";
+}
+@using Stock_Management_System.UrlEncryption;
+@model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Pending_Customers_Payments>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable();
+
+            // Extend DataTable search to include date range filtering
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var startDateInput = $("#startdate").val();
+                var endDateInput = $("#datepickerend").val();
+
+                // If only the end date is specified, set the start date to the first day of the current month
+                var startDate = startDateInput ? moment(startDateInput, "YYYY-MM-DD") : (endDateInput ? moment().startOf('month') : moment().startOf('month'));
+                // If only the start date is specified, set the end date to today's date
+                var endDate = endDateInput ? moment(endDateInput, "YYYY-MM-DD").endOf('day') : (startDateInput ? moment() : moment().endOf('day'));
+
+                var dateColumn = data[0]; // Adjust if date is in another column
+                var date = moment(dateColumn, "DD-MM-YY");
+
+                if (!date.isValid() || !startDate.isValid() || !endDate.isValid()) {
+                    console.error("Invalid date encountered");
+                    return false;
+                }
+
+                return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
+            });
+
+            // Function to apply all search filters and reset date inputs after search
+            function applySearches() {
+                var Name = $("#searchName").val();
+          
+                var location = $("#location").val();
+                var selectedGrain = $("#graintype").val();
+                var selectedGrainText = $("#graintype option:selected").text();
+
+                // Clear existing searches
+                table.search('').columns().search('');
+
+                // Apply text input searches
+                table.column(1).search(Name, true, false);
+                table.column(3).search(location, true, false);
+
+                // Apply dropdown searches
+                if (selectedGrain) {
+                    table.column(2).search(selectedGrainText, false, false);
+                }
+
+               
+
+                // Redraw table to apply all filters
+                table.draw();
+
+                // Reset start and end date values after search
+                $("#startdate, #datepickerend").val('');
+            }
+
+            // Bind the search function to the search button click event
+            $('#searchButton').on('click', function () {
+                applySearches();
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Attach event to document, delegate to .loadPaymentInfoBtn
+            $(document).on('click', '.loadPaymentInfoBtn', function () {
+                var customerId = $(this).data('customer-id');
+                var stockId = $(this).data('stock-id');
+
+                $.ajax({
+                    url: '/Payment/Get_Payment_Info',
+                    data: { Customer_ID: customerId, Stock_ID: stockId },
+                    success: function (response) {
+                        $('#createpayment .modal-content').html(response);
+                        $('#createpayment').modal('show');
+                    },
+                    error: function () {
+                        alert('Error loading payment information');
+                    }
+                });
+            });
+        });
+    </script>
+
+ 
+}
+
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Payments</h4>
+            <h6>List of Pending Customers Payments </h6>
+        </div>
+        <div class="page-btn">
+            <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-path">
+                        <a class="btn btn-filter" id="filter_search">
+                            <img src="~/img/icons/filter.svg" alt="img">
+                            <span><img src="~/img/icons/closes.svg" alt="img"></span>
+                        </a>
+                    </div>
+                    <div class="search-input">
+                        <a class="btn btn-searchset"><img src="~/img/icons/search-white.svg" alt="img"></a>
+                    </div>
+                </div>
+                <div class="wordset">
+                    <ul>
+                        <li>
+                            <form asp-action="Purchase_Invoice_Statement_CreatePDF" asp-controller="Invoice" method="get">
+
+
+
+
+
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
+                                    <img src="~/img/icons/pdf.svg" alt="img">
+                                </button>
+
+
+                            </form>
+                        </li>
+
+                        <li>
+                            <form asp-action="Export_Purchase_Invoices_List_To_Excel" asp-controller="Invoice" method="get">
+
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                                    <img src="~/img/icons/excel.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+                        <li>
+                            <form>
+
+                                <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
+                                    <img src="~/img/icons/printer.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-0" id="filter_inputs">
+                <div class="card-body pb-0">
+                    <div class="row align-items-end">
+                        <!-- Ensure alignment at the bottom -->
+                        <!-- Start Date -->
+                        <div class="col-sm-2">
+                            <!-- Adjusted column size for tighter fit -->
+                            <div class="form-group">
+                                <label for="startdate"><span style="color: black;">*</span> Start Date</label>
+                                <input type="date" class="form-control" id="startdate">
+                            </div>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="col-sm-2">
+                            <!-- Adjusted column size for tighter fit -->
+                            <div class="form-group">
+                                <label for="datepickerend"><span style="color: black;">*</span> End Date</label>
+                                <input type="date" class="form-control" id="enddate" name="enddate">
+                            </div>
+                        </div>
+
+                        <!-- Select Product -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="ProductType"><span style="color: black;">*</span> Select Product</label>
+                                <select class="select form-control" id="producttype" asp-items="@(ViewBag.Products)">
+                                    <option value="" selected disabled>-- Select Product --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        
+
+                        <!-- Search By Name -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="customername"><span style="color: black;">*</span> Search By Location</label>
+                                <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="location">
+                            </div>
+                        </div>
+
+
+
+                       
+
+                        <!-- Search Button -->
+                        <div class="col-sm-1">
+                            <!-- Adjust the column size if necessary -->
+                            <div class="form-group">
+                                <a role="button" id="searchButton" class="btn btn-filters"><img src="~/img/icons/search-whites.svg" alt="search icon"></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <div class="table-responsive">
+            <table id="data" class="table datanew">
+                <thead>
+                    <tr>
+
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Name</th>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Location</th>
+                        <th class="text-center">Total Price</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Pay</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td class="text-center">
+                                        @((DateTime.TryParse(item.StockDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                    </td>
+                                    <td class="text-center">@item.CustomerName</td>
+                                    <td class="text-center">@item.ProductName</td>
+                                    <td class="text-center">@item.Location</td>
+                                    <td class="text-center">@item.TotalPrice</td>
+
+                                    <td class="text-center"><span class="badges bg-lightred">@item.Payment_Status</span></td>
+
+                                    <td class="text-center">
+                                        <a class="loadPaymentInfoBtn"  data-customer-id="@UrlEncryptor.Encrypt(item.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())">
+                                            <i class="fa fa-credit-card"></i>
+                                        </a>
+                                    </td>
+                                  
+
+
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+
+
+        <!-- Modal Shell -->
+        <div class="modal fade" id="createpayment" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <!-- Dynamic Content Will Be Loaded Here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+

@@ -1,0 +1,410 @@
+﻿@using Stock_Management_System.Areas.Manage.Models
+@using Stock_Management_System.UrlEncryption;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Account Details";
+}
+
+@model Stock_Management_System.Areas.Accounts.Models.CustomerDetails_With_Purchased_Stock_Model;
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable();
+
+
+
+            function applySearches() {
+                var Location = $("#searchLocation").val();
+
+                var selectedGrain = $('#graintype').val();
+                var startdate = $('#startdate').val();
+                var enddate = $('#enddate').val();
+
+
+
+                var productColumnIndex = 1;
+
+                // Clear existing searches
+                table.columns().search('');
+
+                // Apply dropdown search if selected
+                if (selectedGrain) {
+                    table.column(productColumnIndex).search(selectedGrain);
+
+                }
+
+                // Apply individual column searches from input fields
+                table.column(2).search(Location);
+
+
+
+
+
+                // Perform a single draw after all search criteria have been applied
+                table.draw();
+
+                // Reset the input values after search
+                $("#searchLocation").val('');
+                $('#graintype').val('').trigger('change'); // For Select2
+
+            }
+
+            $('#searchButton').on('click', function () {
+                applySearches();
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Attach event to document, delegate to .loadPaymentInfoBtn
+            $(document).on('click', '.loadPaymentInfoBtn', function () {
+                var customerId = $(this).data('customer-id');
+                var stockId = $(this).data('stock-id');
+
+                $.ajax({
+                    url: '/Payment/Get_Payment_Info',
+                    data: { Customer_ID: customerId, Stock_ID: stockId },
+                    success: function (response) {
+                        $('#createpayment .modal-content').html(response);
+                        $('#createpayment').modal('show');
+                    },
+                    error: function () {
+                        alert('Error loading payment information');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var banks = @Html.Raw(Json.Serialize(ViewBag.Banks));
+
+            console.log(banks);
+
+            $("#bankDropdown").select2({
+
+                allowClear: true,
+
+                data: banks.map(bank => ({
+                    id: bank.bankId,
+                    text: bank.bankName,
+                    image: bank.bankIcon // Ensure this is the correct property for the image URL
+                })),
+               
+                templateResult: formatBank,
+                templateSelection: formatBank
+            });
+
+            function formatBank(bank) {
+                if (!bank.id) { return bank.text; }
+                var $bank = $(
+                    '<span><img src="' + bank.image + '" class="img-flag" style="width: 20px; height: 20px;"/> ' + bank.text + '</span>'
+                );
+                return $bank;
+            }
+        });
+    </script>
+
+
+   
+
+
+}
+
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Account Details</h4>
+            <h6>Manage Customer Account Statements </h6>
+        </div>
+        <div class="page-btn">
+            <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Entry</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set d-flex align-items-center">
+                    <a asp-action="Manage_Customers_Account" asp-controller="Account" class="text-decoration-none me-3">
+                        <i class="fa fa-arrow-left" style="color:green; transform: scale(1.25);"></i>
+                    </a>
+
+                    <div class="search-path">
+                        <a class="btn btn-filter" id="filter_search">
+                            <img src="~/img/icons/filter.svg" alt="img">
+                            <span><img src="~/img/icons/closes.svg" alt="img"></span>
+                        </a>
+                    </div>
+
+                    <div class="search-input">
+                        <a class="btn btn-searchset"><img src="~/img/icons/search-white.svg" alt="img"></a>
+                    </div>
+                </div>
+                <div class="wordset">
+                    <ul>
+                        <li>
+                            <form asp-action="Customer_Account_Statement_CreatePDF" asp-controller="Account" method="get">
+                                <input type="hidden" name="Customer_ID" value="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" />
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
+                                    <img src="~/img/icons/pdf.svg" alt="img">
+                                </button>
+
+
+                            </form>
+                        </li>
+
+                        <li>
+                            <form method="get" asp-action="Customer_Account_Statement_CreateEXCEL" asp-controller="Account">
+                                <input type="hidden" name="Customer_ID" value="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" />
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                                    <img src="~/img/icons/excel.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+                        <li>
+                            <form>
+
+                                <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
+                                    <img src="~/img/icons/printer.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="card mb-0" id="filter_inputs">
+                <div class="card-body pb-0">
+                    <div class="row">
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="row">
+
+                                <!-- Start Date Input -->
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="startdate" class="text-truncate"><span style="color: black;">*</span> Start Date</label>
+                                        <input type="date" class="form-control" id="startdate">
+                                    </div>
+                                </div>
+
+                                <!-- End Date Input -->
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="datepickerend" class="text-truncate"><span style="color: black;">*</span> End Date</label>
+                                        <input type="date" class="form-control" id="datepickerend" name="enddate">
+                                    </div>
+                                </div>
+
+                                <!-- Search By Location Input -->
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="customertype" class="text-truncate"><span style="color: black;">*</span> Search By Location</label>
+                                        <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="searchLocation">
+                                    </div>
+                                </div>
+                               
+
+
+                                <select id="bankDropdown" style="width: 50%;" name="banks"></select>
+
+
+
+
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12 d-flex align-items-end">
+                            <div class="form-group">
+                                <a role="button" id="searchButton" class="btn btn-filters"><img src="~/img/icons/search-whites.svg" alt="search icon"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <br />
+
+
+            <div class="table-responsive scrollable-table table-responsive-sm">
+                <table class="table">
+                    @if (Model.Customers != null)
+                    {
+                        <tr>
+                            <th>Customer ID:</th>
+                            <td style="font-weight:600; color:black;">@Model.Customers.CustomerId</td>
+                        </tr>
+                        <tr>
+                            <th>Name:</th>
+                            <td style="font-weight:600; color:black; ">@Model.Customers.CustomerName</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td style="font-weight:600; color:black;">@Model.Customers.CustomerAddress</td>
+                        </tr>
+                        <tr>
+                            <th>Contact No:</th>
+                            <td style="font-weight:600; color:black;">@Model.Customers.CustomerContact</td>
+                        </tr>
+                    }
+
+
+                </table>
+            </div>
+
+
+        </div>
+
+
+        <br />
+
+        <div class="table-responsive">
+            <table id="data" class="table datanew">
+                <thead>
+                    <tr>
+
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Name</th>
+                        <th class="text-center">Location</th>
+                        <th class="text-center">Bag</th>
+                        <th class="text-center">Bag Per KG</th>
+                        <th class="text-center">Weight</th>
+                        <th class="text-center">Product-Price(₹)</th>
+                        <th class="text-center">Total-Price(₹)</th>
+                        <th class="text-center">Vehicle-No</th>
+                        <th class="text-center">Payment-Status</th>
+
+                        <th class="text-center">Actions</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @{
+                        @if (Model?.Purchased_Stocks != null && Model.Purchased_Stocks.Count > 0)
+                        {
+
+                            foreach (var item in Model.Purchased_Stocks)
+                            {
+                                <tr>
+
+                                    <td class="text-center">@(DateTime.TryParse(item.StockDate.ToString(), out var piDate) ? piDate.ToString("dd-MM-yy") : "")</td>
+                                    <td class="text-center">@item.ProductName</td>
+                                    <td class="text-center">@item.PurchaseStockLocation</td>
+                                    <td class="text-center">@item.Bags</td>
+                                    <td class="text-center">@item.BagPerKg</td>
+                                    <td class="text-center">@item.TotalWeight</td>
+                                    <td class="text-center">@item.ProductPrice</td>
+                                    <td class="text-center">@item.TotalPrice</td>
+                                    <td class="text-center">@item.VehicleNo</td>
+                                    @{
+                                        if (item.PaymentStatus == "PAID")
+                                        {
+                                            <td class="text-center"><span class="badges bg-lightgreen">@item.PaymentStatus</span></td>
+                                        }
+                                        else if(item.PaymentStatus == "PENDING")
+                                        {
+                                            <td class="text-center"><span class="badges bg-lightred">@item.PaymentStatus</span></td>
+                                        }
+                                        else if(item.PaymentStatus == "REMAIN")
+                                        {
+                                            <td class="text-center"><span class="badges bg-lightyellow">@item.PaymentStatus</span></td>
+                                        }
+                                    }
+
+                                  
+
+
+                                    @*
+                        <td>
+                        <form asp-action="Customer_Wise_Stock_Details" asp-controller="Account">
+                        <input type="hidden" value="@UrlEncryptor.Encrypt(Convert.ToString(item.StockId))" name="TN_ID" />
+                        <button type="submit" class="btn-link" style="background-color: transparent; border: none; padding: 0;">
+                        <img src="~/img/icons/eye.svg" alt="img">
+                        </button>
+                        </form>
+                        </td>
+                        *@
+
+
+
+                                    <td class="text-center">
+                                        <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="sales-details.html" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Details</a>
+                                            </li>
+                                            <li>
+                                                <a href="edit-sales.html" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Edit Info</a>
+                                            </li>
+
+                                            <li>
+                                                <!-- Use class instead of id -->
+                                                <button class="loadPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img">Create Payment</button>
+
+
+                                            </li>
+                                            <li>
+
+                                                <a role="link"
+                                                   href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)) })"
+                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock</a>
+                                            </li>
+
+                                        </ul>
+                                    </td>
+
+
+
+
+
+
+                                </tr>
+                            }
+
+
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+    <!-- Modal Shell -->
+    <div class="modal fade" id="createpayment" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Dynamic Content Will Be Loaded Here -->
+            </div>
+        </div>
+    </div>
+
+
+</div>
+

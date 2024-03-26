@@ -1,0 +1,80 @@
+﻿/*-- CSS MAIN FILES IMPORTED --*/
+
+@import "animate.css";
+@import "bootstrap-datetimepicker.min.css";
+@import "bootstrap.min.css";
+@import "dataTables.bootstrap4.min.css";
+@import "style.css";
+
+
+/*-- PLUGINS FOLDERS ALL CSS IMPORTED -- */
+
+/* alertify */
+@import "../plugins/alertify/alertify.min.css";
+
+/* dragula */
+@import "../plugins/dragula/css/dragula.min.css";
+
+/* fontawesome */
+
+@import "../plugins/fontawesome/css/all.min.css";
+@import "../plugins/fontawesome/css/fontawesome.min.css";
+
+/* fullcalendar */
+@import "../plugins/fullcalendar/fullcalendar.min.css";
+
+
+/* Icons */
+@import "../plugins/icons/feather/feather.css";
+@import "../plugins/icons/flags/flags.css";
+@import "../plugins/icons/ionic/ionicons.css";
+@import "../plugins/icons/pe7/pe-icon-7.css";
+@import "../plugins/icons/themify/themify.css";
+@import "../plugins/icons/typicons/typicons.css";
+@import "../plugins/icons/weather/weathericons.css";
+
+
+/* Ion-Rangesilder */
+
+@import "../plugins/ion-rangeslider/css/ion.rangeSlider.min.css";
+
+/* LightBox */
+
+@import "../plugins/lightbox/glightbox.min.css";
+
+/* Material */
+@import "../plugins/material/materialdesignicons.css";
+
+/* OwlCarousel */
+
+@import "../plugins/owlcarousel/owl.carousel.min.css";
+@import "../plugins/owlcarousel/owl.theme.default.min.css";
+
+/* ScrollBar */
+
+@import "../plugins/scrollbar/scroll.min.css";
+
+/* Select2 */
+
+@import "../plugins/select2/css/select2.min.css";
+
+/* Simpleline */
+
+@import "../plugins/simpleline/simple-line-icons.css";
+
+/*Sticky Note*/
+
+@import "../plugins/stickynote/sticky.css";
+
+/* SummerNote */
+
+@import "../plugins/summernote/summernote-bs4.min.css";
+
+/* Toastr */
+
+@import "../plugins/toastr/toatr.css";
+
+/* Twitter - Bootstrap - Wizard */
+
+@import "../plugins/twitter-bootstrap-wizard/form-wizard.css";
+

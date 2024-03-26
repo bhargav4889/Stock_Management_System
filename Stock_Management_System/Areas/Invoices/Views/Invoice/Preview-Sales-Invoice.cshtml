@@ -1,0 +1,57 @@
+﻿@model Stock_Management_System.Areas.Invoices.Models.MutipleModel
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Preview Sale Invoice</h4>
+            <h6>Preview Invoices</h6>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="page-btn">
+                    <a role="button" asp-action="Create_Sell_Invoice" asp-controller="Invoice" class="btn btn-added">
+                        <img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice
+                    </a>
+                </div>
+            </div>
+            @if (Model != null)
+            {
+                <div class="col">
+                    <div class="page-btn">
+                        <a href="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)"
+                           download="@($"{Model.sales_Invoice?.PartyName?.Replace(" ", "_")}_{Model.sales_Invoice?.ProductName?.Replace(" ", "_")}_Invoice.pdf")"
+                           class="btn btn-added">
+                            <img src="~/img/icons/pdf.svg" alt="img" class="me-1">Download Invoice
+                        </a>
+                    </div>
+                </div>
+            }
+        
+        </div>
+
+
+
+
+
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="pdf-viewer-container" class="d-flex justify-content-center align-items-center">
+                <iframe id="pdf-viewer" src="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)" width="900" height="900"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div id="download-button" class="download-btn text-center">
+    @if (Model != null)
+    {
+        <!-- Anchor tag styled as a button for download -->
+        <a href="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)"
+           download="@($"{Model.sell_Invoice?.Party_Name?.Replace(" ", "_")}_{Model.sell_Invoice?.GrainTypeName?.Replace(" ", "_")}_Invoice.pdf")"
+           class="btn btn-outline-success">
+            <i class="bi bi-download"></i> Download
+        </a>
+    }
+</div>*@

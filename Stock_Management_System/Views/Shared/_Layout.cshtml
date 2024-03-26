@@ -1,0 +1,296 @@
+﻿@using Stock_Management_System.BAL;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <meta name="description" content="POS - Bootstrap Admin Template">
+    <meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern,  html5, responsive">
+    <meta name="author" content="Dreamguys - Bootstrap Admin Template">
+    <meta name="robots" content="noindex, nofollow">
+    <title>@ViewData["Title"]</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="~/img/Icon.ico">
+
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
+
+    <link rel="stylesheet" href="~/css/animate.css">
+
+
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" />
+
+
+    <link rel="stylesheet" href="~/css/dataTables.bootstrap4.min.css">
+
+    <link rel="stylesheet" href="~/plugins/fontawesome/css/fontawesome.min.css">
+    <link rel="stylesheet" href="~/plugins/fontawesome/css/all.min.css">
+
+
+    <link rel="stylesheet" href="~/css/style.css">
+
+    <link rel="stylesheet" href="~/plugins/toastr/toatr.css" />
+
+
+    <link rel="stylesheet" href="~/css/removeincrementdecrement.css" />
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+    <div class="main-wrapper">
+
+        <div class="header">
+
+            <div id="sidebar" class="header-left active">
+                <a asp-action="Index" asp-controller="Home" class="logo">
+                    <img id="logo" src="~/img/LOGO_MAIN.png" alt="" class="img-fluid" style="width: auto; display: inline-block;">
+                </a>
+
+                <a asp-action="Index" asp-controller="Home" class="logo-small">
+                    <img src="~/img/LOGO_MAIN.png" alt="" style="width:auto">
+                </a>
+
+                <a id="toggle_btn" href="javascript:void(0);">
+                </a>
+            </div>
+
+            <a id="mobile_btn" class="mobile_btn" href="#sidebar">
+                <span class="bar-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+
+
+            <div class="container-fluid">
+                <ul class="nav user-menu justify-content-end">
+
+                    <!-- Current Time with Timer Icon -->
+                    <li class="nav-item align-self-center me-3">
+                        <i class="fa fa-clock-o" aria-hidden="true" style="color:black; margin-right: 5px;"></i>
+                        <span id="current-time" style="color:black; font-weight:800; font-family:'Times New Roman', Times, serif; font-size: 18px;">00:00:00 AM</span>
+                    </li>
+
+
+                    <!-- Profile Menu or Icon -->
+                    <li class="nav-item dropdown has-arrow main-drop">
+                        <a href="~/profile-menu" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
+                            <div class="avatar avatar-lg">
+                                <img class="avatar-img rounded-circle" alt="User Image" src="~/img/profile.png">
+                            </div>
+                            <span style="color:black; font-style:initial; font-weight:bolder">Hi, @CV.Username()</span>
+                        </a>
+                        <div class="dropdown-menu menu-drop-user">
+                            <div class="profilename">
+                                <div class="profileset">
+                                    <span class="user-img">
+                                        <img src="~/img/profile.png" alt="">
+                                        <span class="status online"></span>
+                                    </span>
+                                    <div class="profilesets">
+                                        <h6>Bhargav</h6>
+                                        <h5>Admin</h5>
+                                    </div>
+                                </div>
+                                <hr class="m-0">
+                                <a class="dropdown-item" asp-action="Profile" asp-controller="Manage">
+                                    <i class="me-2" data-feather="user"></i> My Profile
+                                </a>
+                                <hr class="m-0">
+                                <a class="dropdown-item logout pb-0" asp-action="Logout" asp-controller="Login">
+                                    <img src="~/img/icons/log-out.svg" class="me-2" alt="img">Logout
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+
+
+            <div class="dropdown mobile-user-menu">
+                <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" asp-action="Profile" asp-controller="Manage">My Profile</a>
+                    @* <a class="dropdown-item" href="generalsettings.html">Settings</a>*@
+                    <a class="dropdown-item" asp-action="Logout" asp-controller="Login">Logout</a>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-inner slimscroll">
+                <div id="sidebar-menu" class="sidebar-menu">
+                    <ul>
+                        <li>
+                            <a asp-action="Dashboard" asp-controller="Manage"><img src="~/img/icons/dashboard.svg" alt="img"><span> Dashboard</span> </a>
+                        </li>
+                        <li class="submenu">
+                            <a href="~/Stocks"><img src="~/img/icons/product.svg" alt="img"><span> Stock</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a asp-action="Add_Stock" asp-controller="Stock">Add Stock</a></li>
+                                <li><a asp-action="Manage_Stocks" asp-controller="Stock">Stock List</a></li>
+
+
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a href="~/Sales"><img src="~/img/icons/sales1.svg" alt="img"><span> Sales</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                @* <li><a href="saleslist.html">Sales List</a></li>
+                                <li><a href="pos.html">Create Sale</a></li>*@
+                                <li><a asp-action="Create_Sales_Invoice" asp-controller="Invoice">Create Invoice Sale</a></li>
+                                <li><a asp-action="History_Sales_Invoice" asp-controller="Invoice">History Invoice Sale</a></li>
+
+                            </ul>
+                        </li>
+                        <li class="submenu">
+                            <a href="~/Purchase"><img src="~/img/icons/purchase1.svg" alt="img"><span> Purchase</span> <span class="menu-arrow"></span></a>
+                            <ul>
+
+                                @* <li><a href="addpurchase.html">Purchase List</a></li>
+                                <li><a href="importpurchase.html">Add Purchase</a></li>*@
+                                <li><a asp-action="Create_Purchase_Invoice" asp-controller="Invoice">Create Purchase Invoice</a></li>
+                                <li><a asp-action="History_Purchase_Invoice" asp-controller="Invoice">History Purchase Invoice</a></li>
+                            </ul>
+                        </li>
+                        @* <li class="submenu">
+                        <a href="javascript:void(0);"><img src="~/img/icons/expense1.svg" alt="img"><span> Expense</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                        <li><a href="expenselist.html">Expense List</a></li>
+                        <li><a href="createexpense.html">Add Expense</a></li>
+
+                        </ul>
+                        </li>*@
+
+                        <li class="submenu">
+                            <a href="~/Customers"><img src="~/img/icons/users1.svg" alt="img"><span> Customers</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a asp-action="Manage_Customers_Account" asp-controller="Account">Customer List</a></li>
+                                <li><a asp-action="Create_Customer_Account" asp-controller="Account">Add Customer </a></li>
+                            </ul>
+                        </li>
+
+
+
+                        <li class="submenu">
+                            <a href="~/Payments"><img src="~/img/icons/dollar-square.svg" alt="img"><span> Payments</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a asp-action="Pending_Payments" asp-controller="Payment">Pending Payments</a></li>
+                                <li><a asp-action="Remain_Payments" asp-controller="Payments">Remain Payments</a></li>
+                                <li><a asp-action="Success_Payments" asp-controller="Payments">Success Payments</a></li>
+                            </ul>
+                        </li>
+
+                       
+
+                        <li class="submenu">
+                            <a href="~/Remainder"><img src="~/img/icons/notification-bing.svg" alt="img"><span> Remainder</span> <span class="menu-arrow"></span></a>
+                            <ul>
+                                <li><a asp-action="Create_Remainder" asp-controller="Remainder">Create Reminder</a></li>
+                            </ul>
+                           
+                        </li>
+
+
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div id="global-loader" style="align-content:center">
+            <div class="whirly-loader"></div>
+            
+        </div>
+
+
+        <div class="page-wrapper" style="background-color:whitesmoke;">
+
+
+
+
+            @RenderBody()
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <script src="~/js/jquery-3.6.0.min.js"></script>
+
+    <script src="~/js/feather.min.js"></script>
+
+    <script src="~/js/jquery-ui.min.js" asp-append-version="true"></script>
+
+    <script src="~/js/jquery.slimscroll.min.js"></script>
+
+    <script src="~/plugins/select2/js/select2.min.js"></script>
+    <script src="~/plugins/select2/js/custom-select.js"></script>
+
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/dataTables.bootstrap4.min.js"></script>
+
+    <script src="~/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+
+
+    <script src="~/js/script.js"></script>
+
+    <script src="~/plugins/apexchart/chart-data.js"></script>
+    <script src="~/plugins/apexchart/apexcharts.min.js"></script>
+
+    <script src="~/plugins/toastr/toastr.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+
+    <script src="~/js/moment.min.js"></script>
+
+    <script src="~/js/currenttimeshowfun.js"></script>
+
+    <script src="~/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/_framework/aspnetcore-browser-refresh.js"></script>
+
+
+
+
+</body>
+
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+@await RenderSectionAsync("Scripts", required: false)
+
+
+</html>

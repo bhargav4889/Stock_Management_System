@@ -1,0 +1,153 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Purchase Invoice Details";
+
+    DateTime? invoiceDate = Model.PurchaseInvoiceDate;
+    DateTime? onlyDate = invoiceDate?.Date;
+
+    string? formattedDate = onlyDate?.ToString("dd-MM-yyyy");
+
+
+}
+@using Stock_Management_System.UrlEncryption;
+@model Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model;
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .scrollable-table {
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+</style>
+
+<div class="container">
+    <br />
+    <div class="row">
+        <!-- Left side - Back link -->
+        <div class="col-2">
+            <a asp-action="History_Purchase_Invoice" asp-controller="Invoice" class="text-decoration-none">
+                <i class="fa fa-arrow-left" style="color:green; transform: scale(1.25);"> </i>
+            </a>
+        </div>
+
+        <!-- Center - Invoice Details -->
+        <div class="col-8 text-center">
+            <h5>Invoice Details</h5>
+        </div>
+
+        <!-- Right side - PDF icon button -->
+        <div class="col-2 text-end">
+            <ul class="list-unstyled d-flex justify-content-end">
+                <li>
+                    <form asp-action="PDF_Preview_Download" asp-controller="Invoice" method="get">
+                        <input type="hidden" value="@Model.PurchaseInvoiceId" name="Invoice_ID" />
+                        <button type="submit" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview/Download PDF" style="transform: scale(1.15);">
+                            <img src="~/img/icons/pdf.svg" alt="img">
+                        </button>
+                    </form>
+                </li>
+                <li>
+                    <form asp-action="Update_Purchase_Invoice" asp-controller="Invoice" method="get">
+                        <input type="hidden" value=@UrlEncryptor.Encrypt(Convert.ToString(Model.PurchaseInvoiceId)) name="Invoice_ID" />
+                        <button type="submit" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Details" style="transform: scale(1.15);">
+                            <img src="~/img/icons/edit.svg" alt="img">
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+
+    <br />
+    <div class="table-responsive scrollable-table table-responsive-sm">
+        <table class="table">
+
+            <tr>
+                <th>Invoice ID</th>
+                <td>@Model.PurchaseInvoiceId</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>@formattedDate</td>
+            </tr>
+            <tr>
+                <th>Farmer Name</th>
+                <td>@Model.CustomerName</td>
+            </tr>
+            <tr>
+                <th>Product Name</th>
+                <td>@Model?.ProductName</td>
+            </tr>
+            <tr>
+                <th>Bag</th>
+                <td>@(string.IsNullOrWhiteSpace(Convert.ToString(Model?.Bags)) ? "--" : Model?.Bags)</td>
+            </tr>
+            <tr>
+                <th>Bag Per Kg</th>
+                <td>@(string.IsNullOrWhiteSpace(Convert.ToString(Model?.BagPerKg)) ? "--" : Model?.BagPerKg)</td>
+            </tr>
+            <tr>
+                <th>Weight</th>
+                <td>@Model?.TotalWeight</td>
+            </tr>
+            <tr>
+                <th>Product Price(₹)</th>
+                <td>@Model?.ProductPrice</td>
+            </tr>
+            <tr>
+                <th>Total Price(₹)</th>
+                <td>@Model?.TotalPrice</td>
+            </tr>
+            <tr>
+                <th>Vehicle Type</th>
+                <td>@Model?.VehicleName</td>
+            </tr>
+            <tr>
+                <th>Vehicle No.</th>
+                <td>@Model?.VehicleNo</td>
+            </tr>
+            <tr>
+                <th>Driver Name</th>
+                <td>@Model?.DriverName</td>
+            </tr>
+            <tr>
+                <th>Tolat Name</th>
+                <td>@Model?.TolatName</td>
+            </tr>
+            <tr>
+                <th>Stock Grade</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.ProductGrade) ? "--" : Model?.ProductGrade)</td>
+            </tr>
+
+            @*<tr>
+            <th>Recreate Invoice PDF</th>
+            <td>
+            <form asp-action="PDF_Preview_Download" asp-controller="Invoice" method="get">
+            <input type="hidden" value="@Model?.INVOICE_ID" name="id" />
+            <button class="btn btn-outline-primary" type="submit">PDF</button>
+            </form>
+
+            </td>
+            </tr>*@
+
+
+
+        </table>
+    </div>
+</div>

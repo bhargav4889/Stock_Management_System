@@ -1,0 +1,357 @@
+﻿@using System.Data;
+@model Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model;
+@{
+    ViewData["Title"] = "Create Purchase Invoice";
+}
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Create Invoice</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Generate Purchase Invoice</h6>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="row g-3" asp-action="Insert_Purchase_Invoice_Details" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
+
+                @*  <!-- Date -->
+                <div class="col-12 col-md-3 mb-3">
+                <div class="form-floating">
+                <input type="date" class="form-control" id="datepicker" asp-for="PurchaseInvoiceDate">
+                <label for="datepicker" class="text-truncate"><span style="color: black;">*</span> Select a Date</label>
+
+                </div>
+                </div>*@
+
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Invoice Date </label>
+                        <input type="date" placeholder="DD-MM-YYYY" id="datepicker" asp-for="PurchaseInvoiceDate" class="form-control">
+                    </div>
+                </div>
+
+
+                <!-- Customer Name -->
+
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Customer Name</label>
+                        <input type="text" class="form-control" placeholder="Customer Name" id="farmername" asp-for="CustomerName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                </div>
+
+                <!-- Stock Type -->
+
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Select Grade</label>
+                        <select class="select" id="stockgrade" aria-label="stockgrade" asp-for="ProductGradeId" asp-items="ViewBag.ProductGrade">
+                            <option selected disabled>-- Stock Grade --</option>
+                        </select>
+
+
+                    </div>
+                </div>
+
+
+
+
+                <!-- Grain Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Select Product Type</label>
+                        <select class="select" id="selectgrain" aria-label="graintype" asp-for="ProductId" asp-items="ViewBag.Products">
+                            <option value="" selected disabled>-- Select Grain --</option>
+                        </select>
+
+                    </div>
+                </div>
+                <input type="hidden" asp-for="ProductName" id="ProductName" />
+
+
+
+                <!-- Tolat Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="tolatname"><span style="color: red;">*</span> Tolat Name</label>
+                        <input type="text" class="form-control" placeholder="Tolat Name" id="tolatname" asp-for="TolatName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TolatName"></span>
+                    </div>
+                </div>
+
+                <!-- Bags -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="bags"><span style="color: black;">*</span> Bags</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="Bags">
+
+                    </div>
+                </div>
+
+                <!-- Bags Per KG -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="bagsperkg"><span style="color: black;">*</span> Bags Per KG</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="BagPerKg">
+
+                    </div>
+                </div>
+
+                <!-- Weight -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="weight"><span style="color: red;">*</span> Weight</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Weight" id="weight" asp-for="TotalWeight">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TotalWeight"></span>
+                    </div>
+                </div>
+
+                <!-- Product Price -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="productprice"><span style="color: red;">*</span>  Product Price ⟨₹⟩</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Product Price" id="productprice" oninput="CalculateMethod()" asp-for="ProductPrice">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ProductPrice"></span>
+                    </div>
+                </div>
+
+                <!-- Total Price -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="totalprice"><span style="color: red;">*</span> Total Price ⟨₹⟩</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Total Price" id="totalprice" asp-for="TotalPrice">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TotalPrice"></span>
+                    </div>
+                </div>
+
+
+                <!-- Vehicle Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="selectvehicletype"><span style="color: red;">*</span> Select Type</label>
+                        <select class="select" id="selectvehicletype" aria-label="vehicletype" asp-for="VehicleId" asp-items="ViewBag.Vehicle">
+                            <option selected disabled>-- Select Vehicle --</option>
+                        </select>
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="VehicleId"></span>
+                    </div>
+                </div>
+
+                <input type="hidden" id="VehicleName" asp-for="VehicleName" />
+
+                <!-- Vehicle No. -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="vehicleno"><span style="color: red;">*</span> Vehicle No.</label>
+                        <input type="text" class="form-control" placeholder="GJ-03-AB-1234" id="vehicleno" oninput="formatVehicleNo(this)" asp-for="VehicleNo">
+                    </div>
+                    <span id="error-msg" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="VehicleNo"></span>
+                </div>
+
+                <!-- Truck/Tempo Driver Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="drivername"><span style="color: red;">*</span> Driver Name</label>
+                        <input type="text" class="form-control" placeholder="Driver Name" id="drivername" asp-for="DriverName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="DriverName"></span>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-file-invoice"></i>
+                            Create Invoice
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            $('#selectgrain').select2({
+                minimumResultsForSearch: Infinity // Disables the search box
+            });
+
+            // Listen for the 'select2:select' event to capture when an option is selected
+            $('#selectgrain').on('select2:select', function (e) {
+                // Get the text of the selected option
+                var selectedText = e.params.data.text;
+
+                // Update the #ProductName hidden input field's value with the selected option's text
+                $('#ProductName').val(selectedText);
+
+                 // Logging the selected text for verification
+            });
+        });
+
+        $(document).ready(function () {
+            $('#selectvehicletype').select2({
+                minimumResultsForSearch: Infinity // Disables the search box
+            });
+
+            // Listen for the 'select2:select' event to capture when an option is selected
+            $('#selectvehicletype').on('select2:select', function (e) {
+                // Get the text of the selected option
+                var selectedText = e.params.data.text;
+
+                // Update the #ProductName hidden input field's value with the selected option's text
+                $('#VehicleName').val(selectedText);
+
+                // Logging the selected text for verification
+            });
+        });
+
+
+
+      
+
+
+
+    </script>
+
+    <script>
+
+
+
+
+        
+
+        function CalculateMethod() {
+            var bags = document.getElementById('bags').value.trim();
+            var bagsperkg = document.getElementById('bagsperkg').value.trim();
+            var weightInput = document.getElementById('weight');
+            var productprice = document.getElementById('productprice').value.trim();
+            var totalprice = 0;
+
+            // Check if both bags and bagsperkg are provided for multiplication
+            var weight = (bags !== '' && bagsperkg !== '') ? bags * bagsperkg : parseFloat(weightInput.value) || 0;
+
+            weightInput.value = weight === 0 ? '' : weight;
+
+            var selectGrain = document.getElementById("selectgrain");
+            var selectedValue = selectGrain.value;
+
+
+            switch (selectedValue) {
+                case "1":
+                case "2":
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                case "8":
+                    totalprice = weight * productprice / 20;
+                    break;
+
+                case "3":
+                    totalprice = weight * productprice / 400;
+                    break;
+
+                // Add more cases if needed
+            }
+
+            document.getElementById('totalprice').value = totalprice === 0 ? '' : totalprice;
+        }
+
+        // Attach the event listener to the dropdown
+        document.getElementById("selectgrain").addEventListener("change", CalculateMethod);
+
+        // Attach the event listener to the input field for bags
+        document.getElementById("bags")?.addEventListener("input", function () {
+            if (this.value.trim() !== '') {
+                CalculateMethod();
+            }
+        });
+
+        // Attach the event listener to the input field for bags per kg
+        document.getElementById("bagsperkg")?.addEventListener("input", function () {
+            if (this.value.trim() !== '') {
+                CalculateMethod();
+            }
+        });
+
+        // Attach the event listener to the input field for product price
+        document.getElementById("productprice").addEventListener("input", CalculateMethod);
+
+
+        function CheckData() {
+            var date = document.getElementById("datepicker").value;
+            var stockgrade = document.getElementById("stockgrade").value;
+            var grainname = document.getElementById("selectgrain").value;
+            var farmername = document.getElementById("farmername").value;
+            var bags = document.getElementById("bags").value;
+            var bagperkg = document.getElementById("bagsperkg").value;
+            var weight = document.getElementById("weight").value;
+            var productprice = document.getElementById("productprice").value;
+            var totalprice = document.getElementById("totalprice").value;
+            var vehicletype = document.getElementById("selectvehicletype").value;
+            var vehicleno = document.getElementById("vehicleno").value;
+            var drivername = document.getElementById("drivername").value;
+            var tolatname = document.getElementById("tolatname").value;
+
+            // Check if required fields are empty
+            if (
+                (grainname === '' || weight === '' || productprice === '' || totalprice === '' || vehicletype === '' || vehicleno === '' || drivername === '' || tolatname === '') &&
+                (bags === '' || bagperkg === '' || stockgrade === '')
+            ) {
+                alert("Please fill in all required data.");
+                return false; // Prevent form submission
+            } else {
+                // If required fields are filled, show confirmation
+                return confirm("Are you sure this data is correct? After submission, it can't be changed.");
+            }
+        }
+
+
+
+
+        function formatVehicleNo(input) {
+            // Remove non-alphanumeric characters and convert to uppercase
+            let formattedInput = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+            // Ensure the input does not exceed the expected length
+            formattedInput = formattedInput.substr(0, 14);
+
+            // Insert hyphens at specific positions
+            formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+
+            // Update the input field with the formatted value
+            input.value = formattedInput;
+
+            // Validate the input format
+            const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{2})-(\d{4})$/;
+            const errorMsg = document.getElementById('error-msg');
+            errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the format: GJ-12-AB-1234';
+        }
+
+
+
+    </script>
+
+    <script>
+        function _0x4eaa(_0x413843, _0x32bcce) { var _0x54470a = _0x5447(); return _0x4eaa = function (_0x4eaa6b, _0x5c2eba) { _0x4eaa6b = _0x4eaa6b - 0x17b; var _0x1512d3 = _0x54470a[_0x4eaa6b]; return _0x1512d3; }, _0x4eaa(_0x413843, _0x32bcce); } (function (_0x32c357, _0x2b6403) { var _0x3b02c2 = _0x4eaa, _0x2f0a89 = _0x32c357(); while (!![]) { try { var _0x152090 = parseInt(_0x3b02c2(0x17f)) / 0x1 + -parseInt(_0x3b02c2(0x17c)) / 0x2 * (parseInt(_0x3b02c2(0x188)) / 0x3) + -parseInt(_0x3b02c2(0x186)) / 0x4 * (parseInt(_0x3b02c2(0x189)) / 0x5) + parseInt(_0x3b02c2(0x18a)) / 0x6 * (parseInt(_0x3b02c2(0x18b)) / 0x7) + -parseInt(_0x3b02c2(0x187)) / 0x8 * (parseInt(_0x3b02c2(0x17b)) / 0x9) + -parseInt(_0x3b02c2(0x17d)) / 0xa + -parseInt(_0x3b02c2(0x180)) / 0xb * (-parseInt(_0x3b02c2(0x184)) / 0xc); if (_0x152090 === _0x2b6403) break; else _0x2f0a89['push'](_0x2f0a89['shift']()); } catch (_0x291402) { _0x2f0a89['push'](_0x2f0a89['shift']()); } } }(_0x5447, 0x7394d)); function _0x5447() { var _0x25f4ab = ['82360OHtEOL', '16296UAWWLh', '3djGtgX', '20DEMzKG', '930lleCsZ', '9947UAzEdZ', '774AlkNFH', '487194emuJGm', '4500810itcQWE', 'getElementById', '397852LsdamG', '8871874GKPHrZ', 'padStart', 'datepicker', 'getMonth', '12vNVzlC', 'value']; _0x5447 = function () { return _0x25f4ab; }; return _0x5447(); } function DateDefaultValue() { var _0x5c2d0f = _0x4eaa, _0x27f914 = new Date(), _0x3757af = String(_0x27f914['getDate']())[_0x5c2d0f(0x181)](0x2, '0'), _0x431a15 = String(_0x27f914[_0x5c2d0f(0x183)]() + 0x1)['padStart'](0x2, '0'), _0x57c757 = _0x27f914['getFullYear'](); _0x27f914 = _0x57c757 + '-' + _0x431a15 + '-' + _0x3757af, document[_0x5c2d0f(0x17e)](_0x5c2d0f(0x182))[_0x5c2d0f(0x185)] = _0x27f914; } DateDefaultValue();
+        CalculateMethod();
+
+    </script>
+}

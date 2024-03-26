@@ -1,0 +1,113 @@
+﻿@model Stock_Management_System.Areas.Accounts.Models.Customer_Model;
+@{
+    ViewData["Title"] = "Create Customer";
+}
+
+
+
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Update Customer</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Update Customer Info</h6>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+
+            <form class="row g-3" asp-action="Update_Customer_Info_Details" asp-controller="Account" onsubmit="return CheckData()" method="post">
+
+                <input type="hidden" value="@Model.CustomerId" name="CustomerId" />
+
+                <!-- Customer Name -->
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="Farmer" id="farmer" asp-for="CustomerName" value="@Model.CustomerName" oninput="this.value = this.value.toUpperCase()">
+                        <label for="farmer"><span style="color: red;">*</span> Enter Customer Name</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="CustomerName"></span>
+                        <span id="newCustomerMessage" style="color:black">* Exist Customer</span>
+                    </div>
+                </div>
+
+
+                <!-- Customer Type -->
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="CTType" id="cttype" asp-for="CustomerType" value="@Model.CustomerType" oninput="this.value = this.value.toUpperCase()">
+                        <label for="ctname"><span style="color: red;">*</span> New Customer Type</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="CustomerType"></span>
+                    </div>
+                </div>
+
+                <!-- Customer City -->
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="CTCity" id="customercity" value="@Model.CustomerAddress" asp-for="CustomerAddress" oninput="this.value = this.value.toUpperCase()">
+                        <label for="ctname"><span style="color: red;">*</span> New Customer City</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="CustomerAddress"></span>
+                    </div>
+                </div>
+
+                <!-- Customer Contact_No -->
+                <div class="col-12 col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="contactno" value="@Model.CustomerContact" asp-for="CustomerContact" id="contactno">
+                        <label for="bags"><span style="color: red;">*</span> Enter Customer No</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="CustomerContact"></span>
+                    </div>
+                </div>
+
+
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-user-plus"></i>
+                            Update Customer
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    function CheckData() {
+        var name = document.getElementById('farmer').value;
+        var ctype = document.getElementById('cttype').value;
+        var ccity = document.getElementById('customercity').value;
+        var cno = document.getElementById('contactno').value;
+
+        if (name === '' || ctype === '' || ccity === '' || cno === '') {
+            // Use Toastr for a more styled notification
+            toastr.error('All Details Required.', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-bottom-right', // Set position to bottom right
+                preventDuplicates: true,
+                showDuration: '300',
+                hideDuration: '1000',
+                timeOut: '5000',
+                extendedTimeOut: '1000',
+                showEasing: 'swing',
+                hideEasing: 'linear',
+                showMethod: 'fadeIn',
+                hideMethod: 'fadeOut',
+
+            });
+        }
+    }
+</script>
+

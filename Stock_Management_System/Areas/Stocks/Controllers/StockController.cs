@@ -1,0 +1,438 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+using System.Data;
+using Stock_Management_System.Areas.Stocks.Models;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
+using System.Text;
+using Newtonsoft.Json;
+using Stock_Management_System.UrlEncryption;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using ClosedXML.Excel;
+using Stock_Management_System.API_Services;
+using Stock_Management_System.All_DropDowns;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Customers_Model = Stock_Management_System.Areas.Accounts.Models.Customer_Model;
+using Stock_Management_System.Areas.Accounts.Models;
+
+namespace Stock_Management_System.Areas.Stocks.Controllers
+{
+
+    [Area("Stocks")]
+    [Route("~/[controller]/[action]")]
+    public class StockController : Controller
+    {
+        public IConfiguration Configuration;
+
+        Uri baseaddress = new Uri("https://localhost:7024/api");
+
+        public readonly HttpClient _Client;
+
+
+        private readonly Api_Service api_Service = new Api_Service();
+
+
+        public StockController(IConfiguration configuration)
+        {
+            Configuration = configuration;
+
+            _Client = new HttpClient();
+            _Client.BaseAddress = baseaddress;
+
+
+
+        }
+
+
+        #region Method : Dropdown Function
+
+        public async Task All_Dropdowns_Call()
+        {
+            All_DropDown_Model all_DropDown_Model = new All_DropDown_Model();
+
+            All_DropDowns_Class all_DropDowns_Class = new All_DropDowns_Class();
+
+            all_DropDown_Model = await all_DropDowns_Class.Get_All_DropdDowns_Data();
+
+
+
+
+
+            if (all_DropDown_Model != null)
+            {
+                ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
+
+                ViewBag.ProductGrade = new SelectList(all_DropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
+                ViewBag.Vehicle = new SelectList(all_DropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
+            }
+
+
+
+
+        }
+
+        #endregion
+
+
+        #region Method : Common Function
+
+        public void SetData_From_Session_For_Pdf_And_Excel(object itmes, string SetSessionStringName)
+        {
+            var serializedSalesInvoices = JsonConvert.SerializeObject(itmes);
+            HttpContext.Session.SetString(SetSessionStringName, serializedSalesInvoices);
+        }
+
+
+
+
+        public List<T> GetData_From_Session_For_Pdf_And_Excel<T>(string SessionStringName)
+        {
+            var serializedSalesInvoices = HttpContext.Session.GetString(SessionStringName);
+            if (string.IsNullOrEmpty(serializedSalesInvoices))
+            {
+                throw new InvalidOperationException($"{SessionStringName} data not found in session.");
+            }
+            return JsonConvert.DeserializeObject<List<T>>(serializedSalesInvoices);
+        }
+
+        #endregion
+
+
+        #region Method : Add Stock Function 
+
+        public async Task<IActionResult> Add_Stock()
+        {
+
+            await All_Dropdowns_Call();
+
+            return View();
+        }
+
+
+        public async Task<IActionResult> Add_Stock_Details(Customers_Stock_Combined_Model customers_Stock_Combined_Model)
+        {
+            // Assuming CustomerName is a unique identifier for simplicity
+            Customer_Model Customer_Info = Existing_Customer_Details(customers_Stock_Combined_Model.Customers.CustomerId);
+
+            if (Customer_Info == null)
+            {
+                Customer_Info = new Customer_Model
+                {
+                    CustomerName = customers_Stock_Combined_Model.Customers.CustomerName,
+                    CustomerType = customers_Stock_Combined_Model.Customers.CustomerType,
+                    CustomerAddress = customers_Stock_Combined_Model.Customers.CustomerAddress,
+                    CustomerContact = customers_Stock_Combined_Model.Customers.CustomerContact,
+                };
+
+                // Await the method to ensure we get the updated customer details back
+                await Add_New_Customer(Customer_Info);
+            }
+
+            // Update the model with the full details of the newly added or existing customer
+            Customer_Model New_Customer_Info = Existing_Customer_Details(Customer_Info.CustomerId);
+
+            New_Customer_Info = customers_Stock_Combined_Model.Customers;
+
+
+            var dataObject = new
+            {
+                purchase_Stock = customers_Stock_Combined_Model.Insert_Purchase_Stock,
+                customers_Model = customers_Stock_Combined_Model.Customers
+            };
+
+            // Serialize the anonymous object to JSON
+            var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(dataObject);
+            var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+            // Directly post the model
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/Insert_Purchase_Stock", content);
+            if (response.IsSuccessStatusCode)
+            {
+
+                return RedirectToAction("Manage_Stocks");
+            }
+            else
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return StatusCode((int)response.StatusCode, responseContent);
+            }
+
+        }
+
+
+        #endregion
+
+
+        #region Method : Update Stock 
+
+        public async Task<IActionResult> Update_Stock(string TN_ID)
+        {
+
+            await All_Dropdowns_Call();
+
+
+
+            Customers_Stock_Combined_Model _Stock_Combined_Model = new Customers_Stock_Combined_Model();
+
+
+            _Stock_Combined_Model = await api_Service.Model_Of_Data_Display<Customers_Stock_Combined_Model>("Stock/Get_Purchase_Stock_By_Id", Convert.ToInt32(UrlEncryptor.Decrypt(TN_ID)));
+
+
+
+            return View(_Stock_Combined_Model);
+        }
+
+
+        #endregion
+
+
+        #region Method  : Get Customer Details From AutoComplete
+        public async Task<JsonResult> Get_Customer_Data(string CustomerName)
+        {
+            // Directly fetch the customer models using the provided name.
+            List<Customers_Model> customerModels = await fetch_customer_name(CustomerName);
+
+            // Assuming customerModels is already a List<Customer_Model> as fetched and deserialized from the API response.
+            // No need to iterate through a DataTable.
+
+            // Return the customer models as a JSON result.
+            return Json(customerModels);
+        }
+
+        private async Task<List<Customers_Model>> fetch_customer_name(string CustomerName)
+        {
+            List<Customers_Model> customer_Models = new List<Customers_Model>();
+
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                var dataObject = jsonObject.data;
+                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+                customer_Models = JsonConvert.DeserializeObject<List<Customers_Model>>(extractedDataJson);
+            }
+
+            return customer_Models;
+        }
+
+
+
+
+
+
+
+
+
+        #endregion
+
+
+        #region Method : Manage Stock
+
+
+
+        public async Task<IActionResult> Manage_Stocks()
+        {
+
+
+
+
+            await All_Dropdowns_Call();
+
+
+
+            List<Purchase_Stock> stockModels = await api_Service.List_Of_Data_Display<Purchase_Stock>("Stock/Purchase_Stocks");
+
+            SetData_From_Session_For_Pdf_And_Excel(stockModels, "ListOfStocksData");
+
+            return View(stockModels);
+        }
+
+
+        #endregion
+
+
+        #region Method : Check Customer Exist Or Not 
+
+        private Customer_Model CHECK_CUSTOMER_INFO_IN_SYSTEM(int Customer_ID)
+        {
+
+
+
+            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}").Result;
+
+            Customer_Model Customer_Info = new Customer_Model();
+
+            if (response.IsSuccessStatusCode)
+            {
+
+
+                string data = response.Content.ReadAsStringAsync().Result;
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                var DataObject = jsonObject.data;
+                var extractedDtaJson = JsonConvert.SerializeObject(DataObject, Formatting.Indented);
+                Customer_Info = JsonConvert.DeserializeObject<Customer_Model>(extractedDtaJson);
+                return Customer_Info;
+            }
+            else
+            {
+                return null;
+            }
+
+
+        }
+
+
+        public Customer_Model Existing_Customer_Details(int Customer_ID)
+        {
+            Customer_Model Existing_Customer_Info = CHECK_CUSTOMER_INFO_IN_SYSTEM(Customer_ID);
+
+            return Existing_Customer_Info;
+
+
+
+        }
+
+        [HttpPost]
+        public async Task<Customer_Model> Add_New_Customer(Customer_Model customerModel)
+        {
+            var customerData = new
+            {
+                cT_Name = customerModel.CustomerName,
+                cT_City = customerModel.CustomerAddress,
+                cT_Type = customerModel.CustomerType,
+                cT_Phone_No = customerModel.CustomerContact
+            };
+
+            var jsonContent = JsonConvert.SerializeObject(customerData);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", stringContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Parse the JSON response to update the customerModel with the new ID and any other returned details
+                var responseString = await response.Content.ReadAsStringAsync();
+                var updatedCustomer = JsonConvert.DeserializeObject<Customer_Model>(responseString);
+
+                // Assuming the API correctly populates and returns the updated customer details including CustomerId
+                customerModel.CustomerId = updatedCustomer.CustomerId;
+                // Update other fields as necessary
+            }
+
+
+            return customerModel;
+        }
+
+
+
+
+        #endregion
+
+
+        #region Method : Delete Stock
+
+        public IActionResult Delete_Stock(string TN_ID)
+        {
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Stock/DELETE_STOCK?TN_ID={UrlEncryptor.Decrypt(TN_ID)}").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Message"] = "Delete Successfully !";
+            }
+            else
+            {
+                TempData["Message"] = "Error. Please try again.";
+            }
+
+            return RedirectToAction("Manage_Stocks");
+        }
+
+
+        #endregion
+
+
+        #region Method : Stock Details Show By Stock ID 
+
+
+
+
+        public async Task<IActionResult> Added_Stock_Details(string TN_ID)
+        {
+            if (HttpContext.Request.Headers["Referer"].ToString() == "")
+            {
+                return RedirectToAction("Manage_Stocks");
+            }
+
+
+
+            Purchase_Stock purchase_Stock = new Purchase_Stock();
+
+
+            purchase_Stock = await api_Service.Model_Of_Data_Display<Purchase_Stock>("Stock/Get_Purchase_Stock_By_Id", Convert.ToInt32(UrlEncryptor.Decrypt(TN_ID)));
+
+
+
+
+            return View(purchase_Stock);
+
+
+
+
+        }
+
+        #endregion
+
+
+        #region Method : Download Statement PDF & EXCEL 
+        public async Task<IActionResult> Purchase_Stocks_Statement_CreatePDF()
+        {
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_PDF");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/pdf", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate PDF.");
+            }
+        }
+
+
+        public async Task<IActionResult> Export_Stock_List_To_Excel()
+        {
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_EXCEL");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate Excel.");
+            }
+        }
+
+        #endregion
+
+    }
+
+
+
+
+
+
+}

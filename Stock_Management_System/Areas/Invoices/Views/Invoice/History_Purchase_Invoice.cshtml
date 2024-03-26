@@ -1,0 +1,427 @@
+﻿@using System.Data;
+@using Stock_Management_System.UrlEncryption;
+
+@{
+    ViewData["Title"] = "Purchase Invoices";
+}
+
+@model IEnumerable<Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model>
+@section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @* <script>
+        $(document).on("click", "#searchButton", function (event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            console.log("Button Clicked");
+
+            // Get the selected grain name from the dropdown
+            var Grain_Name = $("#graintype").val();
+
+            console.log("Grain Name:", Grain_Name);
+
+            $("tbody tr").each(function (index, element) {
+                var row = $(element);
+                var name = row.find("td:eq(2)").text();
+
+                // Check if the name includes the selected Grain_Name
+                if (!Grain_Name || Grain_Name === null || name.includes(Grain_Name)) {
+                    // Show the row if it meets the search criteria
+                    row.show();
+                } else {
+                    // Hide the row if it doesn't meet the search criteria
+                    row.hide();
+                }
+            });
+
+               // Optionally, you might want to keep the dropdown value
+            // If you want to reset it, uncomment the line below
+            $("#graintype").val('');
+        });
+      </script>*@
+    @*   <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable({
+                // Your DataTable options here
+            });
+
+            $(document).on("click", "#searchButton", function (event) {
+                event.preventDefault(); // Prevent the default form submission behavior
+
+                // Get the selected grain name from the dropdown
+                var Grain_Name = $("#graintype").val();
+
+                // Use DataTable's search API to filter results
+                table.search(Grain_Name).draw(); // This searches all fields and handles pagination
+
+                // Optionally, reset the dropdown if needed
+                $("#graintype").val('');
+            });
+        });
+          </script>*@
+    <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable();
+
+            // Extend DataTable search to include date range filtering
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var startDateInput = $("#startdate").val();
+                var endDateInput = $("#datepickerend").val();
+
+                // If only the end date is specified, set the start date to the first day of the current month
+                var startDate = startDateInput ? moment(startDateInput, "YYYY-MM-DD") : (endDateInput ? moment().startOf('month') : moment().startOf('month'));
+                // If only the start date is specified, set the end date to today's date
+                var endDate = endDateInput ? moment(endDateInput, "YYYY-MM-DD").endOf('day') : (startDateInput ? moment() : moment().endOf('day'));
+
+                var dateColumn = data[0]; // Adjust if date is in another column
+                var date = moment(dateColumn, "DD-MM-YY");
+
+                if (!date.isValid() || !startDate.isValid() || !endDate.isValid()) {
+                    console.error("Invalid date encountered");
+                    return false;
+                }
+
+                return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
+            });
+
+            // Function to apply all search filters and reset date inputs after search
+            function applySearches() {
+                var Name = $("#searchName").val();
+                var VehicleName = $("#vehicletype").val();
+                var selectedVehicle = $("#vehicletype option:selected").text();
+                var TolatName = $("#searchTolatName").val();
+                var selectedGrain = $("#graintype").val();
+                var selectedGrainText = $("#graintype option:selected").text();
+
+                // Clear existing searches
+                table.search('').columns().search('');
+
+                // Apply text input searches
+                table.column(1).search(Name, true, false);
+                table.column(8).search(TolatName, true, false);
+
+                // Apply dropdown searches
+                if (selectedGrain) {
+                    table.column(2).search(selectedGrainText, false, false);
+                }
+
+                if (VehicleName) {
+                    table.column(9).search(selectedVehicle, false, false);
+                }
+
+                // Redraw table to apply all filters
+                table.draw();
+
+                // Reset start and end date values after search
+                $("#startdate, #datepickerend").val('');
+            }
+
+            // Bind the search function to the search button click event
+            $('#searchButton').on('click', function () {
+                applySearches();
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+}
+
+
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Purchase Invoice List</h4>
+            <h6>Manage Invoices Purchases </h6>
+        </div>
+        <div class="page-btn">
+            <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
+        </div>
+    </div>
+    @if (TempData["DeleteMessage"] != null)
+    {
+        <input type="hidden" id="toastrErrorMessage" value="@TempData["DeleteMessage"]" />
+    }
+    <div class="card">
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-path">
+                        <a class="btn btn-filter" id="filter_search">
+                            <img src="~/img/icons/filter.svg" alt="img">
+                            <span><img src="~/img/icons/closes.svg" alt="img"></span>
+                        </a>
+                    </div>
+                    <div class="search-input">
+                        <a class="btn btn-searchset"><img src="~/img/icons/search-white.svg" alt="img"></a>
+                    </div>
+                </div>
+                <div class="wordset">
+                    <ul>
+                        <li>
+                            <form asp-action="Purchase_Invoice_Statement_CreatePDF" asp-controller="Invoice" method="get">
+
+
+
+
+
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
+                                    <img src="~/img/icons/pdf.svg" alt="img">
+                                </button>
+
+
+                            </form>
+                        </li>
+
+                        <li>
+                            <form asp-action="Export_Purchase_Invoices_List_To_Excel" asp-controller="Invoice" method="get">
+
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                                    <img src="~/img/icons/excel.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+                        <li>
+                            <form>
+
+                                <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
+                                    <img src="~/img/icons/printer.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-0" id="filter_inputs">
+                <div class="card-body pb-0">
+                    <div class="row align-items-end">
+                        <!-- Ensure alignment at the bottom -->
+                        <!-- Start Date -->
+                        <div class="col-sm-2">
+                            <!-- Adjusted column size for tighter fit -->
+                            <div class="form-group">
+                                <label for="startdate"><span style="color: black;">*</span> Start Date</label>
+                                <input type="date" class="form-control" id="startdate">
+                            </div>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="col-sm-2">
+                            <!-- Adjusted column size for tighter fit -->
+                            <div class="form-group">
+                                <label for="datepickerend"><span style="color: black;">*</span> End Date</label>
+                                <input type="date" class="form-control" id="enddate" name="enddate">
+                            </div>
+                        </div>
+
+                        <!-- Select Product -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="ProductType"><span style="color: black;">*</span> Select Product</label>
+                                <select class="select form-control" id="producttype" asp-items="@(ViewBag.Products)">
+                                    <option value="" selected disabled>-- Select Product --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Select Vehicle -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="VehicleType"><span style="color: black;">*</span> Select Vehicle</label>
+                                <select class="select form-control" id="vehicletype" asp-items="@(ViewBag.Vehicle)">
+                                    <option value="" selected disabled>-- Select Vehicle --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Search By Name -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="customername"><span style="color: black;">*</span> Search By Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Name.." oninput="this.value = this.value.toUpperCase()" id="searchName">
+                            </div>
+                        </div>
+
+
+
+                        <!-- Search By Tolat -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="TolatName"><span style="color: black;">*</span> Search By Tolat</label>
+                                <input type="text" class="form-control" placeholder="Enter Name Of Tolat.." oninput="this.value = this.value.toUpperCase()" id="searchTolatName">
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="col-sm-1">
+                            <!-- Adjust the column size if necessary -->
+                            <div class="form-group">
+                                <a role="button" id="searchButton" class="btn btn-filters"><img src="~/img/icons/search-whites.svg" alt="search icon"></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <div class="table-responsive">
+            <table id="data" class="table datanew">
+                <thead>
+                    <tr>
+
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Name</th>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Bag</th>
+                        <th class="text-center">Bag Per KG</th>
+                        <th class="text-center">Weight</th>
+                        <th class="text-center">Product-Price(₹)</th>
+                        <th class="text-center">Total-Price(₹)</th>
+                        <th class="text-center">Tolat</th>
+                        <th class="text-center">Vehicle</th>
+                        <th class="text-center">Actions</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td class="text-center">
+                                        @((DateTime.TryParse(item.PurchaseInvoiceDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                    </td>
+                                    <td class="text-center">@item.CustomerName</td>
+                                    <td class="text-center">@item.ProductName</td>
+                                    <td class="text-center">@(item.Bags.HasValue ? item.Bags.Value.ToString() : "--")</td>
+                                    <td class="text-center">@(item.BagPerKg.HasValue ? item.BagPerKg.Value.ToString() : "--")</td>
+                                    <td class="text-center">@item.TotalWeight</td>
+                                    <td class="text-center">@item.ProductPrice</td>
+                                    <td class="text-center">@item.TotalPrice</td>
+                                    <td class="text-center">@item.TolatName</td>
+                                    <td class="text-center">@item.VehicleName</td>
+
+
+
+                                    <td class="text-center">
+                                        <a class="action-set" href="/Options" data-bs-toggle="dropdown" aria-expanded="true">
+                                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                        </a>
+                                        <ul class="dropdown-menu text-center">
+                                            <li>
+                                                <a role="link"
+                                                   href="@Url.Action("Purchase_Invoice_Details", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
+                                                   onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Invoice Info</a>
+                                            </li>
+                                            <li>
+                                                <a role="link"
+                                                   href="@Url.Action("Update_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
+                                                   onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Edit Invoice</a>
+                                            </li>
+
+                                            <li>
+                                                <a role="link"
+                                                   href="@Url.Action("Delete_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
+                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+
+    <!-- Modal Shell -->
+    <div class="modal fade" id="createpayment" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Dynamic Content Will Be Loaded Here -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+@*<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+    function confirmDelete(farmerName) {
+         // Corrected: use .value
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: ` Are You Want This ${farmerName}'s Invoice Delete !`, // Using template literal
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteform').submit();
+            }
+        });
+    }
+
+</script>
+
+
+
+<script>
+
+
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var errorMessage = document.getElementById('toastrErrorMessage').value;
+
+        if (errorMessage) {
+            toastr.error(errorMessage, "Alert !!", {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-right',
+                preventDuplicates: true,
+                showDuration: '300',
+                hideDuration: '1000',
+                timeOut: '2000',
+                extendedTimeOut: '1000',
+                showEasing: 'swing',
+                hideEasing: 'linear',
+                showMethod: 'fadeIn',
+                hideMethod: 'fadeOut'
+            });
+        }
+    });
+    </script>*@
+

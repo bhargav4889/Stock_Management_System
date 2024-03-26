@@ -1,0 +1,287 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    Layout = null;
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+@model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Payment_Model;
+<div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-credit-card"></i> Payment Information</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+</div>
+<form id="PaymentForm" asp-action="Create_Payment" asp-controller="Payment" method="post">
+    <div class="modal-body">
+        <div class="row">
+
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Customer Name</label>
+                    <input type="text" disabled value="@Model.Customer_Name">
+                </div>
+            </div>
+
+            <input type="hidden" name="Customer_Id" value="@Model.Customer_Id" />
+
+            <input type="hidden" name="Stock_Id" value="@Model.Stock_Id" />
+
+            <input type="hidden" name="Product_Id" value="@Model.Product_Id" />
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Product Name</label>
+                    <input type="text" disabled name="Product_Name" value="@Model.Product_Name">
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Location</label>
+                    <input type="text" disabled name="Stock_Location" value="@Model.Stock_Loaction">
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Stock Added Date</label>
+                    <input type="date" id="datepicker" name="Stock_Added_Date" disabled value="@Model.Stock_Added_Date.Date.ToString("yyyy-MM-dd")" class="form-control">
+
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Payment Date</label>
+                    <input type="date" placeholder="DD-MM-YYYY" asp-for="Payment_Date" id="datepicker" class="form-control">
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Total Price(₹)</label>
+                    <input type="text" id="totalPrice" name="Total_Price" disabled value="@Model.Total_Price">
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Paying Amount(₹)</label>
+                    <input type="number" id="payingAmount" asp-for=Paid_Amount inputmode="numeric" class="form-control">
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Remain Amount(₹)</label>
+                    <input type="number" id="remainAmount" name="Remain_Amount" asp-for="Remain_Amount" inputmode="numeric" readonly class="form-control">
+
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color: red;">*</span> Select Payment Method</label>
+                    <select class="select" id="selectpaymentmethod" name="Payment_Method">
+                        <option selected disabled>-- Payment Method --</option>
+                        <option value="CASH">CASH</option>
+                        <option value="BANK">BANK</option>
+                        <option value="CHEQ">CHEQ</option>
+                        <option value="RTGS">RTGS</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-12" id="bankSelection" style="display:none;">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Select Bank</label>
+                    <select class="select" id="bankSelect" name="Bank_Id">
+                        <option selected disabled>-- Select Bank --</option>
+                        @foreach (var bank in ViewBag.Banks as IEnumerable<Stock_Management_System.Areas.Manage.Models.Bank_Model>)
+                        {
+                            <option name="Bank_Name" value="@bank.BankId" data-icon="@bank.BankIcon">@bank.BankName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class="col-lg-4 col-sm-12" id="AccountNo" style="display:none;">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Bank Account No</label>
+                    <input type="number" id="bankAccountNumber" asp-for=Bank_Ac_No inputmode="numeric" placeholder="Account No" class="form-control">
+                    <div id="bankAccountNumberError" style="color:red; display:none;">Invalid account number</div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 col-sm-12" id="CheqNoPart" style="display:none;">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> CHEQ NO.</label>
+                    <input type="text" asp-for=CHEQ_No placeholder="CHEQ NO">
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-sm-12" id="RTGSPart" style="display:none;">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> RTGS NO.</label>
+                    <input type="text" asp-for="RTGS_No" placeholder="RTGS NO">
+                </div>
+            </div>
+
+
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-submit" id="submitBtn">Submit</button>
+            <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</form>
+<script>
+    document.getElementById('submitBtn').addEventListener('click', function () {
+        var confirmSubmission = confirm("Are you sure you want to submit this form?");
+        if (confirmSubmission) {
+            // User clicked "OK"
+            document.getElementById('PaymentForm').submit();
+        } else {
+            // User clicked "Cancel", do nothing
+        }
+    });
+</script>
+
+
+
+<script>
+    $(document).ready(function () {
+        // Initialize Select2 for .select elements
+        $('.select').select2({
+            minimumResultsForSearch: Infinity
+        });
+
+        // Event listener for paying amount changes
+        $('#payingAmount').on('input', function () {
+            var total = parseFloat($('#totalPrice').val()) || 0;
+            var paying = parseFloat($(this).val()) || 0;
+
+            // If the paying amount exceeds the total, reset it to the total
+            if (paying > total) {
+                $(this).val(total);
+                paying = total;
+            }
+
+            // Update remaining amount
+            var remaining = total - paying;
+            $('#remainAmount').val(remaining.toFixed(2));
+        });
+
+        // Payment method change handler
+        $('#selectpaymentmethod').change(function () {
+            // Hide all method-specific inputs initially
+            $('#bankSelection, #AccountNo, #CheqNoPart, #RTGSPart').hide();
+
+            var paymentMethod = $(this).val();
+            if (paymentMethod === "BANK") {
+                $('#bankSelection, #AccountNo').show();
+
+            } else if (paymentMethod === "CHEQ") {
+                $('#bankSelection,#AccountNo, #CheqNoPart').show();
+            } else if (paymentMethod === "RTGS") {
+                $('#bankSelection,#AccountNo, #RTGSPart').show();
+            }
+        });
+
+        // Formatting function for bank selection with icons
+        function formatBankOption(bank) {
+            if (!bank.id || bank.text === '-- Select Bank --') return bank.text; // No icon for the placeholder
+            var $bank = $('<span class="img-flag-wrapper"><img src="' + $(bank.element).data('icon') + '" class="img-flag" /> ' + bank.text + '</span>');
+            return $bank;
+        }
+
+        $('#bankSelect').select2({
+            minimumResultsForSearch: -1,
+            templateResult: formatBankOption,
+            templateSelection: formatBankOption
+        });
+
+        // Trigger initial update in case of pre-filled values
+        $('#payingAmount').trigger('input');
+    });
+</script>
+
+<script>
+    document.getElementById('bankAccountNumber').addEventListener('blur', function () {
+        var accountNumber = this.value;
+        var errorMessageDiv = document.getElementById('bankAccountNumberError');
+
+        // Example validation: not empty and length between 8 and 12 characters
+        // Adjust the condition based on your validation rules
+        if (accountNumber.length >= 8 && accountNumber.length <= 12) {
+            errorMessageDiv.style.display = 'none';
+            // Add more complex validation here if needed, such as checksum validation
+        } else {
+            errorMessageDiv.style.display = 'block';
+            errorMessageDiv.textContent = 'Invalid account number. It must be between 8 and 12 digits.';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Validate CHEQ NO.
+        document.getElementById('cheqNoInput').addEventListener('blur', function () {
+            var cheqNo = this.value.trim();
+            var cheqNoErrorDiv = document.getElementById('cheqNoError');
+
+            // Example validation: not empty and has a length of 6 (for example)
+            if (cheqNo.length === 6) {
+                cheqNoErrorDiv.style.display = 'none';
+            } else {
+                cheqNoErrorDiv.style.display = 'block';
+                cheqNoErrorDiv.textContent = 'Please enter a valid 6-digit CHEQ NO.';
+            }
+        });
+
+        // Validate RTGS NO.
+        document.getElementById('rtgsNoInput').addEventListener('blur', function () {
+            var rtgsNo = this.value.trim();
+            var rtgsNoErrorDiv = document.getElementById('rtgsNoError');
+
+            // Example validation: not empty and has a specific pattern or length
+            if (rtgsNo.length === 8) { // Assuming an 8-digit requirement for RTGS NO. as an example
+                rtgsNoErrorDiv.style.display = 'none';
+            } else {
+                rtgsNoErrorDiv.style.display = 'block';
+                rtgsNoErrorDiv.textContent = 'Please enter a valid 8-digit RTGS NO.';
+            }
+        });
+    });
+
+
+</script>
+
+
+<!-- Adjusted CSS for image alignment -->
+<style>
+    .img-flag {
+        height: 20px;
+        width: auto;
+        margin-right: 10px;
+        vertical-align: middle; /* Adjust for better alignment with text */
+    }
+</style>
+
+
+
+

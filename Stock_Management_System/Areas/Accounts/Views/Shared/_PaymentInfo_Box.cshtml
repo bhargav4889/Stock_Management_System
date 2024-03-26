@@ -1,0 +1,292 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    Layout = null;
+}
+
+@model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Payment_Model;
+
+<div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-credit-card"></i> Payment Information</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Customer Name</label>
+                <input type="text" disabled value="@Model.Customer_Name">
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Product Name</label>
+                <input type="text" disabled value="@Model.Product_Name">
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Location</label>
+                <input type="text" disabled value="@Model.Stock_Loaction">
+            </div>
+        </div>
+
+
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Stock Added Date</label>
+                <input type="date" id="datepicker" disabled value="@Model.Stock_Added_Date.Date.ToString("yyyy-MM-dd")" class="form-control">
+
+            </div>
+        </div>
+
+
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Payment Date</label>
+                <input type="date" placeholder="DD-MM-YYYY" id="datepicker" class="form-control">
+            </div>
+        </div>
+
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Total Price(₹)</label>
+                <input type="text" id="totalPrice" disabled value="@Model.Total_Price">
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Paying Amount(₹)</label>
+                <input type="number" id="payingAmount" inputmode="numeric" class="form-control">
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-12">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Remain Amount(₹)</label>
+                <input type="number" id="remainAmount" inputmode="numeric" disabled class="form-control">
+            </div>
+        </div>
+
+
+        <div class="col-lg-4 col-sm-12">    
+            <div class="form-group">
+                <label for="selectpaymentmethod"><span style="color: red;">*</span> Select Payment Method</label>
+                <select class="select" id="selectpaymentmethod">
+                    <option selected disabled>-- Payment Method --</option>
+                    <option value="CASH">CASH</option>
+                    <option value="BANK">BANK</option>
+                    <option value="CHEQ">CHEQ</option>
+                    <option value="RTGS">RTGS</option>
+                </select>
+            </div>
+        </div>
+
+       <h1>demo</h1>
+
+       
+
+        <div class="col-lg-4 col-sm-12" id="AccountNo" style="display:none;">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> Bank Account No</label>
+                <input type="number" id="remainAmount" inputmode="numeric" placeholder="Account No" class="form-control">
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-12" id="CheqNoPart" style="display:none;">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> CHEQ NO.</label>
+                <input type="text" placeholder="CHEQ NO">
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-12" id="RTGSPart" style="display:none;">
+            <div class="form-group">
+                <label><span style="color:red;">*</span> RTGS NO.</label>
+                <input type="text" placeholder="RTGS NO">
+            </div>
+        </div>
+
+       
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-submit">Submit</button>
+        <button type="button" class="btn btn-cancel" data-bs-dismiss="modal">Close</button>
+    </div>
+</div>
+
+<!-- Example of including jQuery and Select2 -->
+
+
+
+@* <script>
+    $(document).ready(function () {
+        $('.select').select2({
+            minimumResultsForSearch: Infinity
+        });
+    });
+</script> *@
+
+
+<style>
+    /* Custom hover styles for Select2 options */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #009541 !important; /* Your desired hover color */
+        color: white; /* Text color on hover - change if needed */
+    }
+
+    /* Example custom styling for bank icons (adjust as needed) */
+    .select2-results__option[aria-selected]::before {
+        content: attr(data-icon);
+        /* You might use a font icon or background image instead */
+        padding-right: 8px;
+    }
+
+    .img-flag {
+        vertical-align: middle; /* Align the image vertically in the middle */
+        height: 25px; /* Adjust based on your needs */
+        width: auto;
+        margin-right: 15px; /* Ensure there's space between the image and text */
+    }
+
+    .select2-dropdown {
+        margin-top: 0px; /* Adjust this value as needed to position the dropdown */
+    }
+
+
+</style>
+
+
+
+<script>
+    $(document).ready(function () {
+        // Function to update the remaining amount and enforce payment constraints
+        function updateRemainingAmount() {
+            var total = parseFloat($('#totalPrice').val()) || 0;
+            var paying = parseFloat($('#payingAmount').val()) || 0;
+
+            // If the paying amount exceeds the total, reset it to the maximum allowed (total price)
+            if (paying > total) {
+                // Set the value of the paying amount input to the total price
+                $('#payingAmount').val(total);
+                paying = total; // Update the paying variable to reflect this change
+            }
+
+            var remaining = total - paying;
+            $('#remainAmount').val(remaining.toFixed(2)); // Update the remaining amount field
+        }
+
+        // Event listener for when the paying amount changes
+        $('#payingAmount').on('input', function () {
+            updateRemainingAmount();
+        });
+
+        // Initial update in case there's a default value
+        updateRemainingAmount();
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+
+        // Handle changes to the payment method dropdown
+        $('#selectpaymentmethod').change(function () {
+            var paymentMethod = $(this).val();
+            if (paymentMethod === "BANK") {
+                $('#bankSelection').show();
+                $('#AccountNo').show();
+                $('#CheqNoPart').hide();
+                $('#RTGSPart').hide();
+            }
+            if (paymentMethod === "CHEQ"){
+                $('#bankSelection').hide();
+                $('#AccountNo').show();
+                $('#CheqNoPart').show();
+                $('#RTGSPart').hide();
+            }
+            if (paymentMethod === "RTGS") {
+                $('#bankSelection').hide();
+                $('#CheqNoPart').hide();
+                $('#RTGSPart').show();
+                $('#AccountNo').show();
+            }
+            if (paymentMethod === "CASH") {
+                $('#bankSelection').hide();
+                $('#CheqNoPart').hide();
+                $('#RTGSPart').hide();
+                $('#AccountNo').hide();
+            }
+           
+        });
+    });
+
+
+
+</script>
+@* 
+<script>
+    $(document).ready(function () {
+        $('#bankSelect').select2({
+            templateResult: formatBankOption,
+            templateSelection: formatBankOptionSelection,
+            minimumResultsForSearch: Infinity
+           
+        });
+
+        function formatBankOption(bank) {
+            if (!bank.id) { return bank.text; }
+            var iconUrl = $(bank.element).data('icon');
+            return $('<span><img src="' + iconUrl + '" class="img-flag" /> ' + bank.text + '</span>');
+        }
+
+        function formatBankOptionSelection(bank) {
+            if (!bank.id) { return bank.text; }
+            var iconUrl = $(bank.element).data('icon');
+            return $('<span><img src="' + iconUrl + '" class="img-flag" /> ' + bank.text + '</span>');
+        }
+
+    });
+</script> *@
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var banks = @Html.Raw(Json.Serialize(ViewBag.Banks));
+
+            $("#bankDropdown").select2({
+
+                allowClear: true,
+                
+                data: banks.map(bank => ({
+                    id: bank.bankId,
+                    text: bank.bankName,
+                    image: bank.bankIcon // Ensure this is the correct property for the image URL
+                })),
+                templateResult: formatBank,
+                templateSelection: formatBank
+            });
+
+            function formatBank(bank) {
+                if (!bank.id) { return bank.text; }
+                var $bank = $(
+                    '<span><img src="' + bank.image + '" class="img-flag" style="width: 20px; height: 20px;"/> ' + bank.text + '</span>'
+                );
+                return $bank;
+            }
+        });
+    </script>
+
+}
+

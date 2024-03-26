@@ -1,0 +1,209 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Details Sell Invoice";
+
+    DateTime? invoiceDate = Model.SalesInvoiceDate;
+    DateTime? onlyDate = invoiceDate?.Date;
+
+    string? formattedDate = onlyDate?.ToString("dd-MM-yyyy");
+}
+
+@model Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Sales_Invoice_Model;
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .scrollable-table {
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+</style>
+
+<div class="container">
+    <br />
+    <div class="row">
+        <!-- Left side - Back link -->
+        <div class="col-2">
+            <a asp-action="History_Sales_Invoice" asp-controller="Invoice" class="text-decoration-none">
+                <i class="fa fa-arrow-left" style="color:green; transform: scale(1.25);"> </i>
+            </a>
+        </div>
+
+        <!-- Center - Invoice Details -->
+        <div class="col-8 text-center">
+            <h5>Invoice Details</h5>
+        </div>
+
+        <!-- Right side - PDF icon button -->
+        <div class="col-2 text-end">
+            <ul class="list-unstyled d-flex justify-content-end">
+                <li>
+                    <form asp-action="Sales_Invoice_PDF_Preview_Download" asp-controller="Invoice" method="get">
+                        <input type="hidden" value="@Model?.SalesInvoiceId" name="Invoice_ID" />
+                        <button type="submit" name="downloadType" value="pdf" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview/Download PDF" style="transform: scale(1.15);">
+                            <img src="~/img/icons/pdf.svg" alt="img">
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+
+    <br />
+    <div class="table-responsive scrollable-table table-responsive-sm">
+        <table class="table">
+            <tr>
+                <th>Invoice ID</th>
+                <td>@Model?.SalesInvoiceId</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>@formattedDate</td>
+            </tr>
+
+            <tr>
+                <th>Invoice Type</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.InvoiceType) ? "--" : Model?.InvoiceType)</td>
+            </tr>
+
+
+            <tr>
+                <th>Broker Name</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.BrokerName) ? "--" : Model?.BrokerName)</td>
+            </tr>
+
+
+            <tr>
+                <th>Party Name</th>
+                <td>@Model?.PartyName</td>
+            </tr>
+
+            <tr>
+                <th>GST NO</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.PartyGstNo) ? "--" : Model?.PartyGstNo)</td>
+            </tr>
+
+            <tr>
+                <th>Party Address</th>
+                <td>@Model?.PartyAddress</td>
+            </tr>
+
+
+            <tr>
+                <th>Product Name</th>
+                <td>@Model?.ProductName</td>
+            </tr>
+
+            <tr>
+                <th>Product Brand Name</th>
+                <td>@Model?.ProductBrandName</td>
+            </tr>
+
+            <tr>
+                <th>Bag</th>
+                <td>@(string.IsNullOrWhiteSpace(Convert.ToString(Model?.Bags)) ? "--" : Model?.Bags)</td>
+            </tr>
+            <tr>
+                <th>Bag Per Kg</th>
+                <td>@(string.IsNullOrWhiteSpace(Convert.ToString(Model?.BagPerKg)) ? "--" : Model?.BagPerKg)</td>
+            </tr>
+            <tr>
+                <th>Weight</th>
+                <td>@Model?.TotalWeight</td>
+            </tr>
+
+            <tr>
+                <th>CGST(%)</th>
+                <td>@(Model?.CGST != null ? Model.CGST.ToString() : "--")</td>
+
+            </tr>
+
+            <tr>
+                <th>SGST(%)</th>
+                <td>@(Model?.SGST != null ? Model.SGST.ToString() : "--")</td>
+
+            </tr>
+
+            <tr>
+                <th>CGST(%) Tax Price(₹)</th>
+                <td>@(Model?.TotalCGSTPrice != null ? Model.TotalCGSTPrice.ToString() : "--")</td>
+
+            </tr>
+
+            <tr>
+                <th>SGST(%) Tax Price(₹)</th>
+                <td>@(Model?.TotalSGSTPrice != null ? Model.TotalSGSTPrice.ToString() : "--")</td>
+
+            </tr>
+
+
+
+            <tr>
+                <th>Product Price(₹)</th>
+                <td>@Model?.ProductPrice</td>
+            </tr>
+
+            <tr>
+                <th>Without GST Tax Price(₹)</th>
+                <td>@(Model?.WithoutGSTPrice != null ? Model.WithoutGSTPrice.ToString() : "--")</td>
+            </tr>
+
+
+            <tr>
+                <th>Total Price(₹)</th>
+                <td>@Model?.TotalPrice</td>
+            </tr>
+            <tr>
+                <th>Vehicle Type</th>
+                <td>@Model?.VehicleName</td>
+            </tr>
+            <tr>
+                <th>Vehicle No.</th>
+                <td>@Model?.VehicleNo</td>
+            </tr>
+            <tr>
+                <th>Driver Name</th>
+                <td>@Model?.DriverName</td>
+            </tr>
+
+            @{
+                if (Model?.ContainerNo != "" || Model?.ContainerNo == null)
+                {
+                    <tr>
+                        <th>Container Number</th>
+                        <td>@(Model?.ContainerNo != null ? Model.ContainerNo.ToString() : "--")</td>
+                    </tr>
+                }
+            }
+
+
+           @* <tr>
+                <th>Recreate Invoice PDF</th>
+                <td>
+                    <form asp-action="SELL_INVOICE_PDF_Preview_Download" asp-controller="Invoice" method="get">
+                        <input type="hidden" value="@Model?.INVOICE_ID" name="id" />
+                        <button class="btn btn-outline-primary" type="submit">PDF</button>
+                    </form>
+
+                </td>
+            </tr>*@
+
+
+        </table>
+    </div>
+</div>

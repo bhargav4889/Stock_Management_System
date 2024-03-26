@@ -1,0 +1,413 @@
+﻿@{
+    ViewData["Title"] = "Dashbaord";
+}
+@model Stock_Management_System.Areas.Manage.Models.Dashboard_All_Models;
+@using Stock_Management_System.UrlEncryption;
+
+
+<div class="content">
+    <div class="row">
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="dash-widget">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash1.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>
+                        ₹<span class="counters">
+                            @Model.All_Counts_Model.AmountOfPurchaseInvoice.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        </span>
+                    </h5>
+                    <h6> Purchase Invoice</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="dash-widget dash1">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash2.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>
+                        ₹<span class="counters">
+                            @Model.All_Counts_Model.AmountOfSalesInvoice.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+
+                        </span>
+                    </h5>
+                    <h6> Sale Invoice</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="dash-widget dash2">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash3.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>₹<span class="counters">  @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))</span></h5>
+                    <h6>Purchase Stock </h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="dash-widget dash3">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash4.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>
+                        ₹<span class="counters">
+                            0
+                        </span>
+                    </h5>
+                    <h6>Sale Stock</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count">
+                <div class="dash-counts">
+                    <h4>
+                        @Model.All_Counts_Model.TotalCustomers
+                    </h4>
+                    <h5>Customers</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i data-feather="user"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count das1">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"));
+                                
+                            }
+                        }
+                    </h4>
+                    <h5>Stocks</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fa fa-cart-arrow-down"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count das2">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.TotalPurchaseInvoice;
+
+                            }
+                        }
+
+                    </h4>
+                    <h5>Purchase Invoice</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i data-feather="file-text"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+
+                                @Model.All_Counts_Model.TotalSalesInvoice;
+                            }
+                        }
+
+                    </h4>
+                    <h5>Sales Invoice</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i data-feather="file"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count das1">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.TotalBags.ToString("N2", new System.Globalization.CultureInfo("en-IN"));
+                            }
+                        }
+                    </h4>
+                    <h5>Total Bags In Stock</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fas fa-shopping-bag"></i>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.TotalWeight.ToString("N2", new System.Globalization.CultureInfo("en-IN"));
+                            }
+                        }
+                    </h4>
+                    <h5>Total Weight In Stock</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fas fa-weight"></i> <!-- Weight scale -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 col-sm-12 col-12 d-flex">
+            <div class="popover-list">
+            </div>
+            <div class="card flex-fill">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+
+                    <h4 class="card-title mb-0">
+                        <span tabindex="0" role="button"  class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Quicks Links Help To Quickly Redirect Page !">
+                            <i class="fas fa-link"></i> Quick Links
+                        </span>
+                    </h4>
+
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                            <i class="fa fa-tasks" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
+                            <a asp-action="Manage_Stocks" asp-controller="Stock" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Stock</a>
+                        </li>
+                        <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                            <i class="fas fa-file-invoice-dollar" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
+                            <a asp-action="History_Purchase_Invoice" asp-controller="Invoice" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Purchase Invoices</a>
+                        </li>
+                        <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                            <i class="fas fa-file-invoice-dollar" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
+                            <a asp-action="History_Sales_Invoice" asp-controller="Invoice" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Sales Invoices</a>
+                        </li>
+                        <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                            <i class="fa fa-users" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
+                            <a asp-action="Manage_Customers_Account" asp-controller="Account" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Customers Accounts</a>
+                        </li>
+                        <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                            <i class="fa fa-user-circle" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
+                            <a asp-action="Profile" asp-controller="Manage" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Your Profile</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+        <div class="col-lg-6 col-sm-12 col-12 d-flex">
+            <div class="popover-list">
+            </div>
+            <div class="card flex-fill">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <span tabindex="0" role="button" class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Recent Actions Show To Notify Which Process Happened !">
+                            <i class="fas fa-clock"></i> Recent Actions
+                        </span>
+                    </h4>
+                </div>
+                <!-- Start of scrollable area -->
+                <div class="card-body overflow-auto" style="max-height: 50vh;">
+                    <!-- Adjust max-height as needed -->
+                    @if (Model.recent_Actions_With_Info != null && Model.recent_Actions_With_Info.Any())
+                    {
+                        var today = DateTime.Today;
+                        var yesterday = today.AddDays(-1);
+                        bool todayTasksExist = Model.recent_Actions_With_Info.Any(a => a.Rec_Act_Create.Date == today);
+                        bool yesterdayTasksExist = Model.recent_Actions_With_Info.Any(a => a.Rec_Act_Create.Date == yesterday);
+
+                        if (todayTasksExist || yesterdayTasksExist)
+                        {
+                            <ul class="list-group list-group-flush">
+                                @if (todayTasksExist)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div class="me-2" style="font-style:initial; font-weight:bold; color:lightslategrey;">Today</div>
+                                            <hr class="flex-grow-1 my-auto">
+                                        </div>
+                                    </li>
+                                    @foreach (var action in Model.recent_Actions_With_Info.Where(a => a.Rec_Act_Create.Date == today))
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center" style="gap: 8px;">
+                                                <i class="fas fa-bell"></i>
+                                                <span>@action.Rec_Act_Info</span>
+                                            </div>
+                                            <span class="text-muted">@action.Rec_Act_Create.ToString("hh:mm tt")</span>
+                                        </li>
+                                    }
+                                }
+
+                                @if (yesterdayTasksExist)
+                                {
+                                    @if (todayTasksExist)
+                                    {
+                                        <li><br /></li> <!-- Optional: Spacer if both today and yesterday tasks exist -->
+                                    }
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div class="me-2" style="font-style:initial; font-weight:bold; color:lightslategrey;">Yesterday</div>
+                                            <hr class="flex-grow-1 my-auto">
+                                        </div>
+                                    </li>
+                                    @foreach (var action in Model.recent_Actions_With_Info.Where(a => a.Rec_Act_Create.Date == yesterday))
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center" style="gap: 8px;">
+                                                <i class="fas fa-bell"></i>
+                                                <span>@action.Rec_Act_Info</span>
+                                            </div>
+                                            <span class="text-muted">@action.Rec_Act_Create.ToString("hh:mm tt")</span>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fa fa-times-circle"></i> No Recent Tasks
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fa fa-times-circle"></i> No Recent Tasks
+                        </div>
+                    }
+                </div>
+                <!-- End of scrollable area -->
+            </div>
+        </div>
+
+
+
+
+
+        <div class="col-lg-6 col-sm-12 col-12 d-flex">
+            <div class="card flex-fill">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <span tabindex="0" role="button" class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Details about pending customer payments.">
+                            <i class="fa fa-cogs"></i> Pending Customers Payment
+                        </span>
+                    </h4>
+                </div>
+
+                @if (Model.recent_Actions_With_Info != null)
+                {
+                    <div class="table-responsive dataview">
+                        <table class="table datatable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var customers_Payment_Sort_List in Model.Pending_Customers_Payment_Sort_List)
+                                {
+                                    <tr onclick="submitForm(this)">
+                                        <form asp-action="Account_Details" asp-controller="Account" method="get">
+                                            <input type="hidden" value="@UrlEncryptor.Encrypt(Convert.ToString(customers_Payment_Sort_List.CustomerId))" name="Customer_ID" />
+                                        </form>
+                                        <td>@customers_Payment_Sort_List.StockDate.ToString("dd/MM/yy")</td>
+                                        <td>@customers_Payment_Sort_List.CustomerName</td>
+                                        <td>@customers_Payment_Sort_List.ProductName</td>
+                                        <td>@customers_Payment_Sort_List.TotalPrice</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-body">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fa fa-times-circle"></i> No Payments Pending
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+
+
+
+        <div class="col-lg-6 col-sm-12 col-12 d-flex">
+            <div class="card flex-fill">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <span tabindex="0" role="button" class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Don't forget to complete your payments to avoid service interruptions.">
+                            <i class="fas fa-bell"></i>
+                            Remainder
+                        </span>
+                    </h4>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                        <i class="fa fa-bell-slash"></i>  No Set Any  Remainder
+
+                    </div>
+                    
+
+                    @* <ul class="list-unstyled">
+                    <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+
+
+                    </li>
+
+                    </ul>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function submitForm(clickedRow) {
+        // Find the form related to the clicked row. This example assumes the form is a sibling or child of the clicked row.
+        // You might need to adjust the selector based on your actual HTML structure.
+        var form = clickedRow.querySelector("form");
+        if (form) {
+            form.submit(); // Submit the found form
+        } else {
+            console.error("Form not found");
+        }
+    }
+
+</script>

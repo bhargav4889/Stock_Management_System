@@ -1,0 +1,336 @@
+﻿@using System.Data;
+@using Stock_Management_System.UrlEncryption;
+
+@model IEnumerable<Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Sales_Invoice_Model>
+@{
+    ViewData["Title"] = "Sales Invoices";
+}
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Sales Invoice List</h4>
+            <h6>Manage Invoices Sales </h6>
+        </div>
+        <div class="page-btn">
+            <a role="button" asp-action="Create_Sales_Invoice" asp-controller="Invoice" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
+        </div>
+    </div>
+    @if (TempData["DeleteMessage"] != null)
+    {
+        <input type="hidden" id="toastrErrorMessage" value="@TempData["DeleteMessage"]" />
+    }
+    <div class="card">
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-path">
+                        <a class="btn btn-filter" id="filter_search">
+                            <img src="~/img/icons/filter.svg" alt="img">
+                            <span><img src="~/img/icons/closes.svg" alt="img"></span>
+                        </a>
+                    </div>
+                    <div class="search-input">
+                        <a class="btn btn-searchset"><img src="~/img/icons/search-white.svg" alt="img"></a>
+                    </div>
+                </div>
+                <div class="wordset">
+                    <ul>
+                        <li>
+                            <form asp-action="Sales_Invoice_Statement_CreatePDF" asp-controller="Invoice" method="get">
+
+
+                              
+
+
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Statement">
+                                    <img src="~/img/icons/pdf.svg" alt="img">
+                                </button>
+
+
+                            </form>
+                        </li>
+
+                        <li>
+                            <form asp-action="Export_Sales_Invoices_List_To_Excel" asp-controller="Invoice" method="get">
+
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                                    <img src="~/img/icons/excel.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+                        <li>
+                            <form>
+
+                                <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
+                                    <img src="~/img/icons/printer.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-0" id="filter_inputs">
+                <div class="card-body pb-0">
+                    <div class="row align-items-end">
+                        <!-- Start Date -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="datepickerstart"><span style="color: black;">*</span> Start Date</label>
+                                <input type="date" class="form-control" id="startdate">
+                            </div>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="datepickerend"><span style="color: black;">*</span> End Date</label>
+                                <input type="date" class="form-control" id="datepickerend" name="enddate">
+                            </div>
+                        </div>
+
+                        <!-- Select Type -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="selectgrain"><span style="color: black;">*</span> Select Type</label>
+                                <select class="select form-control" id="graintype" asp-items="@(ViewBag.ProductsInEnglish)">
+                                    <option value="" selected disabled>-- Select Grain --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Search By Broker Name -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="selectgrain"><span style="color: black;">*</span> Search By Broker</label>
+                                <input type="text" class="form-control" placeholder="Enter Broker Name.." oninput="this.value = this.value.toUpperCase()" id="searchBrokerName">
+                            </div>
+                        </div>
+
+                        <!-- Search By Party Name -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="selectgrain"><span style="color: black;">*</span> Search By Patry Name</label>
+                                <input type="text" class="form-control" placeholder="Enter Party Name.." oninput="this.value = this.value.toUpperCase()" id="searchPartyName">
+                            </div>
+                        </div>
+
+                        <!-- Search By Brand Name -->
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="selectgrain"><span style="color: black;">*</span> Search By Brand</label>
+                                <input type="text" class="form-control" placeholder="Enter Brand Name.." oninput="this.value = this.value.toUpperCase()" id="searchBrandName">
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="col-sm-1">
+                            <!-- Adjust the column size if necessary -->
+                            <div class="form-group">
+                                <a role="button" id="searchButton" class="btn btn-filters"><img src="~/img/icons/search-whites.svg" alt="search icon"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+        <div class="table-responsive">
+            <table id="data" class="table datanew">
+                <thead>
+                    <tr>
+
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Broker</th>
+                        <th class="text-center">Party-Name</th>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Brand</th>
+                        <th class="text-center">Bag</th>
+                        <th class="text-center">Bag Per KG</th>
+                        <th class="text-center">Weight</th>
+                        <th class="text-center">Product-Price(₹)</th>
+                        <th class="text-center">Total-Price(₹)</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td class="text-center">
+                                        @((DateTime.TryParse(item.SalesInvoiceDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                    </td>
+                                    <td class="text-center">
+                                        @(string.IsNullOrWhiteSpace(Convert.ToString(item.BrokerName)) ? "--" : item.BrokerName) </td>
+                                    <td class="text-center">@item.PartyName</td>
+                                    <td class="text-center">@item.ProductName</td>
+                                    <td class="text-center">@item.ProductBrandName</td>
+                                    <td class="text-center">@(item.Bags.HasValue ? item.Bags.Value.ToString() : "--")</td>
+                                    <td class="text-center">@(item.BagPerKg.HasValue ? item.BagPerKg.Value.ToString() : "--")</td>
+                                    <td class="text-center">@item.TotalWeight</td>
+                                    <td class="text-center">@item.ProductPrice</td>
+                                    <td class="text-center">@item.TotalPrice</td>
+
+
+                              
+
+                                    <td class="text-center">
+                                        <a class="action-set" href="/Options" data-bs-toggle="dropdown" aria-expanded="true">
+                                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                        </a>
+                                        <ul class="dropdown-menu text-center">
+                                            <li>
+                                                <a role="link"
+                                                   href="@Url.Action("Sales_Invoice_Details", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
+                                                   onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Invoice Info</a>
+                                            </li>
+                                            <li>
+                                                <a role="link"
+                                                   href="@Url.Action("Update_Sales_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
+                                                   onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img"> Edit Invoice</a>
+                                            </li>
+
+                                            <li>
+                                                <a role="link"
+                                                   href="@Url.Action("Delete_Sales_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
+                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+
+                                   
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/deletefun.js"></script>
+    @* <script>
+        $(document).on("click", "#searchButton", function (event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            console.log("Button Clicked");
+
+            // Get the selected grain name from the dropdown
+            var Grain_Name = $("#graintype").val();
+
+            console.log("Grain Name:", Grain_Name);
+
+            $("tbody tr").each(function (index, element) {
+                var row = $(element);
+                var name = row.find("td:eq(2)").text();
+
+                // Check if the name includes the selected Grain_Name
+                if (!Grain_Name || Grain_Name === null || name.includes(Grain_Name)) {
+                    // Show the row if it meets the search criteria
+                    row.show();
+                } else {
+                    // Hide the row if it doesn't meet the search criteria
+                    row.hide();
+                }
+            });
+
+               // Optionally, you might want to keep the dropdown value
+            // If you want to reset it, uncomment the line below
+            $("#graintype").val('');
+        });
+      </script>*@
+    @*   <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable({
+                // Your DataTable options here
+            });
+
+            $(document).on("click", "#searchButton", function (event) {
+                event.preventDefault(); // Prevent the default form submission behavior
+
+                // Get the selected grain name from the dropdown
+                var Grain_Name = $("#graintype").val();
+
+                // Use DataTable's search API to filter results
+                table.search(Grain_Name).draw(); // This searches all fields and handles pagination
+
+                // Optionally, reset the dropdown if needed
+                $("#graintype").val('');
+            });
+        });
+          </script>*@
+    <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable();
+
+            function applySearches() {
+                var BrokerName = $("#searchBrokerName").val();
+                var PartyName = $("#searchPartyName").val();
+                var Brand = $('#searchBrandName').val();
+                var selectedGrain = $("#graintype").val();
+                var selectedGrainText = $("#graintype option:selected").text(); // Get the selected option text
+                var startdate = $('#startdate').val();
+                var enddate = $('#enddate').val();
+
+                console.log(selectedGrain);
+
+                var productColumnIndex = 3;
+
+                // Clear existing searches
+                table.columns().search('');
+
+                // Apply dropdown search if selected
+                if (selectedGrain) {
+                    table.column(productColumnIndex).search(selectedGrainText);
+
+                }
+
+                // Apply individual column searches from input fields
+                table.column(1).search(BrokerName);
+                table.column(2).search(PartyName);
+                table.column(4).search(Brand);
+
+
+
+                // Perform a single draw after all search criteria have been applied
+                table.draw();
+
+                // Reset the input values after search
+                $("#searchBrokerName, #searchPartyName , #searchBrandName").val('');
+                $('#graintype').val('').trigger('change');
+
+            }
+
+            $('#searchButton').on('click', function () {
+                applySearches();
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+    <script src="~/js/deletefun.js"></script>
+}

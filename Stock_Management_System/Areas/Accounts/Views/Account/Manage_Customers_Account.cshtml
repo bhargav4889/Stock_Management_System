@@ -1,0 +1,255 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Manage Customers";
+}
+
+
+@using System.Data;
+@model IEnumerable<Stock_Management_System.Areas.Accounts.Models.Customer_Model>
+@using Stock_Management_System.UrlEncryption;
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            var table = $('#data').DataTable();
+
+            function applySearches() {
+                var Type = $("#searchCTType").val();
+
+
+
+
+
+
+                // Clear existing searches
+                table.columns().search('');
+
+                // Apply dropdown search if selected
+
+
+                // Apply individual column searches from input fields
+                table.column(1).search(Type);
+
+
+
+
+
+                // Perform a single draw after all search criteria have been applied
+                table.draw();
+
+                // Reset the input values after search
+                $("#searchCTType").val('');
+
+
+            }
+
+            $('#searchButton').on('click', function () {
+                applySearches();
+            });
+        });
+    </script>
+
+
+
+
+    <script>
+        // Check for TempData message and show Toastr
+        var successMessage = '@TempData["SuccessMessage"]';
+        if (successMessage) {
+            toastr.success(successMessage, 'Success', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-bottom-right',
+                preventDuplicates: true,
+                showDuration: '300',
+                hideDuration: '1000',
+                timeOut: '5000',
+                extendedTimeOut: '1000',
+                showEasing: 'swing',
+                hideEasing: 'linear',
+                showMethod: 'fadeIn',
+                hideMethod: 'fadeOut'
+            });
+        }
+    </script>
+
+}
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Customers List</h4>
+            <h6>Manage Customers </h6>
+            
+        </div>
+        <div class="page-btn">
+            <a role="button" asp-action="Create_Customer_Account" asp-controller="Account" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Add Customer</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-path">
+                        <a class="btn btn-filter" id="filter_search">
+                            <img src="~/img/icons/filter.svg" alt="img">
+                            <span><img src="~/img/icons/closes.svg" alt="img"></span>
+                        </a>
+                    </div>
+                    <div class="search-input">
+                        <a class="btn btn-searchset"><img src="~/img/icons/search-white.svg" alt="img"></a>
+                    </div>
+                </div>
+                <div class="wordset">
+                    <ul>
+                        <li>
+                            <form asp-action="Customers_Statement_PDF" asp-controller="Account" method="get">
+
+
+
+
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF">
+                                    <img src="~/img/icons/pdf.svg" alt="img">
+                                </button>
+
+
+                            </form>
+                        </li>
+
+                        <li>
+                            <form asp-action="Customers_Statement_EXCEL" asp-controller="Account" method="get">
+
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                                    <img src="~/img/icons/excel.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+                        <li>
+                            <form>
+
+                                <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
+                                    <img src="~/img/icons/printer.svg" alt="img">
+                                </button>
+
+                            </form>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="card mb-0" id="filter_inputs">
+                <div class="card-body pb-0">
+                    <div class="row">
+                        <div class="col-lg-8 col-sm-6">
+                            <div class="row">
+                                <div class="col-9 col-sm-4">
+                                    <div class="form-group">
+                                        <label for="searchCTType" class="text-truncate"><span style="color: black;">*</span> Search By Type</label>
+                                        <input type="text" class="form-control" placeholder="Enter Customer Type.." oninput="this.value = this.value.toUpperCase()" id="searchCTType">
+                                    </div>
+                                </div>
+                                <div class="col-3 col-sm-4 d-flex align-items-end">
+                                    <div class="form-group">
+                                        <a role="button" id="searchButton" class="btn btn-filters"><img src="~/img/icons/search-whites.svg" alt="search icon"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="table-responsive  justify-content-center">
+                <table id="data" class="table datanew">
+                    <thead>
+                        <tr>
+
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Customer-Type</th>
+                            <th class="text-center">Contact No.</th>
+                            <th class="text-center">Address</th>
+                            <th class="text-center">Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model != null)
+                            {
+                                foreach (var row in Model)
+                                {
+                                    <tr>
+
+
+                                        <td class="text-center">@row.CustomerName</td>
+                                        <td class="text-center">@row.CustomerType</td>
+                                        <td class="text-center">@row.CustomerContact</td>
+                                        <td class="text-center">@row.CustomerAddress</td>
+
+
+
+
+                                        <td class="text-center">
+                                            <a class="action-set" href="/Options" data-bs-toggle="dropdown" aria-expanded="true">
+                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu text-center">
+                                                <li>
+                                                    <a role="link"
+                                                       href="@Url.Action("Update_Customer_Info", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) })"
+                                                       onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img"> Edit Customer</a>
+                                                </li>
+
+                                                <li>
+                                                    <a role="link"
+                                                       href="@Url.Action("Account_Details", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) })"
+                                                       onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/dollar.svg" class="me-2" alt="img">Go to Account</a>
+                                                </li>
+                                            </ul>
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        @if (TempData["AddCustomerInfoMsg"] != null)
+        {
+            <script>
+                toastr.success('@TempData["AddCustomerInfoMsg"]', {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: 'toast-bottom-right',
+                    preventDuplicates: true,
+                    showDuration: '300',
+                    hideDuration: '1000',
+                    timeOut: '5000',
+                    extendedTimeOut: '1000',
+                    showEasing: 'swing',
+                    hideEasing: 'linear',
+                    showMethod: 'fadeIn',
+                    hideMethod: 'fadeOut',
+                });
+            </script>
+        }
+
+
+
+
+
+
+    </div>
+
+
+
+</div>

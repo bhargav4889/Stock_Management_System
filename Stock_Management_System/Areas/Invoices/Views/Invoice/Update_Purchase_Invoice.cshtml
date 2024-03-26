@@ -1,0 +1,308 @@
+﻿@using System.Data;
+@model Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model;
+@{
+    ViewData["Title"] = "Update Purchase Invoice";
+}
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Update Invoice</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Info Purchase Invoice</h6>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="row g-3" asp-action="Update_Purchase_Invoice_Details" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
+
+                @{
+                    DateTime dateTime = Model.PurchaseInvoiceDate;
+                    string OnlyDate = dateTime.ToString("yyyy-MM-dd"); // Correct date format for input[type=date]
+                }
+
+
+                <!-- Date -->
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="form-floating">
+                        <input type="date" class="form-control" id="datepicker" asp-for="PurchaseInvoiceDate">
+                        <label for="datepicker" class="text-truncate"><span style="color: black;">*</span> Select a Date</label>
+                    </div>
+                </div>
+
+
+
+             
+                <!-- Customer Name -->
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="Customer Name" id="customer" value="@Model.CustomerName" asp-for="CustomerName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+                        <label for="customername"><span style="color: red;">*</span> Enter Customer Name</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="CustomerName"></span>
+                    </div>
+                </div>
+
+
+                <!-- Stock Type -->
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="form-floating">
+                        <select class="form-select" id="stockgrade"aria-label="stockgrade" asp-for="ProductGradeId" asp-items="ViewBag.ProductGrade">
+                            <option value="">-- Stock Grade --</option>
+                            <!-- Removed selected and disabled attributes -->
+                        </select>
+                        <label for="stockgrade"><span style="color: black;">*</span> Select Type</label> <!-- Fixed the 'for' attribute to match the select id -->
+                    </div>
+                </div>
+
+
+                <!-- Grain Type -->
+                <div class="col-12 col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="selectgrain" aria-label="graintype" asp-for="ProductId" asp-items="ViewBag.Products">
+
+                            <option selected disabled>-- Select Product --</option>
+                        </select>
+                        <label for="selectgrain"><span style="color: red;">*</span> Select Type</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ProductId"></span>
+                    </div>
+                </div>
+
+                <input type="hidden" asp-for="ProductName" />
+
+
+                <!-- Tolat Name -->
+                <div class="col-12 col-md-2 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="tolatName" id="tolatname" value="@Model.TolatName" asp-for="TolatName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+                        <label for="tolatname"><span style="color: red;">*</span> Enter Tolat Name</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TolatName"></span>
+                    </div>
+                </div>
+
+                <!-- Bags -->
+                <div class="col-12 col-md-2 mb-3">
+                    <div class="form-floating">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" value="@Model.Bags" asp-for="Bags">
+                        <label for="bags"><span style="color: black;">*</span> Enter Bags</label>
+                    </div>
+                </div>
+
+                <!-- Bags Per KG -->
+                <div class="col-12 col-md-2 mb-3">
+                    <div class="form-floating">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags per KG" value="@Model.BagPerKg" id="bagsperkg" oninput="CalculateMethod()" asp-for="BagPerKg">
+                        <label for="bagsperkg"><span style="color: black;">*</span> Enter Bags Per KG</label>
+                    </div>
+                </div>
+
+                <!-- Weight -->
+                <div class="col-12 col-md-2 mb-3">
+                    <div class="form-floating">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Weight" value="@Model.TotalWeight" id="weight" asp-for="TotalWeight">
+                        <label for="weight"><span style="color: red;">*</span> Weight</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TotalWeight"></span>
+                    </div>
+                </div>
+
+                <!-- Product Price -->
+                <div class="col-12 col-md-2 mb-3">
+                    <div class="form-floating">
+                        <input type="number" inputmode="numeric" class="form-control" value="@Model.ProductPrice" placeholder="Product Price" id="productprice" oninput="CalculateMethod()" asp-for="ProductPrice">
+                        <label for="productprice"><span style="color: red;">*</span> Enter Product Price ⟨₹⟩</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ProductPrice"></span>
+                    </div>
+                </div>
+
+                <!-- Total Price -->
+                <div class="col-12 col-md-2 mb-3">
+                    <div class="form-floating">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Total Price" value="@Model.TotalPrice" id="totalprice" asp-for="TotalPrice">
+                        <label for="totalprice"><span style="color: red;">*</span> Total Price ⟨₹⟩</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TotalPrice"></span>
+                    </div>
+                </div>
+
+
+                <!-- Vehicle Type -->
+                <div class="col-12 col-md-3">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="selectvehicletype" aria-label="vehicletype" asp-for="VehicleId"  asp-items="ViewBag.Vehicle">
+                            <option selected disabled>-- Select Vehicle --</option>
+                        </select>
+                        <label for="selectvehicletype"><span style="color: red;">*</span> Select Type</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="VehicleId"></span>
+                    </div>
+                </div>
+
+                <!-- Vehicle No. -->
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="GJ-01-MH-1234" id="vehicleno" value="@Model.VehicleNo" oninput="formatVehicleNo(this)" asp-for="VehicleNo">
+                        <label for="vehicleno"><span style="color: red;">*</span> Enter Vehicle No.</label>
+                    </div>
+                    <span id="error-msg" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="VehicleNo"></span>
+                </div>
+
+                <!-- Driver Name -->
+                <div class="col-12 col-md-3 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" placeholder="Driver Name" id="drivername" asp-for="DriverName" value="@Model.DriverName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+                        <label for="drivername"><span style="color: red;">*</span> Enter Driver Name</label>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="DriverName"></span>
+                    </div>
+                </div>
+
+
+                <input type="hidden" name="PurchaseInvoiceId" value="@Model.PurchaseInvoiceId" />
+
+
+        
+
+
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-file-invoice"></i>
+                            Update Invoice
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.getElementById('selectgrain').addEventListener('change', function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var selectedText = selectedOption.text; // This will be "ઘઉં" for the given example
+        document.querySelector('input[name="ProductName"]').value = selectedText;
+
+        console.log(selectedText);// Update the hidden input
+    });
+</script>
+
+<script>
+   
+
+
+    function CalculateMethod() {
+        var bags = document.getElementById('bags').value.trim();
+        var bagsperkg = document.getElementById('bagsperkg').value.trim();
+        var weightInput = document.getElementById('weight');
+        var productprice = document.getElementById('productprice').value.trim();
+        var totalprice = 0;
+
+        // Check if both bags and bagsperkg are provided for multiplication
+        var weight = (bags !== '' && bagsperkg !== '') ? bags * bagsperkg : parseFloat(weightInput.value) || 0;
+
+        weightInput.value = weight === 0 ? '' : weight;
+
+        var selectGrain = document.getElementById("selectgrain");
+        var selectedValue = selectGrain.value;
+
+        switch (selectedValue) {
+            case "1":
+            case "2":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+            case "8":
+                totalprice = weight * productprice / 20;
+                break;
+
+            case "3":
+                totalprice = weight * productprice / 400;
+                break;
+
+            // Add more cases if needed
+        }
+
+        document.getElementById('totalprice').value = totalprice === 0 ? '' : totalprice;
+    }
+
+    // Attach the event listener to the dropdown
+    document.getElementById("selectgrain").addEventListener("change", CalculateMethod);
+
+    // Attach the event listener to the input field for bags
+    document.getElementById("bags")?.addEventListener("input", function () {
+        if (this.value.trim() !== '') {
+            CalculateMethod();
+        }
+    });
+
+    // Attach the event listener to the input field for bags per kg
+    document.getElementById("bagsperkg")?.addEventListener("input", function () {
+        if (this.value.trim() !== '') {
+            CalculateMethod();
+        }
+    });
+
+    // Attach the event listener to the input field for product price
+    document.getElementById("productprice").addEventListener("input", CalculateMethod);
+
+
+    function CheckData() {
+        var date = document.getElementById("datepicker").value;
+        var stockgrade = document.getElementById("stockgrade").value;
+        var grainname = document.getElementById("selectgrain").value;
+        var customer = document.getElementById("customer").value;
+        var bags = document.getElementById("bags").value;
+        var bagperkg = document.getElementById("bagsperkg").value;
+        var weight = document.getElementById("weight").value;
+        var productprice = document.getElementById("productprice").value;
+        var totalprice = document.getElementById("totalprice").value;
+        var vehicletype = document.getElementById("selectvehicletype").value;
+        var vehicleno = document.getElementById("vehicleno").value;
+        var drivername = document.getElementById("drivername").value;
+        var tolatname = document.getElementById("tolatname").value;
+
+        // Check if required fields are empty
+        if (
+            (grainname === '' || weight === '' || productprice === '' || totalprice === '' || vehicletype === '' || vehicleno === '' || drivername === '' || tolatname === '') &&
+            (bags === '' || bagperkg === '' || stockgrade === '')
+        ) {
+            alert("Please fill in all required data.");
+            return false; // Prevent form submission
+        } else {
+            // If required fields are filled, show confirmation
+            return confirm("Are you sure this data is correct? After submission, it can't be changed.");
+        }
+    }
+
+
+
+
+    function formatVehicleNo(input) {
+        // Remove non-alphanumeric characters and convert to uppercase
+        let formattedInput = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+        // Ensure the input does not exceed the expected length
+        formattedInput = formattedInput.substr(0, 14);
+
+        // Insert hyphens at specific positions
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+
+        // Update the input field with the formatted value
+        input.value = formattedInput;
+
+        // Validate the input format
+        const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{2})-(\d{4})$/;
+        const errorMsg = document.getElementById('error-msg');
+        errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the format: GJ-12-AB-1234';
+    }
+
+
+
+</script>
+
+<script>
+    DateDefaultValue();
+    CalculateMethod();
+
+</script>

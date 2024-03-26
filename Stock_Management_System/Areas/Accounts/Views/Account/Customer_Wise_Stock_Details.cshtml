@@ -1,0 +1,161 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = " Customer Wise Details Stock";
+
+    DateTime? invoiceDate = Model.TN_Date;
+    DateTime? onlyDate = invoiceDate?.Date;
+
+    string? formattedDate = onlyDate?.ToString("dd-MM-yyyy");
+}
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .scrollable-table {
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+</style>
+
+<div class="container">
+    <br />
+    <div class="row">
+        <!-- Left side - Back link -->
+        <div class="col-2">
+            <a asp-action="Manage_Customers_Account" asp-controller="Account" class="text-decoration-none">
+              
+              
+                <i class="fa fa-arrow-left" style="color:green; transform: scale(1.25);"> </i>
+            </a>
+        </div>
+
+        <!-- Center - Invoice Details -->
+        <div class="col-8 text-center">
+            <h5>Stock Details</h5>
+        </div>
+
+        <!-- Right side - PDF icon button -->
+        <div class="col-2 text-end">
+            <ul class="list-unstyled d-flex justify-content-end">
+                <li>
+                    <form asp-action="PDF_Preview_Download" asp-controller="Invoice" method="get">
+                        <input type="hidden" value="@Model.TN_ID" name="Invoice_ID" />
+                        <button type="submit" name="downloadType" value="pdf" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview/Download PDF" style="transform: scale(1.15);">
+                            <img src="~/img/icons/pdf.svg" alt="img">
+                        </button>
+                    </form>
+                </li>
+                <li>
+                    <form asp-action="PDF_Preview_Download" asp-controller="Invoice" method="get">
+                        <input type="hidden" value="@Model.TN_ID" name="Invoice_ID" />
+                        <button type="submit" name="downloadType" value="pdf" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Details" style="transform: scale(1.15);">
+                            <img src="~/img/icons/edit.svg" alt="img">
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <br />
+    <div class="table-responsive scrollable-table table-responsive-sm">
+        <table class="table">
+            <tr>
+                <th>Transaction ID</th>
+                <td>@Model.TN_ID</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>@formattedDate</td>
+            </tr>
+            <tr>
+                <th>Customer Name</th>
+                <td>@Model.CT_Name</td>
+            </tr>
+
+            <tr>
+                <th>Customer Type</th>
+                <td>@Model.CT_Type</td>
+            </tr>
+
+            <tr>
+                <th>Customer Contact</th>
+                <td>@Model.CT_Phone_No</td>
+            </tr>
+
+            <tr>
+                <th>Customer Address</th>
+                <td>@Model.CT_City</td>
+            </tr>
+
+            <tr>
+                <th>Product Name</th>
+                <td>@Model.Grain_Name</td>
+            </tr>
+
+            <tr>
+                <th>Goods Taken Loaction</th>
+                <td>@Model.Grain_Taken_Location</td>
+            </tr>
+
+            <tr>
+                <th>Bag</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.Bag) ? "--" : Model?.Bag)</td>
+            </tr>
+            <tr>
+                <th>Bag Per Kg</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.BagPerKg) ? "--" : Model?.BagPerKg)</td>
+            </tr>
+            <tr>
+                <th>Weight</th>
+                <td>@Model?.Weight</td>
+            </tr>
+            <tr>
+                <th>Product Price(₹)</th>
+                <td>@Model?.ProductPrice</td>
+            </tr>
+            <tr>
+                <th>Total Price(₹)</th>
+                <td>@Model?.TotalPrice</td>
+            </tr>
+            <tr>
+                <th>Vehicle Type</th>
+                <td>@Model?.VehicleTypeName</td>
+            </tr>
+            <tr>
+                <th>Vehicle No.</th>
+                <td>@Model?.VehicleNo</td>
+            </tr>
+            <tr>
+                <th>Driver Name</th>
+                <td>@Model?.DriverName</td>
+            </tr>
+            <tr>
+                <th>Tolat Name</th>
+                <td>@Model?.TolatName</td>
+            </tr>
+            <tr>
+                <th>Stock Grade</th>
+                <td>@(string.IsNullOrWhiteSpace(Model?.StockGrade) ? "--" : Model?.StockGrade)</td>
+            </tr>
+
+
+
+
+        </table>
+    </div>
+</div>
