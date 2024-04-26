@@ -1,0 +1,100 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Features";
+}
+
+<link rel="stylesheet" href="~/css/featurespagestyle.css" />
+
+
+<div class="content">
+    <div class="col-md-12">
+        <div class="card bg-white">
+            <div class="card-header">
+                <h5 class="card-title" style="text-align:center;">Features Of Our System</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="container mt-3">
+                    <ul class="nav nav-tabs nav-tabs-solid nav-tabs-rounded nav-justified flex-nowrap">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="stocks-tab" data-bs-toggle="tab" data-bs-target="#Stocks" role="tab" aria-controls="Stocks" aria-selected="true">
+                                <i class="fa fa-cubes me-1"></i> Stocks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="invoice-tab" data-bs-toggle="tab" data-bs-target="#Invoice" role="tab" aria-controls="Invoice" aria-selected="false">
+                                <i class="fa fa-file-invoice-dollar me-1"></i> Invoice
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="accounting-tab" data-bs-toggle="tab" data-bs-target="#Accounting" role="tab" aria-controls="Accounting" aria-selected="false">
+                                <i class="fa fa-book me-1"></i> Accounting
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#Payments" role="tab" aria-controls="Payments" aria-selected="false">
+                                <i class="fa fa-money-bill-wave me-1"></i> Payments
+                            </a>
+                        </li>
+                    </ul>
+                    <br/>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="Stocks" role="tabpanel" aria-labelledby="stocks-tab">
+                            <ul class="feature-list">
+                                <li>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow-bullet"></span><span style="color: #009541; font-weight: bold;">Add new stock items and link them to existing customers. If the customer is already in the system, it will automatically connect them.</span>
+                                    <br><br>
+                                </li>
+                                <li>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow-bullet"></span><span style="color: #009541; font-weight: bold;">Change any details about a stock item if needed. But you can only update stock details and information for customers already in the system.</span>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: red; font-weight: bold;">Note: You can only change stock details and existing customer information, not add new customers.</span>
+                                    <br><br>
+                                </li>
+                                <li>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow-bullet"></span><span style="color: #009541; font-weight: bold;">Remove stock items if you want to. Deleting a stock item will update your inventory, and it will also affect the customer's account and payments linked to that stock item.</span>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: red; font-weight: bold;">Note: Be careful when deleting stock items as it will change your inventory and customer records.</span>
+                                    <br><br>
+                                </li>
+                                <li>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow-bullet"></span><span style="color: #009541; font-weight: bold;">View the history of all stock items and use filters to find specific items easily.</span>
+                                    <br><br>
+                                </li>
+                                <li>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow-bullet"></span><span style="color: #009541; font-weight: bold;">Download the stock history in PDF or Excel format to save or print it.</span>
+                                    <br><br>
+                                </li>
+                                <li>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow-bullet"></span><span style="color: #009541; font-weight: bold;">Print any stock records directly from the page.</span>
+                                    <br><br>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="Invoice" role="tabpanel" aria-labelledby="invoice-tab">
+                            <!-- Content for Invoice -->
+                        </div>
+                        <div class="tab-pane fade" id="Accounting" role="tabpanel" aria-labelledby="accounting-tab">
+                            <!-- Content for Accounting -->
+                        </div>
+                        <div class="tab-pane fade" id="Payments" role="tabpanel" aria-labelledby="payments-tab">
+                            <!-- Content for Payments -->
+                        </div>
+                    </div>
+                </div>
+
+
+
+        </div>
+    </div>
+
+    </div>

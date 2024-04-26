@@ -29,6 +29,19 @@ namespace Stock_Management_System.Areas.Manage.Models
         public int TotalSalesInvoice { get; set; }
         public decimal AmountOfSalesInvoice { get; set; }
 
+        public int TotalPayments { get; set; }
+
+        public int PaidPayments { get; set; }
+
+        public int RemainPayments { get; set; }
+        public int PendingPayments { get; set; }
+        public decimal AmountOfPaidPayments { get; set; }
+
+        public decimal AmountOfPendingPayments { get; set; }
+
+
+
+
     }
 
 

@@ -7,6 +7,7 @@
 
 <div class="content">
     <div class="row">
+
         <div class="col-lg-3 col-sm-6 col-12">
             <div class="dash-widget">
                 <div class="dash-widgetimg">
@@ -57,13 +58,33 @@
                 <div class="dash-widgetcontent">
                     <h5>
                         ₹<span class="counters">
-                            0
+                            @Model.All_Counts_Model.AmountOfPaidPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
                         </span>
                     </h5>
-                    <h6>Sale Stock</h6>
+                    <h6>Total Paid Payments</h6>
                 </div>
             </div>
         </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+
+            <div class="dash-widget dash2">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash3.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>
+                        ₹<span class="counters">
+                            @Model.All_Counts_Model.AmountOfPendingPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        </span>
+                    </h5>
+                    <h6>Total Pending Payments</h6>
+                </div>
+            </div>
+        </div>
+
+
+
+
         <div class="col-lg-3 col-sm-6 col-12 d-flex">
             <div class="dash-count">
                 <div class="dash-counts">
@@ -83,8 +104,9 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"));
-                                
+                                @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                ;
+
                             }
                         }
                     </h4>
@@ -101,7 +123,8 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalPurchaseInvoice;
+                                @Model.All_Counts_Model.TotalPurchaseInvoice
+                                ;
 
                             }
                         }
@@ -121,7 +144,8 @@
                         @{
                             {
 
-                                @Model.All_Counts_Model.TotalSalesInvoice;
+                                @Model.All_Counts_Model.TotalSalesInvoice
+                                ;
                             }
                         }
 
@@ -139,7 +163,8 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalBags.ToString("N2", new System.Globalization.CultureInfo("en-IN"));
+                                @Model.All_Counts_Model.TotalBags.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                ;
                             }
                         }
                     </h4>
@@ -157,7 +182,8 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalWeight.ToString("N2", new System.Globalization.CultureInfo("en-IN"));
+                                @Model.All_Counts_Model.TotalWeight.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                ;
                             }
                         }
                     </h4>
@@ -166,6 +192,62 @@
                 <div class="dash-imgs">
                     <i class="fas fa-weight"></i> <!-- Weight scale -->
 
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count das2">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.TotalPayments
+                                ;
+                            }
+                        }
+                    </h4>
+                    <h5>Total Payments</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fas fa-dollar-sign"></i>
+
+                </div>
+            </div>
+        </div>
+         <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count das1">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.RemainPayments
+                                ;
+                            }
+                        }
+                    </h4>
+                    <h5>Total Remain Payments</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fas fa-hourglass-half"></i>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.PaidPayments
+                                ;
+                            }
+                        }
+                    </h4>
+                    <h5>Total Paid Payments</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fas fa-check"></i>
                 </div>
             </div>
         </div>
@@ -179,7 +261,7 @@
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
 
                     <h4 class="card-title mb-0">
-                        <span tabindex="0" role="button"  class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Quicks Links Help To Quickly Redirect Page !">
+                        <span tabindex="0" role="button" class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Quicks Links Help To Quickly Redirect Page !">
                             <i class="fas fa-link"></i> Quick Links
                         </span>
                     </h4>
@@ -381,7 +463,7 @@
                         <i class="fa fa-bell-slash"></i>  No Set Any  Remainder
 
                     </div>
-                    
+
 
                     @* <ul class="list-unstyled">
                     <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">

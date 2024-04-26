@@ -94,5 +94,10 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         }
 
 
+        public IActionResult Features()
+        {
+            return View();
+        }
+
     }
 }
