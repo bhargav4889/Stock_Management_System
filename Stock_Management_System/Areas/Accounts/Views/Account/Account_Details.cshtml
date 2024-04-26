@@ -79,6 +79,49 @@
     </script>
     <script>
         $(document).ready(function () {
+            // Attach event to document, delegate to .loadPaymentInfoBtn
+            $(document).on('click', '.loadRemainPaymentInfoBtn', function () {
+                var customerId = $(this).data('customer-id');
+                var stockId = $(this).data('stock-id');
+
+                $.ajax({
+                    url: '/Payment/Remain_Get_Payment_Info',
+                    data: { Customer_ID: customerId, Stock_ID: stockId },
+                    success: function (response) {
+                        $('#createpayment .modal-content').html(response);
+                        $('#createpayment').modal('show');
+                    },
+                    error: function () {
+                        alert('Error loading payment information');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Attach event to document, delegate to .loadPaymentInfoBtn
+            $(document).on('click', '.loadShowPaymentInfoBtn', function () {
+                var customerId = $(this).data('customer-id');
+                var stockId = $(this).data('stock-id');
+
+                $.ajax({
+                    url: '/Payment/Payment_Info_By_Customer_And_Stock',
+                    data: { Customer_ID: customerId, Stock_ID: stockId },
+                    success: function (response) {
+                        $('#createpayment .modal-content').html(response);
+                        $('#createpayment').modal('show');
+                    },
+                    error: function () {
+                        alert('Error loading payment information');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
             var banks = @Html.Raw(Json.Serialize(ViewBag.Banks));
 
             console.log(banks);
@@ -239,10 +282,7 @@
                 <table class="table">
                     @if (Model.Customers != null)
                     {
-                        <tr>
-                            <th>Customer ID:</th>
-                            <td style="font-weight:600; color:black;">@Model.Customers.CustomerId</td>
-                        </tr>
+                      
                         <tr>
                             <th>Name:</th>
                             <td style="font-weight:600; color:black; ">@Model.Customers.CustomerName</td>
@@ -342,18 +382,23 @@
                                             <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                         </a>
                                         <ul class="dropdown-menu">
-                                            <li>
-                                                <a href="sales-details.html" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Details</a>
-                                            </li>
-                                            <li>
-                                                <a href="edit-sales.html" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Edit Info</a>
-                                            </li>
+                                          
 
                                             <li>
-                                                <!-- Use class instead of id -->
-                                                <button class="loadPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img">Create Payment</button>
-
-
+                                                @if(item.PaymentStatus == "PENDING")
+                                                {
+                                                    <button class="loadPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img"> Create Payment</button>
+                                                }
+                                                else if (item.PaymentStatus == "REMAIN")
+                                                {
+                                                    <button class="loadRemainPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img"> Remain Payment</button>
+                                                }
+                                                else if (item.PaymentStatus == "PAID")
+                                                {
+                                                    <button class="loadShowPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/eye.svg" class="me-2" alt="img"> Show Payment</button>
+                                                }
+                                               
+                                                
                                             </li>
                                             <li>
 

@@ -109,46 +109,35 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         }
 
 
-        public async Task<IActionResult> Add_Stock_Details(Customers_Stock_Combined_Model customers_Stock_Combined_Model)
+        public async Task<IActionResult> Add_Stock_Details(Customers_Stock_Combined_Model model)
         {
-            // Assuming CustomerName is a unique identifier for simplicity
-            Customer_Model Customer_Info = Existing_Customer_Details(customers_Stock_Combined_Model.Customers.CustomerId);
-
-            if (Customer_Info == null)
+            // Check if the customer exists; if not, add them
+            Customer_Model customerInfo = await Existing_Customer_Details(model.Customers.CustomerId);
+            if (customerInfo == null)
             {
-                Customer_Info = new Customer_Model
+                // Add the new customer and directly use the returned model
+                customerInfo = await Add_New_Customer(model.Customers);
+                if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
-                    CustomerName = customers_Stock_Combined_Model.Customers.CustomerName,
-                    CustomerType = customers_Stock_Combined_Model.Customers.CustomerType,
-                    CustomerAddress = customers_Stock_Combined_Model.Customers.CustomerAddress,
-                    CustomerContact = customers_Stock_Combined_Model.Customers.CustomerContact,
-                };
-
-                // Await the method to ensure we get the updated customer details back
-                await Add_New_Customer(Customer_Info);
+                    return BadRequest("Failed to create a new customer.");
+                }
             }
 
-            // Update the model with the full details of the newly added or existing customer
-            Customer_Model New_Customer_Info = Existing_Customer_Details(Customer_Info.CustomerId);
-
-            New_Customer_Info = customers_Stock_Combined_Model.Customers;
-
-
+            // Prepare the data object for posting stock details
             var dataObject = new
             {
-                purchase_Stock = customers_Stock_Combined_Model.Insert_Purchase_Stock,
-                customers_Model = customers_Stock_Combined_Model.Customers
+                purchase_Stock = model.Insert_Purchase_Stock,
+                customers_Model = customerInfo // Use the updated/existing customer details
             };
 
             // Serialize the anonymous object to JSON
-            var jsonContent = Newtonsoft.Json.JsonConvert.SerializeObject(dataObject);
-            var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+            var jsonContent = JsonConvert.SerializeObject(dataObject);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            // Directly post the model
+            // Post the model to the "Stock/Insert_Purchase_Stock" endpoint
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/Insert_Purchase_Stock", content);
             if (response.IsSuccessStatusCode)
             {
-
                 return RedirectToAction("Manage_Stocks");
             }
             else
@@ -156,7 +145,20 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
                 var responseContent = await response.Content.ReadAsStringAsync();
                 return StatusCode((int)response.StatusCode, responseContent);
             }
+        }
 
+
+        private async Task<Customer_Model> Existing_Customer_Details(int customerId)
+        {
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{customerId}");
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                Customer_Model customerInfo = JsonConvert.DeserializeObject<Customer_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
+                return customerInfo;
+            }
+            return null;
         }
 
 
@@ -165,22 +167,83 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
         #region Method : Update Stock 
 
-        public async Task<IActionResult> Update_Stock(string TN_ID)
+        public async Task<IActionResult> Update_Stock(string TN_ID, string Customer_ID)
         {
 
             await All_Dropdowns_Call();
 
 
-
-            Customers_Stock_Combined_Model _Stock_Combined_Model = new Customers_Stock_Combined_Model();
-
-
-            _Stock_Combined_Model = await api_Service.Model_Of_Data_Display<Customers_Stock_Combined_Model>("Stock/Get_Purchase_Stock_By_Id", Convert.ToInt32(UrlEncryptor.Decrypt(TN_ID)));
+            Customers_Stock_Combined_Model customers_Stock_Combined_Model = new Customers_Stock_Combined_Model();
 
 
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Stock/Fetch_Stock_And_Customer_Details/{UrlEncryptor.Decrypt(TN_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
 
-            return View(_Stock_Combined_Model);
+
+            if (response.IsSuccessStatusCode)
+            {
+
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                var dataObject = jsonObject.data;
+                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+                customers_Stock_Combined_Model = JsonConvert.DeserializeObject<Customers_Stock_Combined_Model>(extractedDataJson);
+
+
+
+            }
+
+            return View(customers_Stock_Combined_Model);
+
+
+
+
+
+
         }
+
+        public async Task<IActionResult> Update_Stock_Details(Customers_Stock_Combined_Model model)
+        {
+            
+
+
+            // Check if the customer is new; if so, add them
+            if (model.Customers.CustomerId == 0)
+            {
+                // Add the new customer and directly use the returned model
+                Customer_Model customerInfo = await Add_New_Customer(model.Customers);
+                if (customerInfo == null || customerInfo.CustomerId == 0)
+                {
+                    return BadRequest("Failed to create a new customer.");
+                }
+                model.Customers = customerInfo; // Update the model with the new customer info
+            }
+
+            // Prepare the data object for updating stock details
+            var dataObject = new
+            {
+                purchase_Stock = model.Insert_Purchase_Stock,
+                customers_Model = model.Customers // Use the updated/existing customer details
+            };
+
+            // Serialize the data object to JSON
+            var jsonContent = JsonConvert.SerializeObject(dataObject);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            // Send the PUT request to the "Stock/Update_Purchase_Stock" endpoint
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Stock/Update_Purchase_Stock", stringContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Manage_Stocks");
+            }
+            else
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                // Log or display the responseContent for more detailed error information
+                return StatusCode((int)response.StatusCode, responseContent);
+            }
+        }
+
 
 
         #endregion
@@ -284,46 +347,29 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         }
 
 
-        public Customer_Model Existing_Customer_Details(int Customer_ID)
-        {
-            Customer_Model Existing_Customer_Info = CHECK_CUSTOMER_INFO_IN_SYSTEM(Customer_ID);
 
-            return Existing_Customer_Info;
-
-
-
-        }
 
         [HttpPost]
         public async Task<Customer_Model> Add_New_Customer(Customer_Model customerModel)
         {
-            var customerData = new
-            {
-                cT_Name = customerModel.CustomerName,
-                cT_City = customerModel.CustomerAddress,
-                cT_Type = customerModel.CustomerType,
-                cT_Phone_No = customerModel.CustomerContact
-            };
-
-            var jsonContent = JsonConvert.SerializeObject(customerData);
-            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", stringContent);
+            var jsonContent = JsonConvert.SerializeObject(customerModel);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", content);
 
             if (response.IsSuccessStatusCode)
             {
-                // Parse the JSON response to update the customerModel with the new ID and any other returned details
                 var responseString = await response.Content.ReadAsStringAsync();
-                var updatedCustomer = JsonConvert.DeserializeObject<Customer_Model>(responseString);
+                var responseObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(responseString);
 
-                // Assuming the API correctly populates and returns the updated customer details including CustomerId
-                customerModel.CustomerId = updatedCustomer.CustomerId;
-                // Update other fields as necessary
+                if (responseObject != null && responseObject["status"] == true)
+                {
+                    var updatedCustomer = JsonConvert.DeserializeObject<Customer_Model>(Convert.ToString(responseObject["data"]));
+                    return updatedCustomer; // This will now include all details, including the new ID
+                }
             }
-
-
-            return customerModel;
+            return null;
         }
+
 
 
 

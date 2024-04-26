@@ -325,7 +325,7 @@
 
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Update_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseStockId)) })"
+                                                   href="@Url.Action("Update_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseStockId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Stock</a>
                                             </li>
                                             <li>

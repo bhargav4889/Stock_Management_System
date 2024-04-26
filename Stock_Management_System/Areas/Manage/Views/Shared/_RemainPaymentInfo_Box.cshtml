@@ -9,91 +9,158 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-@model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Payment_Model;
+@model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Remain_Payment_Model;
 
+<style>
+    .bank-option {
+        display: flex;
+        align-items: center;
+    }
+
+    .bank-icon {
+        margin-right: 0.5rem;
+    }
+
+        .bank-icon img {
+            max-width: 24px; /* Adjust the size as needed */
+            max-height: 24px; /* Adjust the size as needed */
+        }
+</style>
 
 <div class="modal-header">
-    <h5 class="modal-title"><i class="fa fa-credit-card"></i> Payment Information</h5>
+    <h5 class="modal-title"><i class="fa fa-credit-card"></i>  Remain Payment Information</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 </div>
-<form id="PaymentForm" asp-action="Create_Payment" asp-controller="Payment" method="post">
+<form id="PaymentForm" asp-action="Create_Remain_Payment" asp-controller="Payment" method="post">
     <div class="modal-body">
         <div class="row">
 
 
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Customer Name</label>
-                    <input type="text" disabled value="@Model.Customer_Name">
+                    <label><span style="color:red;">*</span> Payment Date</label>
+                    <input type="date" id="datepicker" asp-for="Payment_Date" name="Payment_Date" disabled value="@Model.Payment_Date.Date.ToString("yyyy-MM-dd")" class="form-control">
+
                 </div>
             </div>
 
-            <input type="hidden" name="Customer_Id" value="@Model.Customer_Id" />
 
-            <input type="hidden" name="Stock_Id" value="@Model.Stock_Id" />
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Customer Name</label>
+                    <input type="text" disabled asp-for="Customer_Name" name="Customer_Name" value="@Model.Customer_Name">
+                </div>
+            </div>
 
-            <input type="hidden" name="Product_Id" value="@Model.Product_Id" />
+            <input type="hidden" name="Payment_Id" asp-for=Payment_Id value="@Model.Payment_Id" />
+
+            <input type="hidden" name="Customer_Id" asp-for=Customer_Id value="@Model.Customer_Id" />
+
+            <input type="hidden" name="Product_Id" asp-for=Product_Id value="@Model.Product_Id" />
+
+            <input type="hidden" name="Stock_Id" asp-for=Stock_Id value="@Model.Stock_Id" />
 
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
                     <label><span style="color:red;">*</span> Product Name</label>
-                    <input type="text" disabled name="Product_Name" value="@Model.Product_Name">
+                    <input type="text" disabled asp-for=Product_Name value="@Model.Product_Name" name="Product_Name">
                 </div>
             </div>
 
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Location</label>
-                    <input type="text" disabled name="Stock_Location" value="@Model.Stock_Loaction">
+                    <label><span style="color:red;">*</span> Total Amount (₹)</label>
+                    <input type="text" disabled name="Total_Amount" asp-for=Total_Amount name="Total_Amount" value="@Model.Total_Amount">
                 </div>
             </div>
-
-
-
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Stock Added Date</label>
-                    <input type="date" id="datepicker" name="Stock_Added_Date" disabled value="@Model.Stock_Added_Date.Date.ToString("yyyy-MM-dd")" class="form-control">
-
+                    <label><span style="color:red;">*</span> Paid Amount (₹)</label>
+                    <input type="text" disabled name="Paid_Amount" asp-for=Paid_Amount name="Paid_Amount" value="@Model.Paid_Amount">
                 </div>
             </div>
-
-
-
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Payment Date</label>
-                    <input type="date" asp-for="Payment_Date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")">
-                </div>
-            </div>
-
-
-            <div class="col-lg-4 col-sm-12">
-                <div class="form-group">
-                    <label><span style="color:red;">*</span> Total Price(₹)</label>
-                    <input type="text" id="totalPrice" name="Total_Price" disabled value="@Model.Total_Price">
+                    <label><span style="color:red;">*</span> Current Remain Amount (₹)</label>
+                    <input type="text" id="currentRemainAmount" class="form-control" asp-for="Remain_Amount" name="Remain_Amount" value="@Model.Remain_Amount" disabled>
                 </div>
             </div>
 
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Paying Amount(₹)</label>
-                    <input type="number" id="payingAmount" asp-for=Paid_Amount inputmode="numeric" class="form-control">
+                    <label><span style="color:red;">*</span> Previous Payment Method</label>
+                    <input type="text" disabled asp-for=First_Payment_Method name="First_Payment_Method" value="@Model.First_Payment_Method">
+                </div>
+            </div>
+
+            @if (Model.Bank_Id != 0)
+            {
+
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label><span style="color:red;">*</span> Previous Selected Bank</label>
+                        <select class="select" asp-for=Bank_Id id="PreviousbankSelect" name="Bank_Id">
+
+                            @{
+                                var baseAddress = "https://localhost:7024/";
+                                var Bank_Icon = baseAddress + Model.Bank_Icon;
+                            }
+                            <option name="Bank_Name" disabled selected  value="@Model.Bank_Id" data-icon="@Bank_Icon">@Model.Bank_Name</option>
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-12">
+                    <div class="form-group">
+                        <label><span style="color:red;">*</span> Previous Account No</label>
+                        <input type="text" asp-for="Bank_Ac_No" name="Bank_Ac_No" disabled readonly value="@Model.Bank_Ac_No">
+                    </div>
+                </div>
+
+                @if (Model.CHEQ_NO != null)
+                {
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="form-group">
+                            <label><span style="color:red;">*</span> Previous CHEQ NO</label>
+                            <input type="text" disabled asp-for="CHEQ_NO" name="CHEQ_NO" value="@Model.CHEQ_NO">
+                        </div>
+                    </div>
+
+                }
+                else if (Model.RTGS_No != null)
+                {
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="form-group">
+                            <label><span style="color:red;">*</span> Previous RTGS No</label>
+                            <input type="text" disabled asp-for="RTGS_No" name="RTGS_No" value="@Model.RTGS_No">
+                        </div>
+                    </div>
+                }
+
+
+            }
+
+
+
+            <div class="col-lg-4 col-sm-12">
+                <div class="form-group">
+                    <label><span style="color:red;">*</span> Remain Payment Date</label>
+                    <input type="date" asp-for="Remain_Payment_Date" name="Remain_Payment_Date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")">
                 </div>
             </div>
 
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Remain Amount(₹)</label>
-                    <input type="number" id="remainAmount" name="Remain_Amount" asp-for="Remain_Amount" inputmode="numeric" readonly class="form-control">
-
+                    <label><span style="color:red;">*</span> Remain Paying Amount (₹)</label>
+                    <input type="number" id="payingAmount" asp-for=Pay_Amount name="Pay_Amount" class="form-control" inputmode="numeric">
                 </div>
             </div>
 
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
                     <label><span style="color: red;">*</span> Select Payment Method</label>
-                    <select class="select" id="selectpaymentmethod" name="Payment_Method">
+                    <select class="select" asp-for=Remain_Payment_Method id="selectpaymentmethod" name="Remain_Payment_Method">
                         <option selected disabled>-- Payment Method --</option>
                         <option value="CASH">CASH</option>
                         <option value="BANK">BANK</option>
@@ -106,11 +173,11 @@
             <div class="col-lg-4 col-sm-12" id="bankSelection" style="display:none;">
                 <div class="form-group">
                     <label><span style="color:red;">*</span> Select Bank</label>
-                    <select class="select" id="bankSelect" name="Bank_Id">
+                    <select class="select" asp-for="Remain_Bank_Id" id="bankSelect" name="Remain_Bank_Id">
                         <option selected disabled>-- Select Bank --</option>
                         @foreach (var bank in ViewBag.Banks as IEnumerable<Stock_Management_System.Areas.Manage.Models.Bank_Model>)
                         {
-                            <option name="Bank_Name" value="@bank.BankId" data-icon="@bank.BankIcon">@bank.BankName</option>
+                            <option name="Bank_Name"  value="@bank.BankId" data-icon="@bank.BankIcon">@bank.BankName</option>
                         }
                     </select>
                 </div>
@@ -123,8 +190,8 @@
 
             <div class="col-lg-4 col-sm-12" id="AccountNo" style="display:none;">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> Bank Account No</label>
-                    <input type="number" id="bankAccountNumber" asp-for=Bank_Ac_No inputmode="numeric" placeholder="Account No" class="form-control">
+                    <label><span style="color:red;">*</span> Remain Bank Account No</label>
+                    <input type="number" id="bankAccountNumber" asp-for=Remain_Bank_Ac_No name="Remain_Bank_Ac_No" inputmode="numeric" placeholder="Account No" class="form-control">
                     <div id="bankAccountNumberError" style="color:red; display:none;">Invalid account number</div>
                 </div>
             </div>
@@ -132,15 +199,15 @@
 
             <div class="col-lg-4 col-sm-12" id="CheqNoPart" style="display:none;">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> CHEQ NO.</label>
-                    <input type="text" asp-for=CHEQ_No placeholder="CHEQ NO">
+                    <label><span style="color:red;">*</span> Remain CHEQ NO.</label>
+                    <input type="text" asp-for="Remain_CHEQ_NO" name="Remain_CHEQ_NO" placeholder="CHEQ NO">
                 </div>
             </div>
 
             <div class="col-lg-4 col-sm-12" id="RTGSPart" style="display:none;">
                 <div class="form-group">
-                    <label><span style="color:red;">*</span> RTGS NO.</label>
-                    <input type="text" asp-for="RTGS_No" placeholder="RTGS NO">
+                    <label><span style="color:red;">*</span> Remain RTGS NO.</label>
+                    <input type="text" asp-for="Remain_RTGS_No" name="Remain_RTGS_No" placeholder="RTGS NO">
                 </div>
             </div>
 
@@ -169,28 +236,28 @@
 
 
 <script>
-
-
     $(document).ready(function () {
         // Initialize Select2 for .select elements
         $('.select').select2({
             minimumResultsForSearch: Infinity
         });
 
-        // Event listener for paying amount changes
-        $('#payingAmount').on('input', function () {
-            var total = parseFloat($('#totalPrice').val()) || 0;
-            var paying = parseFloat($(this).val()) || 0;
+        $(document).ready(function () {
+            var totalRemain = parseFloat($('#currentRemainAmount').val()) || 0;
 
-            // If the paying amount exceeds the total, reset it to the total
-            if (paying > total) {
-                $(this).val(total);
-                paying = total;
-            }
+            $('#payingAmount').on('input', function () {
+                var paying = parseFloat($(this).val()) || 0;
 
-            // Update remaining amount
-            var remaining = total - paying;
-            $('#remainAmount').val(remaining.toFixed(2));
+                // Check if the paying amount is more than the current remain amount
+                if (paying > totalRemain) {
+                    $(this).val(totalRemain); // Set value to max allowable if it's over
+                    paying = totalRemain;
+                }
+
+                // Calculate and display the new remaining amount
+                var newRemaining = totalRemain - paying;
+                $('#currentRemainAmount').val(newRemaining.toFixed(2)); // Optionally update display or another field
+            });
         });
 
         // Payment method change handler
@@ -221,6 +288,13 @@
             templateResult: formatBankOption,
             templateSelection: formatBankOption
         });
+
+        $('#PreviousbankSelect').select2({
+            minimumResultsForSearch: -1,
+            templateResult: formatBankOption,
+            templateSelection: formatBankOption
+        });
+
 
         // Trigger initial update in case of pre-filled values
         $('#payingAmount').trigger('input');

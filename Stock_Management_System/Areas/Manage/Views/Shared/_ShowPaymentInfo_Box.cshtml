@@ -1,0 +1,269 @@
+﻿@using Stock_Management_System.UrlEncryption
+@{
+    Layout = null;
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+@model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Show_Payment_Info;
+
+@{
+    string BaseAddress = "https://localhost:7024/";
+
+    string Icon = Model.BankIcon;
+    string RemainIcon = Model.RemainBankIcon;
+
+    string BankIcon = BaseAddress + Icon;
+    string RemainBankIcon = BaseAddress + RemainIcon;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-credit-card"></i> Payment Information</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+    }
+
+    .table-section {
+        width: 100%;
+        border-right: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    img.bank-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+
+    .table-section:last-child {
+        border-right: none;
+    }
+</style>
+
+<script>
+    function toggleMainAccountNo() {
+        var accountNo = document.getElementById("mainAccountNo");
+        var toggleIcon = document.querySelector(".toggle-BankAcNo");
+
+        if (toggleIcon.classList.contains("fa-eye-slash")) {
+            accountNo.textContent = "@Model.BankAcNo";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            accountNo.textContent = "xxxxx" + "@Model.BankAcNo".substring("@Model.BankAcNo".length - 4);
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+
+    function toggleRemainAccountNo() {
+        var accountNo = document.getElementById("remainAccountNo");
+        var toggleIcon = document.querySelector(".toggle-RemainBankAcNo");
+
+        if (toggleIcon.classList.contains("fa-eye-slash")) {
+            accountNo.textContent = "@Model.RemainBankAcNo";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            accountNo.textContent = "xxxxx" + "@Model.RemainBankAcNo".substring("@Model.RemainBankAcNo".length - 4);
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+</script>
+
+
+@if (Model.PaymentID != 0)
+{
+    <div class="container">
+        <div class="table-section">
+            <table class="table" style="text-align:center;">
+                <!-- Payment Details -->
+
+                <tr>
+                    <th>Date</th>
+                    <td>@Model.PaymentDate.Date.ToShortDateString()</td>
+                </tr>
+                <tr>
+                    <th>Customer Name</th>
+                    <td>@Model.CustomerName</td>
+                </tr>
+                <tr>
+                    <th>Product Name</th>
+                    <td>@Model?.ProductName</td>
+                </tr>
+                <tr>
+                    <th>Total Amount</th>
+                    <td>@Model.TotalPrice</td>
+                </tr>
+                <tr>
+                    <th>Paid Amount</th>
+                    <td>@Model.AmountPaid</td>
+                </tr>
+                <tr>
+                    <th>Payment Method</th>
+                    <td>@Model.PaymentMethod</td>
+                </tr>
+                <!-- Bank Details -->
+                @if (Model.BankID != 0)
+                {
+                    <tr>
+                        <th>Bank Name</th>
+                        <td><img src="@BankIcon" class="bank-icon">@Model.BankName</td>
+                    </tr>
+                    <tr>
+                        <th>Bank Account No</th>
+                        <td>
+                            <span id="mainAccountNo">xxxxx@(Model.BankAcNo.Substring(Model.BankAcNo.Length - 4))</span>
+                            <span class="fas fa-eye-slash toggle-BankAcNo" onclick="toggleMainAccountNo()" role="button" tabindex="0"></span>
+                        </td>
+                    </tr>
+                    @if (Model.CheqNo != "--")
+                    {
+                        <tr>
+                            <th>CHEQ No</th>
+                            <td>@Model.CheqNo</td>
+                        </tr>
+                    }
+                    else if (Model.RtgsNo != "--")
+                    {
+                        <tr>
+                            <th>RTGS No.</th>
+                            <td>@Model.RtgsNo</td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+        @if (Model.RemainPaymentID != 0)
+        {
+            <div class="table-section">
+                <table class="table">
+                    <!-- Remain Payment Details -->
+                    <tr>
+                        <th>Remain Payment Date</th>
+                        <td>@Model.RemainPaymentDate.Date.ToShortDateString()</td>
+                    </tr>
+                    <tr>
+                        <th>Remain Amount</th>
+                        <td>@Model.RemainPaymentAmount</td>
+                    </tr>
+                    <tr>
+                        <th>Payment Method</th>
+                        <td>@Model.RemainPaymentMethod</td>
+                    </tr>
+                    <!-- Bank Details -->
+                    @if (Model.RemainBankID != 0)
+                    {
+                        <tr>
+                            <th>Bank</th>
+                            <td><img src="@RemainBankIcon" class="bank-icon">@Model.RemainBankName</td>
+                        </tr>
+                        <tr>
+                            <th>Remain Bank Account No</th>
+                            <td>
+                                <span id="remainAccountNo">xxxxx@(Model.BankAcNo.Substring(Model.RemainBankAcNo.Length - 4))</span>
+                                <span class="fas fa-eye-slash toggle-RemainBankAcNo" onclick="toggleRemainAccountNo()" role="button" tabindex="0"></span>
+                            </td>
+                        </tr>
+
+
+                        @if (Model.RemainCheqNo != "--")
+                        {
+                            <tr>
+                                <th>CHEQ No</th>
+                                <td>@Model.RemainCheqNo</td>
+                            </tr>
+                        }
+                        else if (Model.RemainRtgsNo != "--")
+                        {
+                            <tr>
+                                <th>RTGS No.</th>
+                                <td>@Model.RemainRtgsNo</td>
+                            </tr>
+                        }
+                    }
+                </table>
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <div class="container">
+        <div class="table-section">
+            <table class="table">
+                <!-- Payment Details -->
+                <tr>
+                    <th>Invoice ID</th>
+                    <td>@Model.PaymentID</td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td>@Model.PaymentDate.Date.ToShortDateString()</td>
+                </tr>
+                <tr>
+                    <th>Customer Name</th>
+                    <td>@Model.CustomerName</td>
+                </tr>
+                <tr>
+                    <th>Product Name</th>
+                    <td>@Model?.ProductName</td>
+                </tr>
+                <tr>
+                    <th>Total Amount</th>
+                    <td>@Model.TotalPrice</td>
+                </tr>
+                <tr>
+                    <th>Paid Amount</th>
+                    <td>@Model.AmountPaid</td>
+                </tr>
+                <tr>
+                    <th>Payment Method</th>
+                    <td>@Model.PaymentMethod</td>
+                </tr>
+                <!-- Bank Details -->
+                @if (Model.BankID != 0)
+                {
+                    <tr>
+                        <th>Bank Name</th>
+                        <td><img src="@BankIcon" class="bank-icon">@Model.BankName</td>
+                    </tr>
+                    <tr>
+                        <th>Remain Bank Account No</th>
+                        <td>
+                            <span id="accountNo">xxxxx@(Model.BankAcNo.Substring(Model.RemainBankAcNo.Length - 4))</span>
+                            <span class="fas toggle-password fa-eye-slash" onclick="toggleAccountNo()"></span>
+                        </td>
+                    </tr>
+                    @if (Model.CheqNo != "--")
+                    {
+                        <tr>
+                            <th>CHEQ No</th>
+                            <td>@Model.CheqNo</td>
+                        </tr>
+                    }
+                    else if (Model.RtgsNo != "--")
+                    {
+                        <tr>
+                            <th>RTGS No.</th>
+                            <td>@Model.RtgsNo</td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+}

@@ -554,7 +554,7 @@
     });
 </script>*@
 
-<script>
+@* <script>
     $(document).ready(function () {
         var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
 
@@ -626,7 +626,86 @@
             toggleNewCustomerFields(false);
         });
     });
+</script> *@
+
+<script>
+    $(document).ready(function () {
+        var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
+
+        // Function to show or hide new customer fields and a message.
+        function toggleNewCustomerFields(show) {
+            $("#newCustomerMessage").toggle(show);
+            $("#newcustomertype").toggle(show);
+            $("#newcustomercity").toggle(show);
+            $("#newcustomerphoneno").toggle(show);
+        }
+
+        // Initially hide the new customer message and fields.
+        toggleNewCustomerFields(false);
+
+        $("#farmer").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("Get_Customer_Data", "Stock")', // Make sure this URL is correct for your setup.
+                    type: "POST",
+                    dataType: "json",
+                    data: { CustomerName: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
+                                value: item.customerName,
+                                id: item.customerId // This will be used to set the hidden field value on selection.
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 1, // Minimum length before searching.
+            response: function (event, ui) {
+                // Check if any of the suggestions exactly match the entered input.
+                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#farmer").val().toLowerCase());
+                // Show the new customer fields if no exact matches are found.
+                toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
+            },
+            select: function (event, ui) {
+                // Set flag based on selection.
+                isSuggestionSelected = true;
+
+                // Prevent default to avoid placing label in the input.
+                event.preventDefault();
+
+                // Set the input to the customer name.
+                $("#farmer").val(ui.item.value);
+
+                // Update hidden field with selected customer ID.
+                $("#CustomerId").val(ui.item.id);
+
+                // Hide new customer fields as a selection has been made.
+                toggleNewCustomerFields(false);
+            }
+        });
+
+        // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
+        $("#farmer").on('input', function () {
+            var enteredValue = $(this).val().trim();
+            if (!enteredValue) {
+                toggleNewCustomerFields(false);
+                isSuggestionSelected = false;
+            } else {
+                isSuggestionSelected = false;
+                // Since we are still typing, check if any item matches exactly from the last search.
+                $("#farmer").autocomplete("search", enteredValue);
+            }
+        });
+
+        // Optionally, reset the form state when the page is refreshed or navigated away.
+        $(window).on('beforeunload', function () {
+            toggleNewCustomerFields(false);
+        });
+    });
 </script>
+
 
 
 

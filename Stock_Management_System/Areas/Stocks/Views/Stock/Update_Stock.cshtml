@@ -8,7 +8,7 @@
 <div class="content">
     <div class="page-header">
         <div class="page-title">
-            <h4>Stock Add</h4>
+            <h4>Update Stock</h4>
             <h6 style="font-style:initial; font-weight:bolder;color:gray">Update Existing Stock</h6>
         </div>
     </div>
@@ -18,175 +18,212 @@
 
             <form class="row g-3" asp-action="Update_Stock_Details" asp-controller="Stock" onsubmit="return CheckData()" method="post">
 
+
+                <input type="hidden" value="@Model.Insert_Purchase_Stock.PurchaseStockId"  asp-for="@Model.Insert_Purchase_Stock.PurchaseStockId" />
+
                 <!-- Date -->
-                <div class="col-12 col-md-4 mb-3">
-                    <div class="form-floating">
-                        <input type="date" class="form-control" id="datepicker" asp-for="Insert_Purchase_Stock.PurchaseStockDate">
-                        <label for="datepicker" class="text-truncate"><span style="color: red;">*</span> Select a Date</label>
-                        <span class="text-danger"></span>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Stock Date </label>
+                        <input type="date" placeholder="DD-MM-YYYY" id="datepicker" asp-for="@Model.Insert_Purchase_Stock.PurchaseStockDate" class="form-control">
                     </div>
                 </div>
 
                 <!-- Stock Type -->
 
-                <div class="col-12 col-md-4 mb-3">
-
-
-                    <div class="form-floating">
-                        <select class="form-select" id="stockgrade" aria-label="stockgrade" asp-for="Insert_Purchase_Stock.ProductGradeId" asp-items="ViewBag.ProductGrade">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Select Grade</label>
+                        <select class="select" id="stockgrade" aria-label="stockgrade" asp-for="@Model.Insert_Purchase_Stock.ProductGradeId" asp-items="ViewBag.ProductGrade">
                             <option selected disabled>-- Stock Grade --</option>
                         </select>
-                        <label for="SelectStockGrade"><span style="color: black;">*</span> Select Stock Grade</label>
+
 
                     </div>
                 </div>
 
 
                 <!-- Grain Type -->
-                <div class="col-12 col-md-4 mb-3">
-                    <div class="form-floating">
-                        <select class="form-select" id="selectgrain" aria-label="graintype" asp-for="Insert_Purchase_Stock.ProductId" asp-items="ViewBag.Products">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Select Product Type</label>
+                        <select class="select" id="selectgrain" aria-label="graintype" asp-for="@Model.Insert_Purchase_Stock.ProductId" asp-items="ViewBag.Products">
                             <option value="" selected disabled>-- Select Grain --</option>
                         </select>
-                        <label for="selectgrain"><span style="color: red;">*</span> Select Grain Type</label>
+
                     </div>
                 </div>
-              @*  <input type="hidden" asp-for="Insert_Purchase_Stock.ProductName" />*@
+                @*   <input type="hidden" asp-for="Purchase_Stock.ProductName" />*@
 
 
 
 
 
                 <!-- Customer Name -->
-                <div class="col-12 col-md-5 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="farmer" name="CustomerName" asp-for="Customers.CustomerName" oninput="this.value = this.value.toUpperCase()">
-                        <label for="farmer"><span style="color: red;">*</span> Enter Customer Name</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerName"></span>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Customer Name</label>
+                        <input type="text" class="form-control" id="farmer" placeholder="Customer Name" asp-for="@Model.Customers.CustomerName" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Customers.CustomerName"></span>
                         <span id="newCustomerMessage" style="color:green">* New Customer</span>
                     </div>
                 </div>
 
-                <input type="hidden" id="CustomerId" asp-for="Customers.CustomerId" />
+                @if(Model.Customers.CustomerName == Model.Customers.CustomerName)
+                {
+                    <input type="hidden" id="CustomerId" asp-for="@Model.Customers.CustomerId" />
+                }
+                else
+                {
+                    Model.Customers.CustomerId = 0;
+                    <input type="hidden" id="CustomerId" value="0" />
+                }
+
 
 
                 <!-- Customer Type -->
-                <div id="newcustomertype" class="col-12 col-md-4 mb-3" style="display: none;">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" placeholder="CTType" id="cttype" asp-for="Customers.CustomerType" oninput="this.value = this.value.toUpperCase()">
-                        <label for="ctname"><span style="color: red;">*</span> New Customer Type</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerType"></span>
+                <div id="newcustomertype" class="col-lg-3 col-sm-6 col-12" style="display: none;">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> New Customer Type</label>
+                        <input type="text" class="form-control" placeholder="Customer Type" id="cttype" asp-for="@Model.Customers.CustomerType" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Customers.CustomerType"></span>
                     </div>
                 </div>
 
                 <!-- Customer City -->
-                <div id="newcustomercity" class="col-12 col-md-4 mb-3" style="display: none;">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" placeholder="CTCity" id="customercity" asp-for="Customers.CustomerAddress" oninput="this.value = this.value.toUpperCase()">
+                <div id="newcustomercity" class="col-lg-3 col-sm-6 col-12" style="display: none;">
+                    <div class="form-group">
                         <label for="ctname"><span style="color: red;">*</span> New Customer City</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerAddress"></span>
+                        <input type="text" class="form-control" placeholder="City Name" id="customercity" asp-for="@Model.Customers.CustomerAddress" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Customers.CustomerAddress"></span>
                     </div>
                 </div>
 
                 <!-- Customer Contact_No -->
-                <div id="newcustomerphoneno" class="col-12 col-md-4 mb-3" style="display: none;">
-                    <div class="form-floating">
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="contactno" asp-for="Customers.CustomerContact" id="contactno">
+                <div id="newcustomerphoneno" class="col-lg-3 col-sm-6 col-12" style="display: none;">
+                    <div class="form-group">
                         <label for="bags"><span style="color: red;">*</span> Enter Customer No</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerContact"></span>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Contact No" asp-for="@Model.Customers.CustomerContact" id="contactno">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Customers.CustomerContact"></span>
                     </div>
                 </div>
 
 
                 <!-- Customer Good Taken Loaction -->
-                <div class="col-12 col-md-4 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" placeholder="goodtakenloc" asp-for="Insert_Purchase_Stock.PurchaseStockLocation" id="goodtakenloc" oninput="this.value = this.value.toUpperCase()">
-                        <label for="farmer"><span style="color: red;">*</span> Goods Taken Loaction</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.PurchaseStockLocation"></span>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Stock Taken Place</label>
+                        <input type="text" class="form-control" placeholder="Enter Location" asp-for="@Model.Insert_Purchase_Stock.PurchaseStockLocation" id="goodtakenloc" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.PurchaseStockLocation"></span>
                     </div>
                 </div>
 
                 <!-- Tolat Name -->
-                <div class="col-12 col-md-3 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" placeholder="Tolat Name" asp-for="Insert_Purchase_Stock.TolatName" id="tolatname" oninput="this.value = this.value.toUpperCase()">
-                        <label for="tolatname"><span style="color: red;">*</span> Enter Tolat Name</label>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Tolat Name</label>
+                        <input type="text" class="form-control" placeholder="Tolat Name" asp-for="@Model.Insert_Purchase_Stock.TolatName" id="tolatname" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.TolatName"></span>
                     </div>
                 </div>
 
                 <!-- Bags -->
-                <div class="col-12 col-md-2 mb-3">
-                    <div class="form-floating">
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="Insert_Purchase_Stock.Bags">
-                        <label for="bags"><span style="color: black;">*</span> Enter Bags</label>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Bags</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="@Model.Insert_Purchase_Stock.Bags">
+
                     </div>
                 </div>
 
                 <!-- Bags Per KG -->
-                <div class="col-12 col-md-2 mb-3">
-                    <div class="form-floating">
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="Insert_Purchase_Stock.BagPerKg">
-                        <label for="bagsperkg"><span style="color: black;">*</span> Enter Bags Per KG</label>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="bagsperkg"><span style="color: black;">*</span> Bags Per KG</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="@Model.Insert_Purchase_Stock.BagPerKg">
+
                     </div>
                 </div>
 
                 <!-- Weight -->
-                <div class="col-12 col-md-2 mb-3">
-                    <div class="form-floating">
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Weight" id="weight" asp-for="Insert_Purchase_Stock.TotalWeight">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
                         <label for="weight"><span style="color: red;">*</span> Weight</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.TotalWeight"></span>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Weight" id="weight" asp-for="@Model.Insert_Purchase_Stock.TotalWeight">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.TotalWeight"></span>
                     </div>
                 </div>
 
                 <!-- Product Price -->
-                <div class="col-12 col-md-3 mb-3">
-                    <div class="form-floating">
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Product Price" id="productprice" oninput="CalculateMethod()" asp-for="Insert_Purchase_Stock.ProductPrice">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
                         <label for="productprice"><span style="color: red;">*</span> Enter Product Price ⟨₹⟩</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.ProductPrice"></span>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Product Price ⟨₹⟩" id="productprice" oninput="CalculateMethod()" asp-for="@Model.Insert_Purchase_Stock.ProductPrice">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.ProductPrice"></span>
                     </div>
                 </div>
 
                 <!-- Total Price -->
-                <div class="col-12 col-md-3 mb-3">
-                    <div class="form-floating">
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Total Price" id="totalprice" asp-for="Insert_Purchase_Stock.TotalPrice">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
                         <label for="totalprice"><span style="color: red;">*</span> Total Price ⟨₹⟩</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.TotalPrice"></span>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Total Price ⟨₹⟩" id="totalprice" asp-for="@Model.Insert_Purchase_Stock.TotalPrice">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.TotalPrice"></span>
                     </div>
                 </div>
 
                 <!-- Vehicle Type -->
-                <div class="col-12 col-md-3">
-                    <div class="form-floating mb-3">
-                        <select class="form-select" id="selectvehicletype" aria-label="vehicletype" asp-for="Insert_Purchase_Stock.VehicleId" asp-items="@(ViewBag.Vehicle)">
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="selectvehicletype"><span style="color: red;">*</span> Select Vehicle</label>
+                        <select class="select" id="selectvehicletype" aria-label="vehicletype" asp-for="@Model.Insert_Purchase_Stock.VehicleId" asp-items="@(ViewBag.Vehicle)">
                             <option selected disabled>-- Select Vehicle --</option>
                         </select>
-                        <label for="selectvehicletype"><span style="color: red;">*</span> Select Type</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.VehicleId"></span>
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.VehicleId"></span>
                     </div>
                 </div>
+                
 
-                <input type="hidden" asp-for="Insert_Purchase_Stock.VehicleName" />
+            
 
                 <!-- Vehicle No. -->
-                <div class="col-12 col-md-3 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" placeholder="GJ-01-MH-1234" id="vehicleno" asp-for="Insert_Purchase_Stock.VehicleNo" oninput="formatVehicleNo(this)">
-                        <label for="vehicleno"><span style="color: red;">*</span> Enter Vehicle No.</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.VehicleNo"></span>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="vehicleno"><span style="color: red;">*</span> Vehicle No.</label>
+                        <input type="text" class="form-control" placeholder="GJ-01-MH-1234" id="vehicleno" asp-for="@Model.Insert_Purchase_Stock.VehicleNo" oninput="formatVehicleNo(this)">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.VehicleNo"></span>
                     </div>
                     <span id="error-msg" style="color: red; font-size:11px; font-weight:bold;"></span>
                 </div>
 
                 <!-- Truck/Tempo Driver Name -->
-                <div class="col-12 col-md-3 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" placeholder="Driver Name" asp-for="Insert_Purchase_Stock.DriverName" id="drivername" oninput="this.value = this.value.toUpperCase()">
-                        <label for="drivername"><span style="color: red;">*</span> Enter Driver Name</label>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.DriverName"></span>
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="drivername"><span style="color: red;">*</span> Driver Name</label>
+                        <input type="text" class="form-control" placeholder="Driver Name" asp-for="@Model.Insert_Purchase_Stock.DriverName" id="drivername" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.DriverName"></span>
+                    </div>
+                </div>
+
+                <!-- PAYMENT STATUS -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="drivername"><span style="color: red;">*</span> Payment Status</label>
+                        <input type="text" class="form-control" disabled placeholder="Driver Name" asp-for="@Model.Insert_Purchase_Stock.PaymentStatus" id="paymentsatus" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="@Model.Insert_Purchase_Stock.PaymentStatus"></span>
                     </div>
                 </div>
 
@@ -194,10 +231,10 @@
                 <div class="row justify-content-center">
                     <div class="col-auto text-center mb-3" style="margin-top:20px;">
                         <button type="submit" class="btn btn-success me-2">
-                            <i class="fas fa-plus"></i> Add Stock
+                            <i class="fas fa-file"></i> Update Stock
                         </button>
-                        <button type="reset" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Clear All
+                        <button type="submit" asp-action="Manage_Stocks" asp-controller="Stock" class="btn btn-info">
+                            <i class="fas fa-arrow-left"></i> Back to Stocks
                         </button>
                     </div>
                 </div>
@@ -540,7 +577,7 @@
     });
 </script>*@
 
-<script>
+@* <script>
     $(document).ready(function () {
         var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
 
@@ -612,7 +649,86 @@
             toggleNewCustomerFields(false);
         });
     });
+</script> *@
+
+<script>
+    $(document).ready(function () {
+        var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
+
+        // Function to show or hide new customer fields and a message.
+        function toggleNewCustomerFields(show) {
+            $("#newCustomerMessage").toggle(show);
+            $("#newcustomertype").toggle(show);
+            $("#newcustomercity").toggle(show);
+            $("#newcustomerphoneno").toggle(show);
+        }
+
+        // Initially hide the new customer message and fields.
+        toggleNewCustomerFields(false);
+
+        $("#farmer").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("Get_Customer_Data", "Stock")', // Make sure this URL is correct for your setup.
+                    type: "POST",
+                    dataType: "json",
+                    data: { CustomerName: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
+                                value: item.customerName,
+                                id: item.customerId // This will be used to set the hidden field value on selection.
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 1, // Minimum length before searching.
+            response: function (event, ui) {
+                // Check if any of the suggestions exactly match the entered input.
+                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#farmer").val().toLowerCase());
+                // Show the new customer fields if no exact matches are found.
+                toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
+            },
+            select: function (event, ui) {
+                // Set flag based on selection.
+                isSuggestionSelected = true;
+
+                // Prevent default to avoid placing label in the input.
+                event.preventDefault();
+
+                // Set the input to the customer name.
+                $("#farmer").val(ui.item.value);
+
+                // Update hidden field with selected customer ID.
+                $("#CustomerId").val(ui.item.id);
+
+                // Hide new customer fields as a selection has been made.
+                toggleNewCustomerFields(false);
+            }
+        });
+
+        // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
+        $("#farmer").on('input', function () {
+            var enteredValue = $(this).val().trim();
+            if (!enteredValue) {
+                toggleNewCustomerFields(false);
+                isSuggestionSelected = false;
+            } else {
+                isSuggestionSelected = false;
+                // Since we are still typing, check if any item matches exactly from the last search.
+                $("#farmer").autocomplete("search", enteredValue);
+            }
+        });
+
+        // Optionally, reset the form state when the page is refreshed or navigated away.
+        $(window).on('beforeunload', function () {
+            toggleNewCustomerFields(false);
+        });
+    });
 </script>
+
 
 
 

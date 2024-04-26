@@ -12,7 +12,7 @@
     <div class="login-wrapper">
 
 
-        <div class="login-content">
+        <div class="login-content  shadow p-3 mb-5 bg-body rounded" style="max-width: 600px; margin: auto;">
             <div class="login-userset">
                 @if (TempData["ErrorMsg"] != null)
                 {
@@ -43,44 +43,35 @@
                         </div>
                         <span style="color:red;" asp-validation-for="Password"></span>
                     </div>
-                      <div class="form-login">
-                    <div class="alreadyuser">
-                    <h4><a href="forgetpassword.html" class="hover-a">Forgot Password?</a></h4>
-                    </div>
+                    <div class="form-login">
+                        <div class="alreadyuser">
+                            <h4><a asp-action="Forget_Password" asp-controller="Login" class="hover-a">Forgot Password?</a></h4>
+                        </div>
                     </div>
                     <div class="form-login">
                         <button type="submit" class="btn btn-login">Login</button>
                     </div>
                 </form>
-                @* <div class="signinform text-center">
-                <h4>Don’t have an account? <a href="signup.html" class="hover-a">Sign Up</a></h4>
-                </div>
-                <div class="form-setlogin">
-                <h4>Or sign up with</h4>
-                </div>*@
-                @*  <div class="form-sociallink">
-                <ul>
-                <li>
-                <a href="javascript:void(0);">
+               <div class="form-setlogin text-center mt-4">
+    <h4>Other</h4>
+</div>
+<div class="form-sociallink text-center">
+    <ul class="list-inline">
+        <li class="list-inline-item">
+            <a href="javascript:void(0);" class="btn btn-outline-secondary">
                 <img src="~/img/icons/google.png" class="me-2" alt="google">
-                Sign Up using Google
-                </a>
-                </li>
-                <li>
-                <a href="javascript:void(0);">
-                <img src="~/img/icons/facebook.png" class="me-2" alt="google">
-                Sign Up using Facebook
-                </a>
-                </li>
-                </ul>
-                </div>*@
+                Login using Google
+            </a>
+        </li>
+    </ul>
+</div>
+
             </div>
         </div>
-        <div class="login-img">
-            <img src="~/img/login.jpg" alt="img">
-        </div>
+
     </div>
 </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var errorMessage = document.getElementById('toastrErrorMessage').value;

@@ -116,5 +116,10 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             return RedirectToAction("Login_Page");
         }
 
+        public IActionResult Forget_Password()
+        {
+            return View();
+        }
+
     }
 }

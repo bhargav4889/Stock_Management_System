@@ -1255,9 +1255,9 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
 
 
-                        iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\OneDrive\\Desktop\\Icons\\Logo-Size_M.png");
+                        iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\Desktop\\Icons\\Logo-Size_M.png");
 
-                        iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\OneDrive\\Desktop\\Icons\\Backimg.png");
+                        iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\Desktop\\Icons\\Backimg.png");
 
 
                         image.ScaleToFit(60, 60); // Adjust width and height
