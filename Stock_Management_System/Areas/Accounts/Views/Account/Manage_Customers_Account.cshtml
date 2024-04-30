@@ -201,13 +201,13 @@
                                             <ul class="dropdown-menu text-center">
                                                 <li>
                                                     <a role="link"
-                                                       href="@Url.Action("Update_Customer_Info", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) })"
+                                                       href="@Url.Action("Update_Customer_Info", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) , Customer_Type = row.CustomerType })"
                                                        onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img"> Edit Customer</a>
                                                 </li>
 
                                                 <li>
                                                     <a role="link"
-                                                       href="@Url.Action("Account_Details", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) })"
+                                                       href="@Url.Action("Account_Details", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)), Customer_Type = row.CustomerType })"
                                                        onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/dollar.svg" class="me-2" alt="img">Go to Account</a>
                                                 </li>
                                             </ul>

@@ -1,0 +1,176 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Sale Details";
+}
+
+@model Stock_Management_System.Areas.Sales.Models.Show_Sale;
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .scrollable-table {
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+    img.bank-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+</style>
+
+<div class="container">
+    <br />
+    <div class="row">
+        <div class="col-2">
+            <a asp-action="Manage_Sales" asp-controller="Sales" class="text-decoration-none">
+                <i class="fa fa-arrow-left" style="color:green; transform: scale(1.25);"></i> 
+            </a>
+        </div>
+        <div class="col-8 text-center">
+            <h5>Sale Details</h5>
+        </div>
+    </div>
+
+    <div class="table-responsive scrollable-table">
+        <table class="table">
+            @* Display sale creation date and other details *@
+            <tr>
+                <th>Sale Creation Date</th>
+                <td>@Model.Create_Sales.ToString("dd-MM-yyyy")</td>
+            </tr>
+            <tr>
+                <th>Received Payment Date</th>
+                <td>@Model.Receive_Payment_Date.ToString("dd-MM-yyyy")</td>
+            </tr>
+            <tr>
+                <th>Customer Name</th>
+                <td>@Model.CustomerName</td>
+            </tr>
+            <tr>
+                <th>Customer Type</th>
+                <td>@Model.CustomerType</td>
+            </tr>
+            <tr>
+                <th>Product Name</th>
+                <td>@Model.Product_Name</td>
+            </tr>
+            @if (!string.IsNullOrEmpty(Model.Brand_Name))
+            {
+                <tr>
+                    <th>Brand Name</th>
+                    <td>@Model.Brand_Name</td>
+                </tr>
+            }
+            <tr>
+                <th>Bag</th>
+                <td>@(Model.Bags?.ToString() ?? "--")</td>
+            </tr>
+            <tr>
+                <th>Bag Per Kg</th>
+                <td>@(Model.BagPerKg?.ToString() ?? "--")</td>
+            </tr>
+            <tr>
+                <th>Weight</th>
+                <td>@Model.Total_Weight</td>
+            </tr>
+            <tr>
+                <th>Rate(₹)</th>
+                <td>@Model.Rate.ToString("C")</td>
+            </tr>
+            <tr>
+                <th>Total Amount(₹)</th>
+                <td>@Model.Total_Price.ToString("C")</td>
+            </tr>
+            <tr>
+                <th>Received Amount(₹)</th>
+                <td>@Model.Receive_Amount.ToString("C")</td>
+            </tr>
+            <tr>
+                <th>Discount (₹)</th>
+                <td>@Model.Discount?.ToString("C")</td>
+            </tr>
+            <tr>
+                <th>Receive Payment Method</th>
+                <td>@Model.Payment_Method</td>
+            </tr>
+
+            @if (Model.Receive_Information_ID != 0)
+            {
+                string baseAddress = "https://localhost:7024/";
+                string Icon = Model.Bank_Icon;
+                string BankIcon = baseAddress + Icon;
+
+                <tr>
+                    <th> Bank Account No</th>
+                    <td>XXXXX@(Model.Receive_Account_No.Substring(Model.Receive_Account_No.Length - 4)) <img src="@BankIcon" class="bank-icon" /></td>
+                </tr>
+
+                <tr>
+                    <th>Account Holder Name</th>
+                    <td>@Model.Account_Holder_Name</td>
+                </tr>
+            }
+
+            <tr>
+                <th>Deducted Amount(₹)</th>
+                <td>@Model.Deducted_Amount.Value.ToString("C")</td>
+            </tr>
+
+            <tr>
+                <th>Is Full Amount Payment Received?</th>
+                <td>@(Model.IsFullPaymentReceive ? "Yes" : "No")</td>
+            </tr>
+
+            @if (Model.IsFullPaymentReceive)
+            {
+
+
+                <tr>
+                    <th>Remain Payment Date</th>
+                    <td>@Model.Remain_Payment_Date?.ToString("dd-MM-yyyy")</td>
+                </tr>
+                <tr>
+                    <th>Remain Amount(₹)</th>
+                    <td>@Model.Receive_Remain_Amount?.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Remain Payment Method</th>
+                    <td>@Model.Remain_Payment_Method</td>
+                </tr>
+
+                @if (Model.Remain_Receive_Information_ID != 0)
+                {
+                    string baseAddress = "https://localhost:7024/";
+                    string Icon = Model.Remain_Bank_Icon;
+                    string BankIcon = baseAddress + Icon;
+
+                    <tr>
+                        <th> Remain Bank Account No</th>
+                        <td>XXXXX@(Model.Receive_Remain_Account_No.Substring(Model.Receive_Remain_Account_No.Length - 4))  <img src="@BankIcon" class="bank-icon" /></td>
+                    </tr>
+
+                    <tr>
+                        <th>Remain Account Holder Name</th>
+                        <td>@Model.Remain_Account_Holder_Name</td>
+                    </tr>
+
+
+                }
+            }
+
+        </table>
+    </div>
+</div>

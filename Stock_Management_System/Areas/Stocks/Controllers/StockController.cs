@@ -248,25 +248,19 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
         #endregion
 
-
-        #region Method  : Get Customer Details From AutoComplete
-        public async Task<JsonResult> Get_Customer_Data(string CustomerName)
+        #region Method : Get Customer Details From AutoComplete
+        public async Task<JsonResult> Get_Buyer_Customer_Data(string CustomerName)
         {
-            // Directly fetch the customer models using the provided name.
-            List<Customers_Model> customerModels = await fetch_customer_name(CustomerName);
-
-            // Assuming customerModels is already a List<Customer_Model> as fetched and deserialized from the API response.
-            // No need to iterate through a DataTable.
-
-            // Return the customer models as a JSON result.
+            List<Customers_Model> customerModels = await fetch_buyer_customer_name(CustomerName);
             return Json(customerModels);
         }
 
-        private async Task<List<Customers_Model>> fetch_customer_name(string CustomerName)
+
+        private async Task<List<Customers_Model>> fetch_buyer_customer_name(string CustomerName)
         {
             List<Customers_Model> customer_Models = new List<Customers_Model>();
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/BUYER_CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -281,10 +275,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         }
 
 
-
-
-
-
+      
 
 
 
@@ -307,8 +298,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
             List<Purchase_Stock> stockModels = await api_Service.List_Of_Data_Display<Purchase_Stock>("Stock/Purchase_Stocks");
 
-            SetData_From_Session_For_Pdf_And_Excel(stockModels, "ListOfStocksData");
-
+            
             return View(stockModels);
         }
 

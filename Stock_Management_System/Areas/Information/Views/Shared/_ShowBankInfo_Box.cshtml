@@ -1,0 +1,112 @@
+﻿@using Stock_Management_System.UrlEncryption
+@{
+    Layout = null;
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+@model Stock_Management_System.Areas.Information.Models.Information_Model;
+
+@{
+    string BaseAddress = "https://localhost:7024/";
+
+    string Icon = Model.BankIcon;
+
+
+    string BankIcon = BaseAddress + Icon;
+
+}
+
+<div class="modal-header">
+    <h5 class="modal-title"><i class="fas fa-university"></i> Bank Information</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+    }
+
+    .table-section {
+        width: 100%;
+        border-right: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    img.bank-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+
+    .table-section:last-child {
+        border-right: none;
+    }
+</style>
+
+<script>
+    function toggleMainAccountNo() {
+        var accountNo = document.getElementById("mainAccountNo");
+        var toggleIcon = document.querySelector(".toggle-BankAcNo");
+
+        if (toggleIcon.classList.contains("fa-eye-slash")) {
+            accountNo.textContent = "@Model.AccountNo";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            accountNo.textContent = "xxxxx" + "@Model.AccountNo".substring("@Model.AccountNo".length - 4);
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+
+
+
+
+</script>
+
+
+
+<div class="container">
+    <div class="table-section">
+        <table class="table" style="text-align:center;">
+            <!-- Payment Details -->
+
+            <tr>
+                <th>Bank Name</th>
+                <td><img src="@BankIcon" class="bank-icon">@Model.BankName</td>
+            </tr>
+            <tr>
+                <th>Bank Account No</th>
+                <td>
+                    <span id="mainAccountNo">xxxxx@(Model.AccountNo.Substring(Model.AccountNo.Length - 4))</span>
+                    <span class="fas fa-eye-slash toggle-BankAcNo" onclick="toggleMainAccountNo()" role="button" tabindex="0"></span>
+                </td>
+            </tr>
+            <tr>
+                <th>Bank IFSC Code</th>
+                <td>@Model.ifsc_code</td>
+            </tr>
+            <tr>
+                <th>Account Holder Name</th>
+                <td>@Model.AccountHolderName</td>
+            </tr>
+
+
+
+        </table>
+    </div>
+
+
+    
+
+</div>
+
+

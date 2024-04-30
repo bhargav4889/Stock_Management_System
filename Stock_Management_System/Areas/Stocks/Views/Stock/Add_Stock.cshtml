@@ -60,7 +60,7 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Customer Name</label>
-                        <input type="text" class="form-control" id="farmer" placeholder="Customer Name" asp-for="Customers.CustomerName" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" id="Customer" placeholder="Customer Name" asp-for="Customers.CustomerName" oninput="this.value = this.value.toUpperCase()">
                      
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerName"></span>
                         <span id="newCustomerMessage" style="color:green">* New Customer</span>
@@ -345,7 +345,7 @@
         var date = document.getElementById("datepicker").value;
         var stockgrade = document.getElementById("stockgrade").value;
         var grainname = document.getElementById("selectgrain").value;
-        var farmername = document.getElementById("farmer").value;
+        var farmername = document.getElementById("Customer").value;
         var bags = document.getElementById("bags").value;
         var bagperkg = document.getElementById("bagsperkg").value;
         var weight = document.getElementById("weight").value;
@@ -396,238 +396,6 @@
 
 </script>
 
-
-@*<script>
-    $(document).ready(function () {
-        var isSuggestionSelected = false; // Flag to check if a suggestion is selected
-
-        $("#farmer").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: '@Url.Action("Get_Customer_Data", "Stock")',
-                    type: "POST",
-                    dataType: "json",
-                    data: { CustomerName: request.term },
-                    success: function (data) {
-                        response($.map(data, function (item) {
-
-                            console.log(data);
-
-                            return { value: item.cT_Name + ' (' + item.cT_City + ')' + ' - ' + item.cT_Type, id: item.id };
-                        }));
-                    }
-                });
-            },
-            minLength: 1,
-            response: function (event, ui) {
-                var enteredValue = $("#farmer").val().trim();
-
-                // Check if suggestions are available and entered value is not part of suggestions
-                if (ui.content.length === 0 && enteredValue !== "") {
-                    // No suggestions and entered value not part of suggestions, show new customer message and input fields
-                    $("#newCustomerMessage").show();
-                    $("#newcustomertype").show();
-                    $("#newcustomercity").show();
-                    $("#newcustomerphoneno").show();
-                } else {
-                    // Suggestions available or entered value is part of suggestions, hide new customer message and input fields
-                    $("#newCustomerMessage").hide();
-                    $("#newcustomertype").hide();
-                    $("#newcustomercity").hide();
-                    $("#newcustomerphoneno").hide();
-                }
-            },
-            select: function (event, ui) {
-                // Check if the selected item is from the suggestion list
-                isSuggestionSelected = ui.item && ui.item.id;
-
-                // If a suggestion is selected, fill in the input field with only the name part
-                if (isSuggestionSelected) {
-                    var name = ui.item.value.split('(')[0].trim();
-                    $("#farmer").val(name);
-                }
-
-                // If a new value is entered, handle it accordingly
-                return false;
-            }
-        });
-
-        // Hide the new customer message and additional inputs by default
-        $("#newCustomerMessage").hide();
-        $("#newcustomertype").hide();
-        $("#newcustomercity").hide();
-        $("#newcustomerphoneno").hide();
-
-        // Reset visibility when the input is cleared or the page is refreshed
-        $(window).on('beforeunload', function () {
-            $("#newCustomerMessage").hide();
-            $("#newcustomertype").hide();
-            $("#newcustomercity").hide();
-            $("#newcustomerphoneno").hide();
-        });
-
-        // Monitor input changes to handle backspace clearing
-        $("#farmer").on('input', function () {
-            var enteredValue = $(this).val().trim();
-
-            // Check if the entered value is cleared
-            if (enteredValue === "") {
-                $("#newCustomerMessage").hide();
-                $("#newcustomertype").hide();
-                $("#newcustomercity").hide();
-                $("#newcustomerphoneno").hide();
-            }
-        });
-    });
-</script>*@
-@*<script>
-    $(document).ready(function () {
-        var isSuggestionSelected = false; // Flag to check if a suggestion is selected
-
-        function toggleNewCustomerFields(show) {
-            // Toggle visibility of new customer fields and message
-            $("#newCustomerMessage").toggle(show);
-            $("#newcustomertype").toggle(show);
-            $("#newcustomercity").toggle(show);
-            $("#newcustomerphoneno").toggle(show);
-        }
-
-        // Hide the new customer message and additional inputs by default
-        toggleNewCustomerFields(false);
-
-        $("#farmer").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: '@Url.Action("Get_Customer_Data", "Stock")', // Ensure the URL is correct for your routing setup
-                    type: "POST",
-                    dataType: "json",
-                    data: { CustomerName: request.term },
-                    success: function (data) {
-                        console.log(data);
-
-
-                        response($.map(data, function (item) {
-                            // Assuming the response data structure matches your expectations
-                            return {
-                                label: item.customerName + ' (' + item.customerType + ')' + ' - ' + item.customerAddress,
-                                value: item.customerName,
-                                id: item.customerId
-                            };
-                        }));
-                    }
-                });
-            },
-            minLength: 1,
-            response: function (event, ui) {
-                // If no suggestions are found, show the new customer fields
-                toggleNewCustomerFields(ui.content.length === 0);
-            },
-            select: function (event, ui) {
-                isSuggestionSelected = !!ui.item.id;
-
-                // Prevent default behavior to avoid placing the label in the input
-                event.preventDefault();
-
-                // Place only the customer name in the input field
-                if (isSuggestionSelected) {
-                    $("#farmer").val(ui.item.value);
-                }
-
-                // Hide new customer fields as a selection has been made
-                toggleNewCustomerFields(false);
-            }
-        });
-
-        // Reset visibility of fields when input is cleared or changed
-        $("#farmer").on('input', function () {
-            var enteredValue = $(this).val().trim();
-            if (!enteredValue) {
-                toggleNewCustomerFields(false);
-                isSuggestionSelected = false; // Reset the flag as the input is cleared
-            }
-        });
-
-        // Optionally, reset the form state when the page is refreshed or navigated
-        $(window).on('beforeunload', function () {
-            toggleNewCustomerFields(false);
-        });
-    });
-</script>*@
-
-@* <script>
-    $(document).ready(function () {
-        var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
-
-        // Function to show or hide new customer fields and a message.
-        function toggleNewCustomerFields(show) {
-            $("#newCustomerMessage").toggle(show);
-            $("#newcustomertype").toggle(show);
-            $("#newcustomercity").toggle(show);
-            $("#newcustomerphoneno").toggle(show);
-        }
-
-        // Initially hide the new customer message and fields.
-        toggleNewCustomerFields(false);
-
-        $("#farmer").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: '@Url.Action("Get_Customer_Data", "Stock")', // Make sure this URL is correct for your setup.
-                    type: "POST",
-                    dataType: "json",
-                    data: { CustomerName: request.term },
-                    success: function (data) {
-                        response($.map(data, function (item) {
-                            return {
-                                label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
-                                value: item.customerName,
-                                id: item.customerId // This will be used to set the hidden field value on selection.
-                            };
-                        }));
-                    }
-                });
-            },
-            minLength: 1, // Minimum length before searching.
-            response: function (event, ui) {
-                // Show the new customer fields if no suggestions are found.
-                toggleNewCustomerFields(ui.content.length === 0);
-            },
-            select: function (event, ui) {
-                // Set flag based on selection.
-                isSuggestionSelected = true;
-
-                // Prevent default to avoid placing label in the input.
-                event.preventDefault();
-
-                // Set the input to the customer name.
-                $("#farmer").val(ui.item.value);
-
-                // Update hidden field with selected customer ID.
-                $("#CustomerId").val(ui.item.id);
-
-
-             
-                // Hide new customer fields as a selection has been made.
-                toggleNewCustomerFields(false);
-            }
-        });
-
-        // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
-        $("#farmer").on('input', function () {
-            var enteredValue = $(this).val().trim();
-            if (!enteredValue) {
-                toggleNewCustomerFields(false);
-                isSuggestionSelected = false;
-            }
-        });
-
-        // Optionally, reset the form state when the page is refreshed or navigated away.
-        $(window).on('beforeunload', function () {
-            toggleNewCustomerFields(false);
-        });
-    });
-</script> *@
-
 <script>
     $(document).ready(function () {
         var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
@@ -643,7 +411,7 @@
         // Initially hide the new customer message and fields.
         toggleNewCustomerFields(false);
 
-        $("#farmer").autocomplete({
+        $("#Customer").autocomplete({
             source: function (request, response) {
                 $.ajax({
                     url: '@Url.Action("Get_Customer_Data", "Stock")', // Make sure this URL is correct for your setup.
@@ -664,7 +432,7 @@
             minLength: 1, // Minimum length before searching.
             response: function (event, ui) {
                 // Check if any of the suggestions exactly match the entered input.
-                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#farmer").val().toLowerCase());
+                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
                 // Show the new customer fields if no exact matches are found.
                 toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
             },
@@ -676,7 +444,7 @@
                 event.preventDefault();
 
                 // Set the input to the customer name.
-                $("#farmer").val(ui.item.value);
+                $("#Customer").val(ui.item.value);
 
                 // Update hidden field with selected customer ID.
                 $("#CustomerId").val(ui.item.id);
@@ -687,7 +455,7 @@
         });
 
         // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
-        $("#farmer").on('input', function () {
+        $("#Customer").on('input', function () {
             var enteredValue = $(this).val().trim();
             if (!enteredValue) {
                 toggleNewCustomerFields(false);
@@ -695,7 +463,7 @@
             } else {
                 isSuggestionSelected = false;
                 // Since we are still typing, check if any item matches exactly from the last search.
-                $("#farmer").autocomplete("search", enteredValue);
+                $("#Customer").autocomplete("search", enteredValue);
             }
         });
 

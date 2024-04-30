@@ -3,11 +3,11 @@
 *@
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Pending Payments";
+    ViewData["Title"] = "Remain Payments";
 }
 @using Stock_Management_System.UrlEncryption;
-@model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Pending_Customers_Payments>
-@section Scripts{
+@model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Remain_Payment_Model>
+@section Scripts {
     <script>
         $(document).ready(function () {
             var table = $('#data').DataTable();
@@ -36,7 +36,7 @@
             // Function to apply all search filters and reset date inputs after search
             function applySearches() {
                 var Name = $("#searchName").val();
-          
+
                 var location = $("#location").val();
                 var selectedGrain = $("#graintype").val();
                 var selectedGrainText = $("#graintype option:selected").text();
@@ -53,7 +53,7 @@
                     table.column(2).search(selectedGrainText, false, false);
                 }
 
-               
+
 
                 // Redraw table to apply all filters
                 table.draw();
@@ -77,7 +77,7 @@
                 var stockId = $(this).data('stock-id');
 
                 $.ajax({
-                    url: '/Payment/Get_Payment_Info',
+                    url: '/Payment/Remain_Get_Payment_Info',
                     data: { Customer_ID: customerId, Stock_ID: stockId },
                     success: function (response) {
                         $('#createpayment .modal-content').html(response);
@@ -91,7 +91,7 @@
         });
     </script>
 
- 
+
 }
 
 
@@ -99,9 +99,9 @@
     <div class="page-header">
         <div class="page-title">
             <h4>Payments</h4>
-            <h6>List of Pending Customers Payments </h6>
+            <h6>List of Remain Customers Payments </h6>
         </div>
-       
+
     </div>
     <div class="card">
         <div class="card-body">
@@ -186,7 +186,7 @@
                             </div>
                         </div>
 
-                        
+
 
                         <!-- Search By Name -->
                         <div class="col-sm-2">
@@ -198,7 +198,7 @@
 
 
 
-                       
+
 
                         <!-- Search Button -->
                         <div class="col-sm-1">
@@ -221,14 +221,16 @@
                 <thead>
                     <tr>
 
-                        <th class="text-center">Date</th>
+                        <th class="text-center">Payment Date</th>
                         <th class="text-center">Name</th>
                         <th class="text-center">Product</th>
-                        <th class="text-center">Location</th>
-                        <th class="text-center">Total Price</th>
+                        <th class="text-center">Total Amount</th>
+                        <th class="text-center">Total Paid</th>
+                        <th class="text-center">Total Remain</th>
+                        <th class="text-center">Payment-Method</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Pay</th>
-                        
+
                     </tr>
                 </thead>
                 <tbody>
@@ -240,21 +242,23 @@
                                 <tr>
 
                                     <td class="text-center">
-                                        @((DateTime.TryParse(item.StockDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                        @((DateTime.TryParse(item.Payment_Date.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
                                     </td>
-                                    <td class="text-center">@item.CustomerName</td>
-                                    <td class="text-center">@item.ProductName</td>
-                                    <td class="text-center">@item.Location</td>
-                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
+                                    <td class="text-center">@item.Customer_Name</td>
+                                    <td class="text-center">@item.Product_Name</td>
+                                    <td class="text-center">@item.Total_Amount.ToString("C")</td>
+                                    <td class="text-center">@item.Paid_Amount.ToString("C")</td>
+                                    <td class="text-center">@((item.Total_Amount - item.Paid_Amount).ToString("C"))</td> <!-- Display the difference formatted as currency -->
+                                    <td class="text-center">@item.First_Payment_Method</td>
 
-                                    <td class="text-center"><span class="badges bg-lightred">@item.Payment_Status</span></td>
+                                    <td class="text-center"><span class="badges bg-lightyellow">@item.Remain_Payment_Status</span></td>
 
                                     <td class="text-center">
-                                        <a class="loadPaymentInfoBtn"  data-customer-id="@UrlEncryptor.Encrypt(item.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())">
+                                        <a class="loadPaymentInfoBtn" data-customer-id="@UrlEncryptor.Encrypt(item.Customer_Id.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.Stock_Id.ToString())">
                                             <i class="fa fa-credit-card"></i>
                                         </a>
                                     </td>
-                                  
+
 
 
                                 </tr>

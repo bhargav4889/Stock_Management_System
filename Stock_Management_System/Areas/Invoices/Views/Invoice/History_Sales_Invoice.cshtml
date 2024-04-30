@@ -180,8 +180,8 @@
                                     <td class="text-center">@(item.Bags.HasValue ? item.Bags.Value.ToString() : "--")</td>
                                     <td class="text-center">@(item.BagPerKg.HasValue ? item.BagPerKg.Value.ToString() : "--")</td>
                                     <td class="text-center">@item.TotalWeight</td>
-                                    <td class="text-center">@item.ProductPrice</td>
-                                    <td class="text-center">@item.TotalPrice</td>
+                                    <td class="text-center">@item.ProductPrice.ToString("C")</td>
+                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
 
 
                               

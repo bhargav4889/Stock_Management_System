@@ -159,6 +159,8 @@ namespace Stock_Management_System.Areas.Manage.Models
             public string RemainCheqNo { get; set; }
             public string RemainRtgsNo { get; set; }
 
+            public string Payment_Status { get; set; }
+
 
         }
 

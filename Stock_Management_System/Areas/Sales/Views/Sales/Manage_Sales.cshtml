@@ -1,13 +1,14 @@
-﻿@using System.Data;
-@using Stock_Management_System.UrlEncryption;
-
-@{
-    ViewData["Title"] = "Purchase Invoices";
+﻿@{
+    ViewData["Title"] = "Sale List";
 }
 
-@model IEnumerable<Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model>
+@using System.Data;
+@model IEnumerable<Stock_Management_System.Areas.Sales.Models.Show_Sale>
+@using Stock_Management_System.UrlEncryption;
+@using System.Text;
+
 @section Scripts
-    {
+{
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
@@ -66,28 +67,6 @@
         $(document).ready(function () {
             var table = $('#data').DataTable();
 
-            // Extend DataTable search to include date range filtering
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                var startDateInput = $("#startdate").val();
-                var endDateInput = $("#datepickerend").val();
-
-                // If only the end date is specified, set the start date to the first day of the current month
-                var startDate = startDateInput ? moment(startDateInput, "YYYY-MM-DD") : (endDateInput ? moment().startOf('month') : moment().startOf('month'));
-                // If only the start date is specified, set the end date to today's date
-                var endDate = endDateInput ? moment(endDateInput, "YYYY-MM-DD").endOf('day') : (startDateInput ? moment() : moment().endOf('day'));
-
-                var dateColumn = data[0]; // Adjust if date is in another column
-                var date = moment(dateColumn, "DD-MM-YY");
-
-                if (!date.isValid() || !startDate.isValid() || !endDate.isValid()) {
-                    console.error("Invalid date encountered");
-                    return false;
-                }
-
-                return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
-            });
-
-            // Function to apply all search filters and reset date inputs after search
             function applySearches() {
                 var Name = $("#searchName").val();
                 var VehicleName = $("#vehicletype").val();
@@ -95,45 +74,52 @@
                 var TolatName = $("#searchTolatName").val();
                 var selectedGrain = $("#graintype").val();
                 var selectedGrainText = $("#graintype option:selected").text();
+                var startdate = $('#startdate').val();
+                var enddate = $('#enddate').val();
+
+
+
+
+                var productColumnIndex = 3;
+                var VehicleColumnIndex = 10;
 
                 // Clear existing searches
-                table.search('').columns().search('');
+                table.columns().search('');
 
-                // Apply text input searches
-                table.column(1).search(Name, true, false);
-                table.column(8).search(TolatName, true, false);
-
-                // Apply dropdown searches
+                // Apply dropdown search if selected
                 if (selectedGrain) {
-                    table.column(2).search(selectedGrainText, false, false);
+                    table.column(productColumnIndex).search(selectedGrainText);
+
                 }
 
                 if (VehicleName) {
-                    table.column(9).search(selectedVehicle, false, false);
+                    table.column(VehicleColumnIndex).search(selectedVehicle).draw();
                 }
 
-                // Redraw table to apply all filters
+                // Apply individual column searches from input fields
+                table.column(1).search(Name);
+
+                table.column(9).search(TolatName);
+
+
+
+
+                // Perform a single draw after all search criteria have been applied
                 table.draw();
 
-                // Reset start and end date values after search
-                $("#startdate, #datepickerend").val('');
+                // Reset the input values after search
+                $("#searchName, #searchTolatName").val('');
+                $('#graintype').val('').trigger('change');
+                $('#vehicletype').val('').trigger('change');
+
             }
 
-            // Bind the search function to the search button click event
             $('#searchButton').on('click', function () {
                 applySearches();
             });
         });
     </script>
-
-
-
-
-
-
-
-
-
+ 
 }
 
 
@@ -141,17 +127,14 @@
 <div class="content">
     <div class="page-header">
         <div class="page-title">
-            <h4>Purchase Invoice List</h4>
-            <h6>Manage Invoices Purchases </h6>
+            <h4>Sale List</h4>
+            <h6>Manage Sales </h6>
         </div>
         <div class="page-btn">
-            <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
+            <a role="button" asp-action="Create_Sales" asp-controller="Sales" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Sale</a>
         </div>
     </div>
-    @if (TempData["DeleteMessage"] != null)
-    {
-        <input type="hidden" id="toastrErrorMessage" value="@TempData["DeleteMessage"]" />
-    }
+
     <div class="card">
         <div class="card-body">
             <div class="table-top">
@@ -169,12 +152,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Purchase_Invoice_Statement_CreatePDF" asp-controller="Invoice" method="get">
-
-
-
-
-
+                            <form asp-action="Purchase_Stocks_Statement_CreatePDF" asp-controller="Stock" method="get">
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
@@ -184,7 +162,7 @@
                         </li>
 
                         <li>
-                            <form asp-action="Export_Purchase_Invoices_List_To_Excel" asp-controller="Invoice" method="get">
+                            <form asp-action="Export_Stock_List_To_Excel" asp-controller="Stock" method="get">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
                                     <img src="~/img/icons/excel.svg" alt="img">
@@ -224,7 +202,7 @@
                             <!-- Adjusted column size for tighter fit -->
                             <div class="form-group">
                                 <label for="datepickerend"><span style="color: black;">*</span> End Date</label>
-                                <input type="date" class="form-control" id="enddate" name="enddate">
+                                <input type="date" class="form-control" id="datepickerend" name="enddate">
                             </div>
                         </div>
 
@@ -232,7 +210,7 @@
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label for="ProductType"><span style="color: black;">*</span> Select Product</label>
-                                <select class="select form-control" id="producttype" asp-items="@(ViewBag.Products)">
+                                <select class="select form-control" id="graintype" asp-items="@(ViewBag.Products)">
                                     <option value="" selected disabled>-- Select Product --</option>
                                 </select>
                             </div>
@@ -279,7 +257,6 @@
             </div>
 
 
-
         </div>
 
         <div class="table-responsive">
@@ -289,15 +266,18 @@
 
                         <th class="text-center">Date</th>
                         <th class="text-center">Name</th>
+                        
                         <th class="text-center">Product</th>
+                        <th class="text-center">Brand</th>
                         <th class="text-center">Bag</th>
                         <th class="text-center">Bag Per KG</th>
                         <th class="text-center">Weight</th>
-                        <th class="text-center">Product-Price(₹)</th>
+                        <th class="text-center">Rate(₹)</th>
                         <th class="text-center">Total-Price(₹)</th>
-                        <th class="text-center">Tolat</th>
-                        <th class="text-center">Vehicle</th>
+                        <th class="text-center">Discount</th>
+                        <th class="text-center">Received(₹)</th>
                         <th class="text-center">Actions</th>
+
 
                     </tr>
                 </thead>
@@ -310,43 +290,50 @@
                                 <tr>
 
                                     <td class="text-center">
-                                        @((DateTime.TryParse(item.PurchaseInvoiceDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                        @((DateTime.TryParse(item.Create_Sales.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
                                     </td>
                                     <td class="text-center">@item.CustomerName</td>
-                                    <td class="text-center">@item.ProductName</td>
-                                    <td class="text-center">@(item.Bags.HasValue ? item.Bags.Value.ToString() : "--")</td>
-                                    <td class="text-center">@(item.BagPerKg.HasValue ? item.BagPerKg.Value.ToString() : "--")</td>
-                                    <td class="text-center">@item.TotalWeight</td>
-                                    <td class="text-center">@item.ProductPrice.ToString("C")</td>
-                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
-                                    <td class="text-center">@item.TolatName</td>
-                                    <td class="text-center">@item.VehicleName</td>
+                                    
+                                    <td class="text-center">@item.Product_Name</td>
+                                    <td class="text-center">@item.Brand_Name</td>
+                                    <td class="text-center">@item.Bags</td>
+                                    <td class="text-center">@item.BagPerKg</td>
+                                    <td class="text-center">@item.Total_Weight</td>
+                                    <td class="text-center">@item.Rate.ToString("C")</td>
+                                    <td class="text-center">@item.Total_Price.ToString("C")</td>
+                                    <td class="text-center">@item.Discount.Value.ToString("C")</td>
+                                    <td class="text-center">@item.Receive_Amount.ToString("C")</td>
 
 
 
                                     <td class="text-center">
-                                        <a class="action-set" href="/Options" data-bs-toggle="dropdown" aria-expanded="true">
+                                        <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
                                             <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                         </a>
-                                        <ul class="dropdown-menu text-center">
+                                        <ul class="dropdown-menu">
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Purchase_Invoice_Details", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
-                                                   onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Invoice Info</a>
-                                            </li>
-                                            <li>
-                                                <a role="link"
-                                                   href="@Url.Action("Update_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
-                                                   onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Edit Invoice</a>
+                                                   href="@Url.Action("Added_Sales_Details", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
+                                                   onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Sale Info</a>
                                             </li>
 
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Delete_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
-                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice</a>
+                                                   href="@Url.Action("Update_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
+                                                   onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Sale</a>
+                                            </li>
+                                            <li>
+
+                                                <a role="link"
+                                                   href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
+                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale</a>
                                             </li>
                                         </ul>
+
+
+
                                     </td>
+
 
                                 </tr>
                             }
@@ -357,71 +344,8 @@
         </div>
 
     </div>
-
-
-    <!-- Modal Shell -->
-    <div class="modal fade" id="createpayment" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <!-- Dynamic Content Will Be Loaded Here -->
-            </div>
-        </div>
-    </div>
-
 </div>
 
 
 
-@*<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-
-    function confirmDelete(farmerName) {
-         // Corrected: use .value
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: ` Are You Want This ${farmerName}'s Invoice Delete !`, // Using template literal
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Delete'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteform').submit();
-            }
-        });
-    }
-
-</script>
-
-
-
-<script>
-
-
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        var errorMessage = document.getElementById('toastrErrorMessage').value;
-
-        if (errorMessage) {
-            toastr.error(errorMessage, "Alert !!", {
-                closeButton: true,
-                progressBar: true,
-                positionClass: 'toast-top-right',
-                preventDuplicates: true,
-                showDuration: '300',
-                hideDuration: '1000',
-                timeOut: '2000',
-                extendedTimeOut: '1000',
-                showEasing: 'swing',
-                hideEasing: 'linear',
-                showMethod: 'fadeIn',
-                hideMethod: 'fadeOut'
-            });
-        }
-    });
-    </script>*@
 

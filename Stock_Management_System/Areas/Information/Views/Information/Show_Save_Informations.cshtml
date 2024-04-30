@@ -1,0 +1,117 @@
+﻿@using Stock_Management_System.UrlEncryption
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Show Save Informations";
+}
+
+
+
+@model IEnumerable<Stock_Management_System.Areas.Information.Models.Information_Model>;
+<style>
+    img.bank-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+</style>
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Infromation List</h4>
+            <h6>Show All Saved Information </h6>
+
+        </div>
+        <div class="page-btn">
+            <a role="button" asp-action="Create_Customer_Account" asp-controller="Account" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Add Customer</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="table-responsive  justify-content-center">
+                <table id="data" class="table datanew">
+                    <thead>
+                        <tr>
+
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Bank Name</th>
+                            <th class="text-center">View Information</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            if (Model != null)
+                            {
+
+                                foreach (var row in Model)
+                                {
+                                    <tr>
+
+                                        @{
+                                            string BaseAddress = "https://localhost:7024/";
+                                            string Icon = row.BankIcon;
+
+                                            string BankIcon = BaseAddress + Icon;
+
+                                        }
+                                        <td class="text-center">@row.AccountHolderName</td>
+                                        <td class="text-center"><img class="bank-icon" src="@BankIcon">@row.BankName</td>
+                                        <td class="text-center">
+                                            <a class="loadSaveInfo" data-information-id="@UrlEncryptor.Encrypt(row.InformationID.ToString())">
+                                                <img src="~/img/icons/eye.svg" class="me-2" alt="View">
+                                            </a>
+                                        </td>
+                                      
+
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Use a more specific selector if possible to improve performance
+        $(document).on('click', '.loadSaveInfo', function () {
+            var infoId = $(this).data('information-id'); // Corrected the data attribute usage
+
+            $.ajax({
+                url: '/Information/Get_Information_By_ID', // Ensure the endpoint is correct
+                type: 'GET', // Specify the request type if it's not a POST
+                data: { Information_ID: infoId },
+                success: function (response) {
+                    $('#information .modal-content').html(response);
+                    $('#information').modal('show');
+                },
+                error: function () {
+                    alert('Error loading information'); // Improved error message
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Modal Shell -->
+<div class="modal fade" id="information" tabindex="-1" aria-labelledby="information" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Dynamic Content Will Be Loaded Here -->
+        </div>
+    </div>
+</div>
+
+    </div>
+
+

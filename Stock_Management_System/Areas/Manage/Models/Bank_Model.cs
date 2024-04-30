@@ -10,4 +10,16 @@
             public string BankIcon { get; set; }
         
     }
+
+    public class Our_Banks_Dropdown
+    {
+        public int BankId { get; set; }
+
+        public int InformationId { get; set; }
+
+        public string? AccountNo { get; set; }
+
+        public string? BankIcon { get; set; }
+
+    }
 }

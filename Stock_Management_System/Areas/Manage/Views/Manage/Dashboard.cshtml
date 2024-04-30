@@ -1,4 +1,4 @@
-﻿@{
+﻿x@{
     ViewData["Title"] = "Dashbaord";
 }
 @model Stock_Management_System.Areas.Manage.Models.Dashboard_All_Models;
@@ -45,8 +45,34 @@
                     <span><img src="~/img/icons/dash3.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>₹<span class="counters">  @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))</span></h5>
+                    <h5>₹<span class="counters"> @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))</span></h5>
                     <h6>Purchase Stock </h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="dash-widget dash3">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash4.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>₹<span class="counters"> 0</span></h5>
+                    <h6>Sales Stock </h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6 col-12">
+            <div class="dash-widget dash3">
+                <div class="dash-widgetimg">
+                    <span><img src="~/img/icons/dash2.svg" alt="img"></span>
+                </div>
+                <div class="dash-widgetcontent">
+                    <h5>
+                        ₹<span class="counters">
+                            @Model.All_Counts_Model.AmountOfPendingPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        </span>
+                    </h5>
+                    <h6>Total Pending Payments</h6>
                 </div>
             </div>
         </div>
@@ -69,15 +95,15 @@
 
             <div class="dash-widget dash2">
                 <div class="dash-widgetimg">
-                    <span><img src="~/img/icons/dash3.svg" alt="img"></span>
+                    <span><img src="~/img/icons/dash1.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
                     <h5>
                         ₹<span class="counters">
-                            @Model.All_Counts_Model.AmountOfPendingPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                            @Model.All_Counts_Model.AmountOfRemainingPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
                         </span>
                     </h5>
-                    <h6>Total Pending Payments</h6>
+                    <h6>Total Remain Payments</h6>
                 </div>
             </div>
         </div>
@@ -99,26 +125,47 @@
             </div>
         </div>
         <div class="col-lg-3 col-sm-6 col-12 d-flex">
-            <div class="dash-count das1">
+            <div class="dash-count">
                 <div class="dash-counts">
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                @Model.All_Counts_Model.TotalBags.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
                                 ;
-
                             }
                         }
                     </h4>
-                    <h5>Stocks</h5>
+                    <h5>Total Bags In Stock</h5>
                 </div>
                 <div class="dash-imgs">
-                    <i class="fa fa-cart-arrow-down"></i>
+                    <i class="fas fa-shopping-bag"></i>
+
                 </div>
             </div>
         </div>
+
         <div class="col-lg-3 col-sm-6 col-12 d-flex">
-            <div class="dash-count das2">
+            <div class="dash-count">
+                <div class="dash-counts">
+                    <h4>
+                        @{
+                            {
+                                @Model.All_Counts_Model.TotalWeight.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                ;
+                            }
+                        }
+                    </h4>
+                    <h5>Total Weight In Stock</h5>
+                </div>
+                <div class="dash-imgs">
+                    <i class="fas fa-weight"></i> <!-- Weight scale -->
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
+            <div class="dash-count">
                 <div class="dash-counts">
                     <h4>
                         @{
@@ -157,21 +204,23 @@
                 </div>
             </div>
         </div>
+        
+       
         <div class="col-lg-3 col-sm-6 col-12 d-flex">
-            <div class="dash-count das1">
+            <div class="dash-count">
                 <div class="dash-counts">
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalBags.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                @Model.All_Counts_Model.TotalPayments
                                 ;
                             }
                         }
                     </h4>
-                    <h5>Total Bags In Stock</h5>
+                    <h5>Total Created Payments</h5>
                 </div>
                 <div class="dash-imgs">
-                    <i class="fas fa-shopping-bag"></i>
+                    <i class="fas fa-dollar-sign"></i>
 
                 </div>
             </div>
@@ -182,40 +231,21 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalWeight.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                @Model.All_Counts_Model.PendingPayments
                                 ;
                             }
                         }
                     </h4>
-                    <h5>Total Weight In Stock</h5>
+                    <h5>Total Pending Payments</h5>
                 </div>
                 <div class="dash-imgs">
-                    <i class="fas fa-weight"></i> <!-- Weight scale -->
-
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 col-12 d-flex">
-            <div class="dash-count das2">
-                <div class="dash-counts">
-                    <h4>
-                        @{
-                            {
-                                @Model.All_Counts_Model.TotalPayments
-                                ;
-                            }
-                        }
-                    </h4>
-                    <h5>Total Payments</h5>
-                </div>
-                <div class="dash-imgs">
-                    <i class="fas fa-dollar-sign"></i>
+                    <i class="fas fa-hourglass"></i>
 
                 </div>
             </div>
         </div>
          <div class="col-lg-3 col-sm-6 col-12 d-flex">
-            <div class="dash-count das1">
+            <div class="dash-count">
                 <div class="dash-counts">
                     <h4>
                         @{
@@ -252,6 +282,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="row">
         <div class="col-lg-6 col-sm-12 col-12 d-flex">

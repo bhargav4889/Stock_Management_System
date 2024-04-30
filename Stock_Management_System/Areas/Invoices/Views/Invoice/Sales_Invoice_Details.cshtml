@@ -141,15 +141,14 @@
 
             <tr>
                 <th>CGST(%) Tax Price(₹)</th>
-                <td>@(Model?.TotalCGSTPrice != null ? Model.TotalCGSTPrice.ToString() : "--")</td>
-
+                <td>@(Model?.TotalCGSTPrice != null ? Model.TotalCGSTPrice.Value.ToString("C") : "--")</td>
             </tr>
 
             <tr>
                 <th>SGST(%) Tax Price(₹)</th>
-                <td>@(Model?.TotalSGSTPrice != null ? Model.TotalSGSTPrice.ToString() : "--")</td>
-
+                <td>@(Model?.TotalSGSTPrice != null ? Model.TotalSGSTPrice.Value.ToString("C") : "--")</td>
             </tr>
+
 
 
 
@@ -160,13 +159,13 @@
 
             <tr>
                 <th>Without GST Tax Price(₹)</th>
-                <td>@(Model?.WithoutGSTPrice != null ? Model.WithoutGSTPrice.ToString() : "--")</td>
+                <td>@(Model?.WithoutGSTPrice != null ? Model.WithoutGSTPrice.Value.ToString("C") : "--")</td>
             </tr>
 
 
             <tr>
                 <th>Total Price(₹)</th>
-                <td>@Model?.TotalPrice</td>
+                <td>@Model?.TotalPrice.ToString("C")</td>
             </tr>
             <tr>
                 <th>Vehicle Type</th>

@@ -46,38 +46,17 @@
             <h5>Stock Details</h5>
         </div>
 
-        <!-- Right side - PDF icon button -->
-        <div class="col-2 text-end">
-            <ul class="list-unstyled d-flex justify-content-end">
-                <li>
-                    <form asp-action="PDF_Preview_Download" asp-controller="Invoice" method="get">
-                        <input type="hidden" value="@Model.PurchaseStockId" name="Invoice_ID" />
-                        <button type="submit" name="downloadType" value="pdf" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Preview/Download PDF" style="transform: scale(1.15);">
-                            <img src="~/img/icons/pdf.svg" alt="img">
-                        </button>
-                    </form>
-                </li>
-                <li>
-                    <form asp-action="PDF_Preview_Download" asp-controller="Invoice" method="get">
-                        <input type="hidden" value="@Model.PurchaseStockId" name="Invoice_ID" />
-                        <button type="submit" name="downloadType" value="pdf" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Details" style="transform: scale(1.15);">
-                            <img src="~/img/icons/edit.svg" alt="img">
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
+       
 
 
 
     <br />
     <div class="table-responsive scrollable-table table-responsive-sm">
         <table class="table">
-            <tr>
+           @*  <tr>
                 <th>Transaction ID</th>
                 <td>@Model.PurchaseStockId</td>
-            </tr>
+            </tr> *@
             <tr>
                 <th>Date</th>
                 <td>@formattedDate</td>

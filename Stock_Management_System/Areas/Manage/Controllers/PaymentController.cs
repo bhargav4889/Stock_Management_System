@@ -132,6 +132,30 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #endregion
 
+        #region List of Payment Remain 
+
+        public async Task<IActionResult> Remain_Payments()
+        {
+            await All_Dropdowns_Call();
+            await Dropdown_For_Bank_Names();
+            List<Payment_All_Models.Remain_Payment_Model> List_of_Remain_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Remain_Payment_Model>("Payment/Remain_Customers_Payments");
+            return View(List_of_Remain_Customers_Payments);
+        }
+
+        #endregion
+
+        #region List of Payment PAID 
+
+        public async Task<IActionResult> Paid_Payments()
+        {
+            await All_Dropdowns_Call();
+            await Dropdown_For_Bank_Names();
+            List<Payment_All_Models.Show_Payment_Info> List_of_Paid_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Show_Payment_Info>("Payment/Paid_Customers_Payments");
+            return View(List_of_Paid_Customers_Payments);
+        }
+
+        #endregion
+
         #region Method : Get Data For Payment For Modal
 
         public async Task<ActionResult> Get_Payment_Info(string Customer_ID, string Stock_ID)

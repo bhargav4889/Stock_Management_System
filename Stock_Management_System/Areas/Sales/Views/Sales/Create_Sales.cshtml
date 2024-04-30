@@ -1,0 +1,538 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Create Sale";
+}
+
+
+@model Stock_Management_System.Areas.Sales.Models.Sale_Customer_Combied_Model;
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Create Sale</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Add/Existing Sale</h6>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <form class="row g-3" asp-action="Add_Sale_Details" asp-controller="Sales" onsubmit="return CheckData()" method="post">
+
+                <!-- Date -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Sale Date </label>
+                        <input type="date" asp-for="sale.Create_Sales" placeholder="DD-MM-YYYY" id="datepicker" class="form-control">
+                    </div>
+                </div>
+
+
+
+
+                <!-- Grain Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Select Product Type</label>
+                        <select class="select" asp-for="sale.Product_Id" id="selectgrain" aria-label="graintype" asp-items="ViewBag.Products">
+                            <option value="" selected disabled>-- Select Grain --</option>
+                        </select>
+
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Receive Payment Date </label>
+                        <input type="date" asp-for="sale.Receive_Payment_Date" placeholder="DD-MM-YYYY" id="datepicker" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Customer Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Customer Name</label>
+                        <input type="text" class="form-control" id="Customer" placeholder="Customer Name" asp-for="customer.CustomerName" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="customer.CustomerName"></span>
+                        <span id="newCustomerMessage" style="color:green">* New Customer</span>
+                    </div>
+                </div>
+
+                <input type="hidden" id="CustomerId" asp-for="customer.CustomerId" />
+
+
+                <!-- Customer Type -->
+                <div id="newcustomertype" class="col-lg-3 col-sm-6 col-12" style="display: none;">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> New Customer Type</label>
+                        <input type="text" class="form-control" placeholder="Customer Type" id="cttype" asp-for="customer.CustomerType" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="customer.CustomerType"></span>
+                    </div>
+                </div>
+
+                <!-- Customer City -->
+                <div id="newcustomercity" class="col-lg-3 col-sm-6 col-12" style="display: none;">
+                    <div class="form-group">
+                        <label for="ctname"><span style="color: red;">*</span> New Customer City</label>
+                        <input type="text" class="form-control" placeholder="City Name" id="customercity" asp-for="customer.CustomerAddress" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="customer.CustomerAddress"></span>
+                    </div>
+                </div>
+
+                <!-- Customer Contact_No -->
+                <div id="newcustomerphoneno" class="col-lg-3 col-sm-6 col-12" style="display: none;">
+                    <div class="form-group">
+                        <label for="bags"><span style="color: red;">*</span> Enter Customer No</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Contact No" asp-for="customer.CustomerContact" id="contactno">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="customer.CustomerContact"></span>
+                    </div>
+                </div>
+
+
+                <!-- BrandName  -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="BrandName"><span style="color: black;">*</span> Brand Name</label>
+                        <input type="text" class="form-control" placeholder="Brand Name" asp-for="sale.Brand_Name" id="brandName" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Brand_Name"></span>
+                    </div>
+                </div>
+
+
+                <!--Payment Method-->
+                <div class="col-lg-3 col-sm-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Select Payment Method</label>
+                        <select class="select" asp-for="sale.Payment_Method" id="selectpaymentmethod">
+                            <option value="" selected disabled>-- Payment Method --</option>
+                            <option value="CASH">CASH</option>
+                            <option value="BANK">BANK</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!--Bank Information-->
+                <div class="col-lg-3 col-sm-12" id="bankSelection" style="display:none">
+                    <div class="form-group">
+                        <label><span style="color:red;">*</span> Select Bank</label>
+                        <select class="form-control" asp-for=sale.Receive_Bank_Id id="bankSelect">
+                            <option selected disabled value="">-- Select Bank --</option>
+                            @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
+                            {
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                               
+                            }
+                        </select>
+                        <span class="text-danger" asp-validation-for=sale.Receive_Bank_Id style="color: red; font-size:11px; font-weight:bold;"></span>
+
+
+                    </div>
+                </div>
+
+
+                <!-- Bags -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Bags</label>
+                        <input type="number" inputmode="numeric" asp-for="sale.Bags" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="SaleModel.Bags">
+
+                    </div>
+                </div>
+
+                <!-- Bags Per KG -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="bagsperkg"><span style="color: black;">*</span> Bags Per KG</label>
+                        <input type="number" inputmode="numeric" class="form-control" asp-for=sale.BagPerKg placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="SaleModel.BagPerKg">
+
+                    </div>
+                </div>
+
+                <!-- Weight -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="weight"><span style="color: red;">*</span> Weight</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Weight" id="weight" asp-for="sale.Total_Weight">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Total_Weight"></span>
+                    </div>
+                </div>
+
+                <!-- Product Price -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="Rate"><span style="color: red;">*</span> Rate⟨₹⟩</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Enter Rate⟨₹⟩" id="rate" oninput="CalculateMethod()" asp-for="sale.Rate">
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Rate"></span>
+                    </div>
+                </div>
+
+                <!-- Total Price -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="totalprice"><span style="color: red;">*</span> Total Price ⟨₹⟩</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Total Price ⟨₹⟩" id="totalprice" asp-for="sale.Total_Price">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Total_Price"></span>
+                    </div>
+                </div>
+
+
+
+                <!-- Received Amount(₹) -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="receivedAmount"><span style="color: red;">*</span> Received Amount(₹)</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Received Amount ⟨₹⟩" id="ReceivedAmount" asp-for="sale.Receive_Amount">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Receive_Amount"></span>
+                    </div>
+                </div>
+
+                <!-- Discount(₹) -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="discount"><span style="color: black;">*</span> Discount(₹)</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Discount Amount ⟨₹⟩" id="DiscountAmount" asp-for="sale.Discount">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Discount"></span>
+                    </div>
+                </div>
+
+
+                <!--Full Amount Payment Receive -->
+                <div class="col-lg-3 col-sm-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
+                        <select class="select" asp-for="sale.IsFullPaymentReceive" id="isFullAmountReceive" name="Payment_Method">
+                            <option value="" selected disabled>-- Options --</option>
+                            <option value="True">YES</option>
+                            <option value="False">NO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!--Remain Payment Date-->
+                <div class="col-lg-3 col-sm-6 col-12" id="RemainDate" style="display:none">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Remain Payment Date </label>
+                        <input type="date" asp-for="sale.Remain_Payment_Date" placeholder="DD-MM-YYYY" id="datepicker" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Remain Amount  -->
+                <div class="col-lg-3 col-sm-6 col-12" id="RemainAmount" style="display:none;">
+                    <div class="form-group">
+                        <label for="remainAmount"><span style="color: red;">*</span> Remain Amount</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Enter Remain Amount" id="remainAmount" asp-for="sale.Receive_Remain_Amount">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Receive_Remain_Amount"></span>
+                    </div>
+                </div>
+
+                <!-- Remain Payment Method-->
+                <div class="col-lg-3 col-sm-12" id="RemainPaymentMethod" style="display:none;">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Select Remain Payment Method</label>
+                        <select class="select" asp-for="sale.Remain_Payment_Method" id="selectremainpaymentmethod">
+                            <option value="" selected disabled>-- Payment Method --</option>
+                            <option value="CASH">CASH</option>
+                            <option value="BANK">BANK</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Remain Bank Information-->
+                <div class="col-lg-3 col-sm-12" style="display:none" id="RemainbankSelection">
+                    <div class="form-group">
+                        <label><span style="color:red;">*</span> Select Remain Bank</label>
+                        <select class="form-control" asp-for=sale.Remain_Amount_Receive_Bank_Id id="remainbankSelect">
+                            <option selected disabled value="">-- Select Bank --</option>
+                            @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
+                            {
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                              
+                            }
+                        </select>
+                        <span class="text-danger" asp-validation-for=sale.Remain_Amount_Receive_Bank_Id style="color: red; font-size:11px; font-weight:bold;"></span>
+
+
+                    </div>
+                </div>
+
+
+                <!-- Dedcuted Amount(₹) -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="discount"><span style="color: red;">*</span> Deducted Amount(₹)</label>
+                        <input type="number" readonly inputmode="numeric" class="form-control" placeholder="Deducted Amount ⟨₹⟩" id="DeductedAmount" asp-for="sale.Deducted_Amount">
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Deducted_Amount"></span>
+                    </div>
+                </div>
+
+
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-plus"></i> Add Sales
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        function formatBankOption(bank) {
+            if (!bank.id || bank.text === '-- Select Bank --') return bank.text;
+            var iconUrl = $(bank.element).data('icon');
+            var $bank = $('<span><img src="' + iconUrl + '" class="img-flag" /> ' + bank.text + '</span>');
+            return $bank;
+        }
+
+        $('#bankSelect').select2({
+            minimumResultsForSearch: -1,
+            templateResult: formatBankOption,
+            templateSelection: formatBankOption
+        });
+
+        $('#remainbankSelect').select2({
+            minimumResultsForSearch: -1,
+            templateResult: formatBankOption,
+            templateSelection: formatBankOption
+        });
+
+        $('button[type="reset"]').click(function () {
+            setTimeout(function () {
+                $('#bankSelect').val("").trigger('change');
+            }, 1);
+            setTimeout(function () {
+                $('#selectgrain').val("").trigger('change');
+            }, 1);
+            setTimeout(function () {
+                $('#selectpaymentmethod').val("").trigger('change');
+            }, 1);
+            setTimeout(function () {
+                $('#isFullAmountReceive').val("").trigger('change');
+            }, 1);
+        });
+    }); // Correctly closed $(document).ready function
+
+
+
+    
+
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        // Function to calculate Deducted Amount
+        function calculateDeductedAmount() {
+            var totalPrice = parseFloat($('#totalprice').val()) || 0;
+            var receivedAmount = parseFloat($('#ReceivedAmount').val()) || 0;
+            var discount = parseFloat($('#DiscountAmount').val()) || 0;
+            var remainAmount = parseFloat($('#remainAmount').val()) || 0;
+
+            // Applying the formula
+            var deductedAmount = totalPrice - receivedAmount - discount - remainAmount;
+
+            // Setting the value of Deducted Amount
+            $('#DeductedAmount').val(deductedAmount.toFixed(2)); // toFixed(2) to format it to two decimal places
+        }
+
+        // Event listeners for the input fields
+        $('#totalprice, #ReceivedAmount, #DiscountAmount, #remainAmount').on('input', function () {
+            calculateDeductedAmount();
+        });
+    });
+</script>
+
+
+<!-- Load jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+<script>
+    document.getElementById('selectgrain').addEventListener('change', function () {
+        var selectedOption = this.options[this.selectedIndex];
+        var selectedText = selectedOption.text;
+        document.querySelector('input[name="ProductName"]').value = selectedText;
+    });
+
+    $(document).ready(function () {
+        $('#selectpaymentmethod').change(function () {
+            if ($(this).val() === 'BANK') {
+                $('#bankSelection').show();
+            } else {
+                $('#bankSelection').hide();
+            }
+        });
+
+        $('#isFullAmountReceive').change(function () {
+            if ($(this).val() === "False") {
+                $('#RemainDate').show();
+                $('#RemainAmount').show();
+                $('#RemainPaymentMethod').show();
+            } else {
+                $('#RemainDate').hide();
+                $('#RemainAmount').hide();
+                $('#RemainPaymentMethod').hide();
+            }
+        });
+
+        $('#selectremainpaymentmethod').change(function () {
+            if ($(this).val() === 'BANK') {
+                $('#RemainbankSelection').show();
+            } else {
+                $('#RemainbankSelection').hide();
+            }
+        });
+
+        function DateDefaultValue() {
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById('datepicker').value = today;
+        }
+
+        window.onload = function () {
+            DateDefaultValue();
+            CalculateMethod();
+        };
+
+        function CalculateMethod() {
+            var bags = document.getElementById('bags').value.trim();
+            var bagsperkg = document.getElementById('bagsperkg').value.trim();
+            var weightInput = document.getElementById('weight');
+            var rate = document.getElementById('rate').value.trim();
+            var totalprice = 0;
+            var weight = (bags !== '' && bagsperkg !== '') ? bags * bagsperkg : parseFloat(weightInput.value) || 0;
+
+            weightInput.value = weight === 0 ? '' : weight.toFixed(2);  // Ensuring weight is also shown with two decimals if needed
+
+            var selectGrain = document.getElementById("selectgrain");
+            var selectedValue = selectGrain.value;
+            switch (selectedValue) {
+                case "1":
+                case "2":
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                case "8":
+                case "3":  // Combined case since all these cases do the same thing
+                    totalprice = weight * rate;
+                    break;
+            }
+
+            document.getElementById('totalprice').value = totalprice === 0 ? '' : totalprice.toFixed(2);
+        }
+
+        document.getElementById("selectgrain").addEventListener("change", CalculateMethod);
+        document.getElementById("bags").addEventListener("input", CalculateMethod);
+        document.getElementById("bagsperkg").addEventListener("input", CalculateMethod);
+        document.getElementById("rate").addEventListener("input", CalculateMethod);
+
+    }); // Correctly closed $(document).ready function
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        var isSuggestionSelected = false;
+
+        function toggleNewCustomerFields(show) {
+            $("#newCustomerMessage").toggle(show);
+            $("#newcustomertype").toggle(show);
+            $("#newcustomercity").toggle(show);
+            $("#newcustomerphoneno").toggle(show);
+        }
+
+        toggleNewCustomerFields(false);
+
+        $("#Customer").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("Get_Seller_Customer_Data", "Sales")',
+                    type: "POST",
+                    dataType: "json",
+                    data: { CustomerName: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
+                                value: item.customerName,
+                                id: item.customerId
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 1,
+            response: function (event, ui) {
+                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
+                toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
+            },
+            select: function (event, ui) {
+                isSuggestionSelected = true;
+                event.preventDefault();
+                $("#Customer").val(ui.item.value);
+                $("#CustomerId").val(ui.item.id);
+                toggleNewCustomerFields(false);
+            }
+        });
+
+        $("#Customer").on('input', function () {
+            var enteredValue = $(this).val().trim();
+            if (!enteredValue) {
+                toggleNewCustomerFields(false);
+                isSuggestionSelected = false;
+            } else {
+                isSuggestionSelected = false;
+                $("#Customer").autocomplete("search", enteredValue);
+            }
+        });
+
+        $(window).on('beforeunload', function () {
+            toggleNewCustomerFields(false);
+        });
+    }); // Correctly closed $(document).ready function
+
+</script>
+
+
+
+
+
+<style>
+    .img-flag {
+        height: 20px;
+        width: auto;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+</style>

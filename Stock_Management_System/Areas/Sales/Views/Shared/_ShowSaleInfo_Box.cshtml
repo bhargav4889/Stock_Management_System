@@ -1,0 +1,220 @@
+﻿@using Stock_Management_System.UrlEncryption
+@{
+    Layout = null;
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+@model Stock_Management_System.Areas.Sales.Models.Show_Sale;
+
+@{
+    string BaseAddress = "https://localhost:7024/";
+
+    string Icon = Model.Bank_Icon;
+    string RemainIcon = Model.Remain_Bank_Icon;
+
+    string BankIcon = BaseAddress + Icon;
+    string RemainBankIcon = BaseAddress + RemainIcon;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-credit-card"></i> Sale Information</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+</div>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+    }
+
+    .table-section {
+        width: 100%;
+        border-right: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    img.bank-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+
+    .table-section:last-child {
+        border-right: none;
+    }
+</style>
+
+<script>
+    function toggleMainAccountNo() {
+        var accountNo = document.getElementById("mainAccountNo");
+        var toggleIcon = document.querySelector(".toggle-BankAcNo");
+
+        if (toggleIcon.classList.contains("fa-eye-slash")) {
+            accountNo.textContent = "@Model.Receive_Account_No";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            accountNo.textContent = "xxxxx" + "@Model.Receive_Account_No".substring("@Model.Receive_Account_No".length - 4);
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+
+    function toggleRemainAccountNo() {
+        var accountNo = document.getElementById("remainAccountNo");
+        var toggleIcon = document.querySelector(".toggle-RemainBankAcNo");
+
+        if (toggleIcon.classList.contains("fa-eye-slash")) {
+            accountNo.textContent = "@Model.Receive_Remain_Account_No";
+            toggleIcon.classList.remove("fa-eye-slash");
+            toggleIcon.classList.add("fa-eye");
+        } else {
+            accountNo.textContent = "xxxxx" + "@Model.Receive_Remain_Account_No".substring("@Model.Receive_Remain_Account_No".length - 4);
+            toggleIcon.classList.remove("fa-eye");
+            toggleIcon.classList.add("fa-eye-slash");
+        }
+    }
+</script>
+
+
+@if (Model.saleId != 0)
+{
+    <div class="container">
+        <div class="table-section">
+            <table class="table" style="text-align:center;">
+
+                <tr>
+                    <th>Sale Creation Date</th>
+                    <td>@Model.Create_Sales.ToString("dd-MM-yyyy")</td>
+                </tr>
+                <tr>
+                    <th>Received Payment Date</th>
+                    <td>@Model.Receive_Payment_Date.ToString("dd-MM-yyyy")</td>
+                </tr>
+                <tr>
+                    <th>Customer Name</th>
+                    <td>@Model.CustomerName</td>
+                </tr>
+                <tr>
+                    <th>Customer Type</th>
+                    <td>@Model.CustomerType</td>
+                </tr>
+                <tr>
+                    <th>Product Name</th>
+                    <td>@Model.Product_Name</td>
+                </tr>
+                @if (!string.IsNullOrEmpty(Model.Brand_Name))
+                {
+                    <tr>
+                        <th>Brand Name</th>
+                        <td>@Model.Brand_Name</td>
+                    </tr>
+                }
+                <tr>
+                    <th>Bag</th>
+                    <td>@(Model.Bags?.ToString() ?? "--")</td>
+                </tr>
+                <tr>
+                    <th>Bag Per Kg</th>
+                    <td>@(Model.BagPerKg?.ToString() ?? "--")</td>
+                </tr>
+                <tr>
+                    <th>Weight</th>
+                    <td>@Model.Total_Weight</td>
+                </tr>
+                <tr>
+                    <th>Rate(₹)</th>
+                    <td>@Model.Rate.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Total Amount(₹)</th>
+                    <td>@Model.Total_Price.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Received Amount(₹)</th>
+                    <td>@Model.Receive_Amount.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Discount (₹)</th>
+                    <td>@Model.Discount?.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Receive Payment Method</th>
+                    <td>@Model.Payment_Method</td>
+                </tr>
+
+                @if (Model.Receive_Information_ID != 0)
+                {
+                   
+
+                    <tr>
+                        <th> Bank Account No</th>
+                        <td>XXXXX@(Model.Receive_Account_No.Substring(Model.Receive_Account_No.Length - 4)) <img src="@BankIcon" class="bank-icon" /></td>
+                        <span class="fas toggle-password fa-eye-slash" onclick="toggleAccountNo()"></span>
+                    </tr>
+
+                    <tr>
+                        <th>Account Holder Name</th>
+                        <td>@Model.Account_Holder_Name</td>
+                    </tr>
+                }
+
+                <tr>
+                    <th>Deducted Amount(₹)</th>
+                    <td>@Model.Deducted_Amount.Value.ToString("C")</td>
+                </tr>
+
+                <tr>
+                    <th>Is Full Amount Payment Received?</th>
+                    <td>@(Model.IsFullPaymentReceive ? "Yes" : "No")</td>
+                </tr>
+                }
+            </table>
+        </div>
+        @if (Model.IsFullPaymentReceive == false)
+        {
+            <div class="table-section">
+                <table class="table">
+                    <tr>
+                        <th>Remain Payment Date</th>
+                        <td>@Model.Remain_Payment_Date?.ToString("dd-MM-yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>Remain Amount(₹)</th>
+                        <td>@Model.Receive_Remain_Amount?.ToString("C")</td>
+                    </tr>
+                    <tr>
+                        <th>Remain Payment Method</th>
+                        <td>@Model.Remain_Payment_Method</td>
+                    </tr>
+
+                    @if (Model.Remain_Receive_Information_ID != 0)
+                    {
+                        
+
+                        <tr>
+                            <th> Remain Bank Account No</th>
+                            <td>XXXXX@(Model.Receive_Remain_Account_No.Substring(Model.Receive_Remain_Account_No.Length - 4))  <img src="@RemainBankIcon" class="bank-icon" /></td>
+                            <span class="fas toggle-password fa-eye-slash" onclick="toggleRemainAccountNo()"></span>
+                        </tr>
+
+                        <tr>
+                            <th>Remain Account Holder Name</th>
+                            <td>@Model.Remain_Account_Holder_Name</td>
+                        </tr>
+
+
+                    }
+                </table>
+            </div>
+        }
+
+    </div>
+}

@@ -7,7 +7,7 @@
 
 @model Stock_Management_System.Areas.Accounts.Models.CustomerDetails_With_Purchased_Stock_Model;
 
-@section Scripts{
+@section Scripts {
     <script>
         $(document).ready(function () {
             var table = $('#data').DataTable();
@@ -135,7 +135,7 @@
                     text: bank.bankName,
                     image: bank.bankIcon // Ensure this is the correct property for the image URL
                 })),
-               
+
                 templateResult: formatBank,
                 templateSelection: formatBank
             });
@@ -150,8 +150,29 @@
         });
     </script>
 
+    <script>
+        $(document).ready(function () {
+            // Correct class name for the button
+            $(document).on('click', '.loadSalesInfoBtn', function () {
+                var saleId = $(this).data('sale-id');
 
-   
+                $.ajax({
+                    url: '/Sales/Get_Sale_Info',
+                    type: 'GET',
+                    data: { Sale_ID: saleId },
+                    success: function (response) {
+                        $('#showsaleModal .modal-content').html(response);
+                        $('#showsaleModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading sale information: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+
 
 
 }
@@ -192,6 +213,7 @@
                         <li>
                             <form asp-action="Customer_Account_Statement_CreatePDF" asp-controller="Account" method="get">
                                 <input type="hidden" name="Customer_ID" value="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" />
+                                <input type="hidden" name="Customer_Type" value="@(Model.Customers.CustomerType.ToString())" />
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
@@ -203,6 +225,7 @@
                         <li>
                             <form method="get" asp-action="Customer_Account_Statement_CreateEXCEL" asp-controller="Account">
                                 <input type="hidden" name="Customer_ID" value="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" />
+                                <input type="hidden" name="Customer_Type" value="@(Model.Customers.CustomerType.ToString())" />
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
@@ -253,7 +276,7 @@
                                         <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="searchLocation">
                                     </div>
                                 </div>
-                               
+
 
 
                                 <select id="bankDropdown" style="width: 50%;" name="banks"></select>
@@ -282,7 +305,7 @@
                 <table class="table">
                     @if (Model.Customers != null)
                     {
-                      
+
                         <tr>
                             <th>Name:</th>
                             <td style="font-weight:600; color:black; ">@Model.Customers.CustomerName</td>
@@ -307,125 +330,193 @@
 
         <br />
 
-        <div class="table-responsive">
-            <table id="data" class="table datanew">
-                <thead>
-                    <tr>
+        @if (Model.Customers.CustomerType == "BUYER")
+        {
+            <div class="table-responsive">
+                <table id="data" class="table datanew">
+                    <thead>
+                        <tr>
 
-                        <th class="text-center">Date</th>
-                        <th class="text-center">Name</th>
-                        <th class="text-center">Location</th>
-                        <th class="text-center">Bag</th>
-                        <th class="text-center">Bag Per KG</th>
-                        <th class="text-center">Weight</th>
-                        <th class="text-center">Product-Price(₹)</th>
-                        <th class="text-center">Total-Price(₹)</th>
-                        <th class="text-center">Vehicle-No</th>
-                        <th class="text-center">Payment-Status</th>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Location</th>
+                            <th class="text-center">Bag</th>
+                            <th class="text-center">Bag Per KG</th>
+                            <th class="text-center">Weight</th>
+                            <th class="text-center">Product-Price(₹)</th>
+                            <th class="text-center">Total-Price(₹)</th>
+                            <th class="text-center">Vehicle-No</th>
+                            <th class="text-center">Payment-Status</th>
 
-                        <th class="text-center">Actions</th>
+                            <th class="text-center">Actions</th>
 
-                    </tr>
-                </thead>
-                <tbody>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                    @{
-                        @if (Model?.Purchased_Stocks != null && Model.Purchased_Stocks.Count > 0)
-                        {
-
-                            foreach (var item in Model.Purchased_Stocks)
+                        @{
+                            @if (Model?.Purchased_Stocks != null && Model.Purchased_Stocks.Count > 0)
                             {
-                                <tr>
 
-                                    <td class="text-center">@(DateTime.TryParse(item.StockDate.ToString(), out var piDate) ? piDate.ToString("dd-MM-yy") : "")</td>
-                                    <td class="text-center">@item.ProductName</td>
-                                    <td class="text-center">@item.PurchaseStockLocation</td>
-                                    <td class="text-center">@item.Bags</td>
-                                    <td class="text-center">@item.BagPerKg</td>
-                                    <td class="text-center">@item.TotalWeight</td>
-                                    <td class="text-center">@item.ProductPrice</td>
-                                    <td class="text-center">@item.TotalPrice</td>
-                                    <td class="text-center">@item.VehicleNo</td>
-                                    @{
-                                        if (item.PaymentStatus == "PAID")
-                                        {
-                                            <td class="text-center"><span class="badges bg-lightgreen">@item.PaymentStatus</span></td>
+                                foreach (var item in Model.Purchased_Stocks)
+                                {
+                                    <tr>
+
+                                        <td class="text-center">@(DateTime.TryParse(item.StockDate.ToString(), out var piDate) ? piDate.ToString("dd-MM-yy") : "")</td>
+                                        <td class="text-center">@item.ProductName</td>
+                                        <td class="text-center">@item.PurchaseStockLocation</td>
+                                        <td class="text-center">@item.Bags</td>
+                                        <td class="text-center">@item.BagPerKg</td>
+                                        <td class="text-center">@item.TotalWeight</td>
+                                        <td class="text-center">@item.ProductPrice.ToString("C")</td>
+                                        <td class="text-center">@item.TotalPrice.ToString("C")</td>
+                                        <td class="text-center">@item.VehicleNo</td>
+                                        @{
+                                            if (item.PaymentStatus == "PAID")
+                                            {
+                                                <td class="text-center"><span class="badges bg-lightgreen">@item.PaymentStatus</span></td>
+                                            }
+                                            else if (item.PaymentStatus == "PENDING")
+                                            {
+                                                <td class="text-center"><span class="badges bg-lightred">@item.PaymentStatus</span></td>
+                                            }
+                                            else if (item.PaymentStatus == "REMAIN")
+                                            {
+                                                <td class="text-center"><span class="badges bg-lightyellow">@item.PaymentStatus</span></td>
+                                            }
                                         }
-                                        else if(item.PaymentStatus == "PENDING")
-                                        {
-                                            <td class="text-center"><span class="badges bg-lightred">@item.PaymentStatus</span></td>
-                                        }
-                                        else if(item.PaymentStatus == "REMAIN")
-                                        {
-                                            <td class="text-center"><span class="badges bg-lightyellow">@item.PaymentStatus</span></td>
-                                        }
-                                    }
-
-                                  
-
-
-                                    @*
-                        <td>
-                        <form asp-action="Customer_Wise_Stock_Details" asp-controller="Account">
-                        <input type="hidden" value="@UrlEncryptor.Encrypt(Convert.ToString(item.StockId))" name="TN_ID" />
-                        <button type="submit" class="btn-link" style="background-color: transparent; border: none; padding: 0;">
-                        <img src="~/img/icons/eye.svg" alt="img">
-                        </button>
-                        </form>
-                        </td>
-                        *@
-
-
-
-                                    <td class="text-center">
-                                        <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
-                                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                          
-
-                                            <li>
-                                                @if(item.PaymentStatus == "PENDING")
-                                                {
-                                                    <button class="loadPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img"> Create Payment</button>
-                                                }
-                                                else if (item.PaymentStatus == "REMAIN")
-                                                {
-                                                    <button class="loadRemainPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img"> Remain Payment</button>
-                                                }
-                                                else if (item.PaymentStatus == "PAID")
-                                                {
-                                                    <button class="loadShowPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/eye.svg" class="me-2" alt="img"> Show Payment</button>
-                                                }
-                                               
-                                                
-                                            </li>
-                                            <li>
-
-                                                <a role="link"
-                                                   href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)) })"
-                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock</a>
-                                            </li>
-
-                                        </ul>
-                                    </td>
 
 
 
 
 
 
-                                </tr>
+
+
+                                        <td class="text-center">
+                                            <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+
+
+                                                <li>
+                                                    @if (item.PaymentStatus == "PENDING")
+                                                    {
+                                                        <button class="loadPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img"> Create Payment</button>
+                                                    }
+                                                    else if (item.PaymentStatus == "REMAIN")
+                                                    {
+                                                        <button class="loadRemainPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img"> Remain Payment</button>
+                                                    }
+                                                    else if (item.PaymentStatus == "PAID")
+                                                    {
+                                                        <button class="loadShowPaymentInfoBtn dropdown-item" data-customer-id="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockId.ToString())"><img src="~/img/icons/eye.svg" class="me-2" alt="img"> Show Payment</button>
+                                                    }
+
+
+                                                </li>
+                                                <li>
+
+                                                    <a role="link"
+                                                       href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)) })"
+                                                       onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock</a>
+                                                </li>
+
+                                            </ul>
+                                        </td>
+
+
+
+
+
+
+                                    </tr>
+                                }
+
+
                             }
-
-
                         }
-                    }
 
-                </tbody>
-            </table>
-        </div>
+                    </tbody>
+                </table>
+            </div>
+        }
 
+        else if (Model.Customers.CustomerType == "SELLER")
+        {
+            <div class="table-responsive">
+                <table id="data" class="table datanew">
+                    <thead>
+                        <tr>
+
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Product</th>
+                            <th class="text-center">Brand</th>
+                            <th class="text-center">Bag</th>
+                            <th class="text-center">Bag Per KG</th>
+                            <th class="text-center">Weight</th>
+                            <th class="text-center">Rate(₹)</th>
+                            <th class="text-center">Total Amount(₹)</th>
+                            <th class="text-center">Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @{
+                            @if (Model?.Show_Sales != null && Model.Show_Sales.Count > 0)
+                            {
+
+                                foreach (var item in Model.Show_Sales)
+                                {
+                                    <tr>
+
+                                        <td class="text-center">@(DateTime.TryParse(item.Create_Sales.ToString(), out var piDate) ? piDate.ToString("dd-MM-yy") : "")</td>
+                                        <td class="text-center">@item.Product_Name</td>
+                                        <td class="text-center">@item.Brand_Name</td>
+                                        <td class="text-center">@item.Bags</td>
+                                        <td class="text-center">@item.BagPerKg</td>
+                                        <td class="text-center">@item.Total_Weight</td>
+                                        <td class="text-center">@item.Rate.ToString("C")</td>
+                                        <td class="text-center">@item.Total_Price.ToString("C")</td>
+
+                                        <td class="text-center">
+                                            <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <button class="loadSalesInfoBtn dropdown-item" data-sale-id="@UrlEncryptor.Encrypt(item.saleId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.CustomerId.ToString())">
+                                                        <img src="~/img/icons/eye.svg" class="me-2" alt="img"> Show Information
+                                                    </button>
+
+                                                </li>
+                                                <li>
+                                                    <a role="link"
+                                                       href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
+                                                       onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale</a>
+                                                </li>
+
+                                            </ul>
+                                        </td>
+
+
+
+
+
+
+                                    </tr>
+                                }
+
+
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        }
 
 
 
@@ -450,6 +541,14 @@
         </div>
     </div>
 
+    <!-- Modal Shell -->
+    <div class="modal fade" id="showsaleModal" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Dynamic Content Will Be Loaded Here -->
+            </div>
+        </div>
+    </div>
 
 </div>
 

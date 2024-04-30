@@ -13,6 +13,7 @@ using Customer_Model = Stock_Management_System.Areas.Accounts.Models.Customer_Mo
 using static Stock_Management_System.Areas.Invoices.Models.InvoiceModel;
 using System.Net;
 using Stock_Management_System.Areas.Manage.Models;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Stock_Management_System.Areas.Accounts.Controllers
 {
@@ -313,7 +314,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Customer Info With Statements
 
-        public async Task<IActionResult> Account_Details(string Customer_ID)
+        public async Task<IActionResult> Account_Details(string Customer_ID, string Customer_Type)
         {
             if (HttpContext.Request.Headers["Referer"].ToString() == "")
             {
@@ -322,7 +323,17 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
             await Dropdown_For_Bank_Names();
 
-            CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = await api_Service.Model_Of_Data_Display<CustomerDetails_With_Purchased_Stock_Model>("Customers/Account_Details", Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID)));
+            CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = new CustomerDetails_With_Purchased_Stock_Model();
+
+           /*  CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = await api_Service.Model_Of_Data_Display<CustomerDetails_With_Purchased_Stock_Model>("Customers/Account_Details", Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID)),Customer_Type);*/
+           HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Account_Details/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
+
+            string data = await response.Content.ReadAsStringAsync();
+            dynamic jsonObject = JsonConvert.DeserializeObject(data);
+            var dataObject = jsonObject.data;
+            var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+            customerDetails_With_Purchased_Stock = JsonConvert.DeserializeObject<CustomerDetails_With_Purchased_Stock_Model>(extractedDataJson);
+           
 
             return View(customerDetails_With_Purchased_Stock);
 
@@ -386,9 +397,9 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Accounts Statement PDF And Excel
 
-        public async Task<IActionResult> Customer_Account_Statement_CreatePDF(string Customer_ID)
+        public async Task<IActionResult> Customer_Account_Statement_CreatePDF(string Customer_ID,string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_PDF/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_PDF/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -406,9 +417,9 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             }
         }
 
-        public async Task<IActionResult> Customer_Account_Statement_CreateEXCEL(string Customer_ID)
+        public async Task<IActionResult> Customer_Account_Statement_CreateEXCEL(string Customer_ID,string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_EXCEL/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_EXCEL/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
             if (response.IsSuccessStatusCode)
             {

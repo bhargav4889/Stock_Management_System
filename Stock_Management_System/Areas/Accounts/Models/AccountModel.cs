@@ -1,4 +1,6 @@
-﻿using Stock_Management_System.Areas.Manage.Models;
+﻿using Newtonsoft.Json;
+using Stock_Management_System.Areas.Manage.Models;
+using Stock_Management_System.Areas.Sales.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 
@@ -56,14 +58,11 @@ namespace Stock_Management_System.Areas.Accounts.Models
 
         public List<Purchased_Stock_Model> Purchased_Stocks { get; set; }
 
-
-        public Payment_All_Models.Payment_Model payment_Model { get; set; }
-
-
+        public List<Show_Sale> Show_Sales { get; set; }
 
     }
 
-  
+
 
 
 
