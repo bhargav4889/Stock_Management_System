@@ -222,5 +222,146 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         }
 
         #endregion
+
+
+        #region Method : Pending Payments PDF & Excel
+
+        public async Task<IActionResult> Pending_Payments_PDF()
+        {
+
+
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Pending_Payments_PDF");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/pdf", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate PDF.");
+            }
+        }
+
+        public async Task<IActionResult> Pending_Payments_EXCEL()
+        {
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Pending_Payments_EXCEL");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate Excel.");
+            }
+        }
+
+        #endregion
+
+        #region Method : Remain Payments PDF & Excel
+
+        public async Task<IActionResult> Remain_Payments_PDF()
+        {
+
+
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Remain_Payments_PDF");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/pdf", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate PDF.");
+            }
+        }
+
+        public async Task<IActionResult> Remain_Payments_EXCEL()
+        {
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Remain_Payments_EXCEL");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate Excel.");
+            }
+        }
+
+        #endregion
+
+        #region Method : Paid Payments PDF & Excel
+
+        public async Task<IActionResult> Paid_Payments_PDF()
+        {
+
+
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Paid_Payments_PDF");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/pdf", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate PDF.");
+            }
+        }
+
+        public async Task<IActionResult> Paid_Payments_EXCEL()
+        {
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Paid_Payments_EXCEL");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Extract filename from Content-Disposition header
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                string filename = contentDisposition?.FileName;
+
+                var pdfContent = await response.Content.ReadAsByteArrayAsync();
+                return File(pdfContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+            }
+            else
+            {
+                // Handle error or return an error response
+                return BadRequest("Could not generate Excel.");
+            }
+        }
+
+        #endregion
+
+
     }
 }

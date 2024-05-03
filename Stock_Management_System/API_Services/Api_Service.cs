@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Stock_Management_System.UrlEncryption;
+using Stock_Management_System.BAL;
+using System.Net.Http.Headers;
 
 namespace Stock_Management_System.API_Services
 {
@@ -9,27 +11,33 @@ namespace Stock_Management_System.API_Services
         Uri baseaddress = new Uri("https://localhost:7024/api");
 
         private readonly HttpClient _Client;
+        private readonly CV _cv;
+
 
         public Api_Service()
         {
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _cv = new CV();
         }
+
+
 
         // Common Function Of List Of Data Display
 
         #region Common Function Of List Of Data Display
 
-        public async Task<List<T>> List_Of_Data_Display<T>(string requestUri,int reuqestId = 0)
+        public async Task<List<T>> List_Of_Data_Display<T>(string requestUri, int reuqestId = 0)
         {
 
 
             try
             {
-                if(reuqestId == 0)
+                if (reuqestId == 0)
                 {
-                    HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}");
+                
 
+                    HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}");
 
 
                     if (response.IsSuccessStatusCode)
@@ -71,7 +79,7 @@ namespace Stock_Management_System.API_Services
                     }
                 }
 
-                
+
 
 
             }
@@ -81,21 +89,21 @@ namespace Stock_Management_System.API_Services
             }
         }
 
-        public async Task<T> Model_Of_Data_Display<T>(string requestUri,int? requestedId = 0)
+        public async Task<T> Model_Of_Data_Display<T>(string requestUri, int? requestedId = 0)
         {
 
 
             try
             {
 
-                if(requestedId == 0)
+                if (requestedId == 0)
                 {
 
                     HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}");
 
 
                     if (response.IsSuccessStatusCode)
-                    {   
+                    {
 
                         string data = await response.Content.ReadAsStringAsync();
                         // Directly deserialize the JSON string into type T.
@@ -137,7 +145,7 @@ namespace Stock_Management_System.API_Services
 
 
 
-                
+
 
             }
             catch
@@ -147,7 +155,7 @@ namespace Stock_Management_System.API_Services
         }
 
 
-     
+
 
 
         #endregion

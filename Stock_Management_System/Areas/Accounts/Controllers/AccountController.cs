@@ -14,6 +14,9 @@ using static Stock_Management_System.Areas.Invoices.Models.InvoiceModel;
 using System.Net;
 using Stock_Management_System.Areas.Manage.Models;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Stock_Management_System.BAL;
+using System.Net.Http.Headers;
+
 
 namespace Stock_Management_System.Areas.Accounts.Controllers
 {
@@ -34,11 +37,15 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         public Api_Service api_Service = new Api_Service();
 
 
-        public AccountController(IConfiguration configuration)
+        private readonly CV _cV; 
+
+        public AccountController(IConfiguration configuration,CV cV)
         {
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _cV = cV;  
+           
         }
 
 
@@ -301,9 +308,11 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         public async Task<IActionResult> Manage_Customers_Account()
         {
-
+           
 
             List<Customer_Model> customers = await api_Service.List_Of_Data_Display<Customer_Model>("Customers/Customers_List");
+
+           
 
             return View(customers);
         }
@@ -325,15 +334,15 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
             CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = new CustomerDetails_With_Purchased_Stock_Model();
 
-           /*  CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = await api_Service.Model_Of_Data_Display<CustomerDetails_With_Purchased_Stock_Model>("Customers/Account_Details", Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID)),Customer_Type);*/
-           HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Account_Details/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
+            /*  CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = await api_Service.Model_Of_Data_Display<CustomerDetails_With_Purchased_Stock_Model>("Customers/Account_Details", Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID)),Customer_Type);*/
+            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Account_Details/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
 
             string data = await response.Content.ReadAsStringAsync();
             dynamic jsonObject = JsonConvert.DeserializeObject(data);
             var dataObject = jsonObject.data;
             var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
             customerDetails_With_Purchased_Stock = JsonConvert.DeserializeObject<CustomerDetails_With_Purchased_Stock_Model>(extractedDataJson);
-           
+
 
             return View(customerDetails_With_Purchased_Stock);
 
@@ -397,7 +406,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Accounts Statement PDF And Excel
 
-        public async Task<IActionResult> Customer_Account_Statement_CreatePDF(string Customer_ID,string Customer_Type)
+        public async Task<IActionResult> Customer_Account_Statement_CreatePDF(string Customer_ID, string Customer_Type)
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_PDF/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
@@ -405,7 +414,20 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             {
                 // Extract filename from Content-Disposition header
                 var contentDisposition = response.Content.Headers.ContentDisposition;
-                string filename = contentDisposition?.FileName;
+
+                // Set a default filename or use the one from the header if available
+
+                string filename = contentDisposition?.FileNameStar;
+
+                // Decode the filename to handle URL encoded characters
+                filename = Uri.UnescapeDataString(filename);
+
+                // Ensure the filename has the correct ".pdf" extension and no unwanted characters
+                filename = filename.Replace("\"", "").Trim(); // Remove any quotes and trim spaces
+                if (!filename.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    filename += ".pdf"; // Safely append .pdf if it's not there
+                }
 
                 var pdfContent = await response.Content.ReadAsByteArrayAsync();
                 return File(pdfContent, "application/pdf", filename);
@@ -417,18 +439,33 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             }
         }
 
-        public async Task<IActionResult> Customer_Account_Statement_CreateEXCEL(string Customer_ID,string Customer_Type)
+        public async Task<IActionResult> Customer_Account_Statement_CreateEXCEL(string Customer_ID, string Customer_Type)
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_EXCEL/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
             if (response.IsSuccessStatusCode)
             {
+
+
                 // Extract filename from Content-Disposition header
                 var contentDisposition = response.Content.Headers.ContentDisposition;
-                string filename = contentDisposition?.FileName;
 
-                var pdfContent = await response.Content.ReadAsByteArrayAsync();
-                return File(pdfContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+                // Set a default filename or use the one from the header if available
+
+                string filename = contentDisposition?.FileNameStar;
+
+                // Decode the filename to handle URL encoded characters
+                filename = Uri.UnescapeDataString(filename);
+
+                // Ensure the filename has the correct ".pdf" extension and no unwanted characters
+                filename = filename.Replace("\"", "").Trim(); // Remove any quotes and trim spaces
+                if (!filename.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    filename += ".xlsx"; // Safely append .pdf if it's not there
+                }
+
+                var ExcelContent = await response.Content.ReadAsByteArrayAsync();
+                return File(ExcelContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
             }
             else
             {

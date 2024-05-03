@@ -1,88 +1,45 @@
 ﻿using Microsoft.AspNetCore.Http;
+
 namespace Stock_Management_System.BAL
 {
-    public static class CV
+    public class CV
     {
-        private static IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        static CV()
+        public CV(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = new HttpContextAccessor();
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public static string? Username()
+        public CV()
         {
-            string? Username = null;
-
-            if(_httpContextAccessor.HttpContext.Session.GetString("AdminName") != null)
-            {
-                Username = _httpContextAccessor.HttpContext.Session.GetString("AdminName").ToString();
-            }
-            return Username;
-
         }
 
-        public static int? UserID()
+        public string? Username()
         {
-            int? UserID = null;
-
-            if (_httpContextAccessor.HttpContext.Session.GetString("AdminID") != null)
-            {
-                UserID = Convert.ToInt32(_httpContextAccessor.HttpContext.Session.GetString("AdminID"));
-            }
-            return UserID;
-
+            return _httpContextAccessor.HttpContext?.Session.GetString("Auth_Name");
         }
 
-
-        public static string? Password()
+        public string? Email()
         {
-            string? Password = null;
-
-            if (_httpContextAccessor.HttpContext.Session.GetString("AdminPassword") != null)
-            {
-                Password = _httpContextAccessor.HttpContext.Session.GetString("AdminPassword").ToString();
-            }
-            return Password;
-
+            return _httpContextAccessor.HttpContext?.Session.GetString("Auth_Email");
         }
 
-        public static string? Email()
+        public string? ContactNo()
         {
-            string? Email = null;
-
-            if (_httpContextAccessor.HttpContext.Session.GetString("AdminEmail") != null)
-            {
-                Email = _httpContextAccessor.HttpContext.Session.GetString("AdminEmail").ToString();
-            }
-            return Email;
-
+            return _httpContextAccessor.HttpContext?.Session.GetString("Auth_Phone");
         }
 
-        public static string? ContactNo()
+        public DateTime? LastLoginTime()
         {
-            string? ContactNo = null;
-
-            if (_httpContextAccessor.HttpContext.Session.GetString("AdminPhoneNo") != null)
-            {
-                ContactNo = _httpContextAccessor.HttpContext.Session.GetString("AdminPhoneNo").ToString();
-            }
-            return ContactNo;
-
+            var lastLogin = _httpContextAccessor.HttpContext?.Session.GetString("Last_Login");
+            return lastLogin != null ? Convert.ToDateTime(lastLogin) : null;
         }
 
-
-        public static DateTime? LastLoginTime()
+        public string? JWT_Token()
         {
-            DateTime? LastLoginTime = null;
-
-            if (_httpContextAccessor.HttpContext.Session.GetString("LastLogin") != null)
-            {
-                LastLoginTime = Convert.ToDateTime(_httpContextAccessor.HttpContext.Session.GetString("LastLogin").ToString());
-            }
-            return LastLoginTime;
-
+            Console.WriteLine("Token", _httpContextAccessor.HttpContext?.Session.GetString("JWT_Token"));
+            return _httpContextAccessor.HttpContext?.Session.GetString("JWT_Token");
         }
     }
 }

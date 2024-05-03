@@ -1,4 +1,6 @@
 ﻿@using Stock_Management_System.BAL;
+
+@inject CV cv
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,7 +102,7 @@
                             <div class="avatar avatar-lg">
                                 <img class="avatar-img rounded-circle" alt="User Image" src="~/img/profile.png">
                             </div>
-                            <span style="color:black; font-style:initial; font-weight:bolder">Hi, @CV.Username()</span>
+                            <span style="color:black; font-style:initial; font-weight:bolder">Hi, @cv.Username()</span>
                         </a>
                         <div class="dropdown-menu menu-drop-user">
                             <div class="profilename">
@@ -164,7 +166,7 @@
                                 @* <li><a href="saleslist.html">Sales List</a></li>
                                 <li><a href="pos.html">Create Sale</a></li>*@
                                 <li><a asp-action="Create_Sales" asp-controller="Sales">Create Sales</a></li>
-                                <li><a asp-action="History_Sales_Invoice" asp-controller="Invoice">History Sales</a></li>
+                                <li><a asp-action="Manage_Sales" asp-controller="Sales">History Sales</a></li>
 
                             </ul>
                         </li>
@@ -211,9 +213,9 @@
 
 
                         <li class="submenu">
-                            <a href="~/Remainder"><img src="~/img/icons/notification-bing.svg" alt="img"><span> Remainder</span> <span class="menu-arrow"></span></a>
+                            <a href="~/Reminder"><img src="~/img/icons/notification-bing.svg" alt="img"><span> Reminder</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a asp-action="Create_Remainder" asp-controller="Remainder">Create Reminder</a></li>
+                                <li><a asp-action="Create_Reminder" asp-controller="Reminder">Create Reminder</a></li>
                             </ul>
 
                         </li>

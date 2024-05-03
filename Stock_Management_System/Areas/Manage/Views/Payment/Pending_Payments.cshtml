@@ -120,7 +120,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Purchase_Invoice_Statement_CreatePDF" asp-controller="Invoice" method="get">
+                            <form asp-action="Pending_Payments_PDF" asp-controller="Payment" method="get">
 
 
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Pending Payments PDF">
@@ -132,7 +132,7 @@
                         </li>
 
                         <li>
-                            <form asp-action="Export_Purchase_Invoices_List_To_Excel" asp-controller="Invoice" method="get">
+                            <form asp-action="Pending_Payments_EXCEL" asp-controller="Payment" method="get">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
                                     <img src="~/img/icons/excel.svg" alt="img">

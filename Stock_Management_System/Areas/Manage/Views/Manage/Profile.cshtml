@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Profile";
 }
+@inject CV cv
 <div class="content">
     <div class="page-header">
         <div class="page-title">
@@ -22,7 +23,7 @@
                            
                         </div>
                         <div class="profile-contentname">
-                            <h2>Hello,@CV.Username()</h2>
+                            <h2>Hello,@cv.Username()</h2>
                             <h4>Check Yoor Personal Info.</h4>
                         </div>
                     </div>
@@ -36,22 +37,22 @@
                 <div class="col-lg-6 col-sm-12">
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" placeholder="@CV.Username()" style="font-weight:bold; color:black" disabled>
+                        <input type="text" placeholder="@cv.Username()" style="font-weight:bold; color:black" disabled>
                     </div>
                 </div>
                 <div class="col-lg-6 col-sm-12">
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="text" disabled placeholder="@CV.Email()">
+                        <input type="text" disabled placeholder="@cv.Email()">
                     </div>
                 </div>
                 <div class="col-lg-6 col-sm-12">
                     <div class="form-group">
                         <label>Phone</label>
-                        <input type="text" disabled placeholder="@CV.ContactNo()">
+                        <input type="text" disabled placeholder="@cv.ContactNo()">
                     </div>
                 </div>
-                <div class="col-lg-6 col-sm-12">
+                @* <div class="col-lg-6 col-sm-12">
                     <div class="form-group">
                         <label>Password</label>
                         <div class="pass-group">
@@ -59,8 +60,8 @@
                             <span class="fas toggle-password fa-eye-slash"></span>
                         </div>
                     </div>
-                </div>
-               @* <h6>Last Login Time: @CV.LastLoginTime()?.ToString("MM/dd/yyyy hh:mm tt")</h6>*@
+                </div> *@
+               <h6>Last Login Time: @cv.JWT_Token()</h6>
 
             </div>
         </div>

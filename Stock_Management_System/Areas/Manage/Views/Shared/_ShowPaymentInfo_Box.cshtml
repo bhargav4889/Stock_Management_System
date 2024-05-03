@@ -4,6 +4,10 @@
 }
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+
+
 
 @model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Show_Payment_Info;
 
@@ -84,12 +88,18 @@
 </script>
 
 
+
+
+
+
 @if (Model.PaymentID != 0)
 {
     <div class="container">
         <div class="table-section">
             <table class="table" style="text-align:center;">
                 <!-- Payment Details -->
+
+
 
                 <tr>
                     <th>Date</th>
@@ -105,11 +115,11 @@
                 </tr>
                 <tr>
                     <th>Total Amount</th>
-                    <td>@Model.TotalPrice</td>
+                    <td>@Model.TotalPrice.ToString("C")</td>
                 </tr>
                 <tr>
                     <th>Paid Amount</th>
-                    <td>@Model.AmountPaid</td>
+                    <td>@Model.AmountPaid.ToString("C")</td>
                 </tr>
                 <tr>
                     <th>Payment Method</th>
@@ -157,7 +167,7 @@
                     </tr>
                     <tr>
                         <th>Remain Amount</th>
-                        <td>@Model.RemainPaymentAmount</td>
+                        <td>@Model.RemainPaymentAmount.ToString("C")</td>
                     </tr>
                     <tr>
                         <th>Payment Method</th>
@@ -224,11 +234,11 @@ else
                 </tr>
                 <tr>
                     <th>Total Amount</th>
-                    <td>@Model.TotalPrice</td>
+                    <td>@Model.TotalPrice.ToString("C")</td>
                 </tr>
                 <tr>
                     <th>Paid Amount</th>
-                    <td>@Model.AmountPaid</td>
+                    <td>@Model.AmountPaid.ToString("C")</td>
                 </tr>
                 <tr>
                     <th>Payment Method</th>
@@ -264,6 +274,7 @@ else
                     }
                 }
             </table>
+           
         </div>
     </div>
 }

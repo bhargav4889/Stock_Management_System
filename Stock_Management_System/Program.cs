@@ -1,3 +1,4 @@
+using Stock_Management_System.BAL;
 using Stock_Management_System.Email_Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(3);
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -18,6 +19,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<CV>();
 
 // Register EmailSender with SMTP settings
 builder.Services.AddTransient<IEmailSender>(i => new EmailSender(

@@ -122,7 +122,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Insert_Purchase_Invoice_Details(Purchase_Invoice_Model purchase_InvoiceModel)
-        {
+            {
 
 
             var jsonContent = JsonConvert.SerializeObject(purchase_InvoiceModel);

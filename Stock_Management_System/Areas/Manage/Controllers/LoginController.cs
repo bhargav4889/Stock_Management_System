@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Stock_Management_System.API_Services;
 using Stock_Management_System.Areas.Manage.Models;
 using Stock_Management_System.Email_Services;
 using System.Data;
@@ -25,95 +26,84 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         private readonly IEmailSender _emailSender;
 
+       
+        private Api_Service api_Service = new Api_Service();
 
         // Constructor for LoginController, accepting IConfiguration for dependency injection
         public LoginController(IConfiguration configuration, IEmailSender emailSender)
         {
-            // Initialize the Configuration property with the injected IConfiguration
+            
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
             _emailSender = emailSender;
+           
         }
 
 
 
-        public IActionResult Login_Page()
+        public IActionResult Login()
         {
             return View();
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> Login(AdminDetailsModel adminDetails)
-        {
-            string connection = this.Configuration.GetConnectionString("ConnectionDB");
 
+        [HttpPost]
+        public async Task<IActionResult> Login(Auth_Model model)
+            {
             if (ModelState.IsValid)
             {
-                using (SqlConnection sqlConnection = new SqlConnection(connection))
+                string url = $"https://localhost:7024/Auth/Login";
+                StringContent content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await _Client.PostAsync(url, content);
+                if (response.IsSuccessStatusCode)
                 {
-                    await sqlConnection.OpenAsync();
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(jsonResponse);
 
-                    using (SqlCommand command = sqlConnection.CreateCommand())
+                    if (result["success"])
                     {
-                        command.CommandType = System.Data.CommandType.StoredProcedure;
-                        command.CommandText = "PR_ADMIN_LOGIN";
+                        var userData = JsonConvert.SerializeObject(result["user"]);
+                        User_Model user = JsonConvert.DeserializeObject<User_Model>(userData);
 
-                        command.Parameters.AddWithValue("@Admin_Username", SqlDbType.VarChar).Value = adminDetails.UserName;
-                        command.Parameters.AddWithValue("@Password", SqlDbType.VarChar).Value = adminDetails.Password;
+                        // Set individual session items
+                       
+                        HttpContext.Session.SetString("Auth_Name", user.Username);
+                        HttpContext.Session.SetString("Auth_Email", user.Emailaddress); // Handle possible null values
+                        HttpContext.Session.SetString("Auth_Phone", user.Phoneno); // Handle possible null values
+                        HttpContext.Session.SetString("Last_Login", DateTime.Now.ToString());
+                        HttpContext.Session.SetString("JWT_Token", user.Token);
 
-                        using (SqlDataReader dataReader = await command.ExecuteReaderAsync())
-                        {
-                            DataTable admininfo = new DataTable();
-                            admininfo.Load(dataReader);
-
-                            if (admininfo.Rows.Count > 0)
-                            {
-                                DataRow row = admininfo.Rows[0];
-                                HttpContext.Session.SetString("AdminID", row["Admin_ID"].ToString());
-                                HttpContext.Session.SetString("AdminName", row["Admin_Name"].ToString());
-                                HttpContext.Session.SetString("AdminPassword", row["Admin_Password"].ToString());
-                                HttpContext.Session.SetString("AdminPhoneNo", row["Admin_PhoneNo"].ToString());
-                                HttpContext.Session.SetString("AdminEmail", row["Admin_Email"].ToString());
-                                HttpContext.Session.SetString("LastLogin", row["Last_Login_Time"].ToString());
-
-
-                                
-
-
-                            }
-                            else
-                            {
-                                TempData["ErrorMsg"] = "Invalid Username or Password.";
-                                return RedirectToAction("Login_Page");
-                            }
-                        }
+                        return RedirectToAction("Dashboard", "Manage"); // Redirect to home page or dashboard
+                    }
+                    else
+                    {
+                        TempData["ErrorMsg"] = "User Not Found. Please check username and password.";
+                        return View(model);
                     }
                 }
-
-                if (HttpContext.Session.GetString("AdminName") != null && HttpContext.Session.GetString("AdminPassword") != null)
+                else
                 {
-                    string Email = HttpContext.Session.GetString("AdminEmail");
-                    string Username = HttpContext.Session.GetString("AdminName");
-
-                    HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Email/Login_Email/{Email}&{Username}");
-
-                    
-
-                    return RedirectToAction("Dashboard", "Manage");
+                    ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
                 }
             }
 
-            return View("Login_Page");
+            return View(model);
         }
+
+
+
+
+
 
 
 
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Login_Page");
+            return RedirectToAction("Login");
         }
 
         public IActionResult Forget_Password()
