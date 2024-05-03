@@ -1,5 +1,9 @@
 using Stock_Management_System.BAL;
 using Stock_Management_System.Email_Services;
+using WebOptimizer;
+using NUglify;
+using NUglify.JavaScript;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +35,19 @@ builder.Services.AddTransient<IEmailSender>(i => new EmailSender(
 ));
 
 
+
+builder.Services.AddWebOptimizer(pipeline =>
+{
+    pipeline.AddJavaScriptBundle("/js/bundle/stock-section-bundle.js", new string[] {
+            "/js/Stock/auto-datefunctions.js",
+            "/js/Stock/customer-autocomplete.js",
+            "/js/Stock/form-validate-stock.js",
+            "/js/Stock/stock-calculation.js",
+            "/js/Stock/vehicleno-format-validate.js",
+        });
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -49,6 +66,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.UseSession();
+
+app.UseWebOptimizer();
 
 System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 

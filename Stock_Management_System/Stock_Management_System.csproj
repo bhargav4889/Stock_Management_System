@@ -13,6 +13,7 @@
     <PackageReference Include="iTextSharp" Version="5.5.13.3" />
     <PackageReference Include="itextsharp.xmlworker" Version="5.5.13.3" />
     <PackageReference Include="jQuery" Version="3.7.1" />
+    <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.405" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
     <PackageReference Include="PDFsharp" Version="6.0.0" />
@@ -23,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Information\Data\" />
-    <Folder Include="Areas\Sales\Data\" />
   </ItemGroup>
 
 </Project>

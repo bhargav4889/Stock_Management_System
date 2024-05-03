@@ -84,13 +84,13 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         public async Task<JsonResult> Get_Seller_Customer_Data(string CustomerName)
         {
-            List<Customers_Model> customerModels = await fetch_seller_customer_name(CustomerName);
+            List<Customer_Model> customerModels = await fetch_seller_customer_name(CustomerName);
             return Json(customerModels);
         }
 
-        private async Task<List<Customers_Model>> fetch_seller_customer_name(string CustomerName)
+        private async Task<List<Customer_Model>> fetch_seller_customer_name(string CustomerName)
         {
-            List<Customers_Model> customer_Models = new List<Customers_Model>();
+            List<Customer_Model> customer_Models = new List<Customer_Model>();
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/SELLER_CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
 
@@ -100,7 +100,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
                 dynamic jsonObject = JsonConvert.DeserializeObject(data);
                 var dataObject = jsonObject.data;
                 var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                customer_Models = JsonConvert.DeserializeObject<List<Customers_Model>>(extractedDataJson);
+                customer_Models = JsonConvert.DeserializeObject<List<Customer_Model>>(extractedDataJson);
             }
 
             return customer_Models;
@@ -115,7 +115,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         public async Task<IActionResult> Add_Sale_Details(Sale_Customer_Combied_Model model)
         {
             // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await Existing_Customer_Details(model.customer.CustomerId);
+            Customer_Model customerInfo = await Existing_Customer_Details(model.customer.CustomerId,model.customer.CustomerType);
             if (customerInfo == null)
             {
                 // Attempt to add a new customer
@@ -154,9 +154,9 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
 
 
-        private async Task<Customer_Model> Existing_Customer_Details(int customerId)
+        private async Task<Customer_Model> Existing_Customer_Details(int Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{customerId}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}&{Customer_Type}");
             if (response.IsSuccessStatusCode)
             {
                 string data = await response.Content.ReadAsStringAsync();
@@ -220,7 +220,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         #region Method : Download Statement PDF & EXCEL 
         public async Task<IActionResult> Sales_Statement_CreatePDF()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Statement_PDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -241,7 +241,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         public async Task<IActionResult> Export_Sales_To_Excel()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Statement_PDF");
 
             if (response.IsSuccessStatusCode)
             {

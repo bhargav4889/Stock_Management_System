@@ -74,29 +74,6 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         #endregion
 
 
-        #region Method : Common Function
-
-        public void SetData_From_Session_For_Pdf_And_Excel(object itmes, string SetSessionStringName)
-        {
-            var serializedSalesInvoices = JsonConvert.SerializeObject(itmes);
-            HttpContext.Session.SetString(SetSessionStringName, serializedSalesInvoices);
-        }
-
-
-
-
-        public List<T> GetData_From_Session_For_Pdf_And_Excel<T>(string SessionStringName)
-        {
-            var serializedSalesInvoices = HttpContext.Session.GetString(SessionStringName);
-            if (string.IsNullOrEmpty(serializedSalesInvoices))
-            {
-                throw new InvalidOperationException($"{SessionStringName} data not found in session.");
-            }
-            return JsonConvert.DeserializeObject<List<T>>(serializedSalesInvoices);
-        }
-
-        #endregion
-
 
         #region Method : Add Stock Function 
 
@@ -112,7 +89,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         public async Task<IActionResult> Add_Stock_Details(Customers_Stock_Combined_Model model)
         {
             // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await Existing_Customer_Details(model.Customers.CustomerId);
+            Customer_Model customerInfo = await Existing_Customer_Details(model.Customers.CustomerId, model.Customers.CustomerType);
             if (customerInfo == null)
             {
                 // Add the new customer and directly use the returned model
@@ -138,19 +115,20 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/Insert_Purchase_Stock", content);
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Manage_Stocks");
+                return Json(new { redirectUrl = Url.Action("Manage_Stocks", "Stock") });
             }
             else
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return StatusCode((int)response.StatusCode, responseContent);
+                // Handle failures, possibly returning an error status or message
+                return StatusCode((int)response.StatusCode, "Error message here");
             }
+
         }
 
 
-        private async Task<Customer_Model> Existing_Customer_Details(int customerId)
+        private async Task<Customer_Model> Existing_Customer_Details(int Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{customerId}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}&{Customer_Type}");
             if (response.IsSuccessStatusCode)
             {
                 string data = await response.Content.ReadAsStringAsync();
@@ -203,7 +181,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
         public async Task<IActionResult> Update_Stock_Details(Customers_Stock_Combined_Model model)
         {
-            
+
 
 
             // Check if the customer is new; if so, add them
@@ -234,13 +212,12 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Manage_Stocks");
+                return Json(new { redirectUrl = Url.Action("Manage_Stocks", "Stock") });
             }
             else
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                // Log or display the responseContent for more detailed error information
-                return StatusCode((int)response.StatusCode, responseContent);
+                // Handle failures, possibly returning an error status or message
+                return StatusCode((int)response.StatusCode, "Error message here");
             }
         }
 
@@ -251,14 +228,14 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         #region Method : Get Customer Details From AutoComplete
         public async Task<JsonResult> Get_Buyer_Customer_Data(string CustomerName)
         {
-            List<Customers_Model> customerModels = await fetch_buyer_customer_name(CustomerName);
+            List<Customer_Model> customerModels = await fetch_buyer_customer_name(CustomerName);
             return Json(customerModels);
         }
 
 
-        private async Task<List<Customers_Model>> fetch_buyer_customer_name(string CustomerName)
+        private async Task<List<Customer_Model>> fetch_buyer_customer_name(string CustomerName)
         {
-            List<Customers_Model> customer_Models = new List<Customers_Model>();
+            List<Customer_Model> customer_Models = new List<Customer_Model>();
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/BUYER_CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
 
@@ -268,14 +245,14 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
                 dynamic jsonObject = JsonConvert.DeserializeObject(data);
                 var dataObject = jsonObject.data;
                 var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                customer_Models = JsonConvert.DeserializeObject<List<Customers_Model>>(extractedDataJson);
+                customer_Models = JsonConvert.DeserializeObject<List<Customer_Model>>(extractedDataJson);
             }
 
             return customer_Models;
         }
 
 
-      
+
 
 
 
@@ -298,7 +275,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
             List<Purchase_Stock> stockModels = await api_Service.List_Of_Data_Display<Purchase_Stock>("Stock/Purchase_Stocks");
 
-            
+
             return View(stockModels);
         }
 
@@ -307,6 +284,10 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
 
         #region Method : Check Customer Exist Or Not 
+
+
+
+
 
         private Customer_Model CHECK_CUSTOMER_INFO_IN_SYSTEM(int Customer_ID)
         {
@@ -369,20 +350,22 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
         #region Method : Delete Stock
 
+        [HttpPost]
         public IActionResult Delete_Stock(string TN_ID)
         {
-            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Stock/DELETE_STOCK?TN_ID={UrlEncryptor.Decrypt(TN_ID)}").Result;
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Stock/Delete_Purchase_Stock?TN_ID={UrlEncryptor.Decrypt(TN_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                TempData["Message"] = "Delete Successfully !";
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Manage_Stocks") });
             }
             else
             {
-                TempData["Message"] = "Error. Please try again.";
+                return Json(new { success = false, message = "Error. Please try again." });
             }
-
-            return RedirectToAction("Manage_Stocks");
         }
+
+
+
 
 
         #endregion
@@ -452,8 +435,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
                 var contentDisposition = response.Content.Headers.ContentDisposition;
                 string filename = contentDisposition?.FileName;
 
-                var pdfContent = await response.Content.ReadAsByteArrayAsync();
-                return File(pdfContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
+                var ExcelContent = await response.Content.ReadAsByteArrayAsync();
+                return File(ExcelContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
             }
             else
             {

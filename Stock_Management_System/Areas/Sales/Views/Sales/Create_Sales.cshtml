@@ -116,23 +116,23 @@
                     </div>
                 </div>
 
-                <!--Bank Information-->
+
+                <!-- Bank Information -->
                 <div class="col-lg-3 col-sm-12" id="bankSelection" style="display:none">
                     <div class="form-group">
                         <label><span style="color:red;">*</span> Select Bank</label>
-                        <select class="form-control" asp-for=sale.Receive_Bank_Id id="bankSelect">
+                        <select class="form-control" asp-for="sale.Receive_Bank_Id" id="bankSelect">
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option value="@bank.BankId" data-icon="@bank.BankIcon">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
-                               
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
-                        <span class="text-danger" asp-validation-for=sale.Receive_Bank_Id style="color: red; font-size:11px; font-weight:bold;"></span>
-
-
+                        <input type="hidden" asp-for="sale.Receive_Information_Id" id="informationId" />
+                        <span class="text-danger" asp-validation-for="sale.Receive_Bank_Id" style="color: red; font-size:11px; font-weight:bold;"></span>
                     </div>
                 </div>
+
 
 
                 <!-- Bags -->
@@ -251,19 +251,18 @@
                 <div class="col-lg-3 col-sm-12" style="display:none" id="RemainbankSelection">
                     <div class="form-group">
                         <label><span style="color:red;">*</span> Select Remain Bank</label>
-                        <select class="form-control" asp-for=sale.Remain_Amount_Receive_Bank_Id id="remainbankSelect">
+                        <select class="form-control" asp-for="sale.Remain_Amount_Receive_Bank_Id" id="remainbankSelect">
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option value="@bank.BankId" data-icon="@bank.BankIcon">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
-                              
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
-                        <span class="text-danger" asp-validation-for=sale.Remain_Amount_Receive_Bank_Id style="color: red; font-size:11px; font-weight:bold;"></span>
-
-
+                        <input type="hidden" asp-for="sale.Remain_Infromation_ID" id="remainInformationId" />
+                        <span class="text-danger" asp-validation-for="sale.Remain_Amount_Receive_Bank_Id" style="color: red; font-size:11px; font-weight:bold;"></span>
                     </div>
                 </div>
+
 
 
                 <!-- Dedcuted Amount(₹) -->
@@ -340,7 +339,7 @@
 
 
 
-    
+
 
 
 </script>
@@ -380,6 +379,28 @@
         var selectedText = selectedOption.text;
         document.querySelector('input[name="ProductName"]').value = selectedText;
     });
+
+
+    $(document).ready(function () {
+        // Handle bank selection change
+        $('#bankSelect').change(function () {
+            var selectedOption = $(this).find('option:selected');
+            var informationId = selectedOption.data('info-id'); // Retrieve the InformationId from data attribute
+            $('#informationId').val(informationId); // Set the hidden input value
+        });
+    });
+
+    
+        $(document).ready(function () {
+            // Handle change event for the "Remain Bank" select dropdown
+            $('#remainbankSelect').change(function () {
+                var selectedOption = $(this).find('option:selected');
+                var informationId = selectedOption.data('info-id'); // Retrieve the InformationId from data attribute
+                $('#remainInformationId').val(informationId); // Update the hidden input field with the retrieved Information ID
+            });
+        });
+
+
 
     $(document).ready(function () {
         $('#selectpaymentmethod').change(function () {
@@ -486,7 +507,8 @@
                             return {
                                 label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
                                 value: item.customerName,
-                                id: item.customerId
+                                id: item.customerId,
+                                type: item.customerType // Ensure 'customerType' is provided by your server
                             };
                         }));
                     }
@@ -502,25 +524,12 @@
                 event.preventDefault();
                 $("#Customer").val(ui.item.value);
                 $("#CustomerId").val(ui.item.id);
+                $("#cttype").val(ui.item.type); // Update the customer type field
                 toggleNewCustomerFields(false);
             }
         });
+    });
 
-        $("#Customer").on('input', function () {
-            var enteredValue = $(this).val().trim();
-            if (!enteredValue) {
-                toggleNewCustomerFields(false);
-                isSuggestionSelected = false;
-            } else {
-                isSuggestionSelected = false;
-                $("#Customer").autocomplete("search", enteredValue);
-            }
-        });
-
-        $(window).on('beforeunload', function () {
-            toggleNewCustomerFields(false);
-        });
-    }); // Correctly closed $(document).ready function
 
 </script>
 

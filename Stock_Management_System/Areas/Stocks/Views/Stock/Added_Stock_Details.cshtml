@@ -46,95 +46,86 @@
             <h5>Stock Details</h5>
         </div>
 
-       
 
 
 
-    <br />
-    <div class="table-responsive scrollable-table table-responsive-sm">
-        <table class="table">
-           @*  <tr>
+
+        <br />
+        <div class="table-responsive scrollable-table table-responsive-sm">
+            <table class="table">
+                @*  <tr>
                 <th>Transaction ID</th>
                 <td>@Model.PurchaseStockId</td>
-            </tr> *@
-            <tr>
-                <th>Date</th>
-                <td>@formattedDate</td>
-            </tr>
-            <tr>
-                <th>Customer Name</th>
-                <td>@Model.CustomerName</td>
-            </tr>
+                </tr> *@
+                <tr>
+                    <th>Date</th>
+                    <td>@formattedDate</td>
+                </tr>
+                <tr>
+                    <th>Customer Name</th>
+                    <td>@Model.CustomerName</td>
+                </tr>
 
-            <tr>
-                <th>Customer Type</th>
-                <td>@Model.CustomerType</td>
-            </tr>
+                <tr>
+                    <th>Customer Type</th>
+                    <td>@Model.CustomerType</td>
+                </tr>
 
-            @*<tr>
-                <th>Customer Contact</th>
-                <td>@Model.Cus/td>
-            </tr>
 
-            <tr>
-                <th>Customer Address</th>
-                <td>@Model.CT_City</td>
-            </tr>*@
+                <tr>
+                    <th>Product Name</th>
+                    <td>@Model.ProductName</td>
+                </tr>
 
-            <tr>
-                <th>Product Name</th>
-                <td>@Model.ProductName</td>
-            </tr>
+                <tr>
+                    <th>Goods Taken Loaction</th>
+                    <td>@Model.PurchaseStockLocation</td>
+                </tr>
 
-            <tr>
-                <th>Goods Taken Loaction</th>
-                <td>@Model.PurchaseStockLocation</td>
-            </tr>
-
-            <tr>
-                <th>Bag</th>
-                <td>@(string.IsNullOrWhiteSpace(Convert.ToString(Model?.Bags)) ? "--" : Model?.Bags)</td>
-            </tr>
-            <tr>
-                <th>Bag Per Kg</th>
-                <td>@(string.IsNullOrWhiteSpace(Model?.BagPerKg.ToString()) ? "--" : Model?.BagPerKg)</td>
-            </tr>
-            <tr>
-                <th>Weight</th>
-                <td>@Model?.TotalWeight</td>
-            </tr>
-            <tr>
-                <th>Product Price(₹)</th>
-                <td>@Model?.ProductPrice</td>
-            </tr>
-            <tr>
-                <th>Total Price(₹)</th>
-                <td>@Model?.TotalPrice</td>
-            </tr>
-            <tr>
-                <th>Vehicle Type</th>
-                <td>@Model?.VehicleName</td>
-            </tr>
-            <tr>
-                <th>Vehicle No.</th>
-                <td>@Model?.VehicleNo</td>
-            </tr>
-            <tr>
-                <th>Driver Name</th>
-                <td>@Model?.DriverName</td>
-            </tr>
-            <tr>
-                <th>Tolat Name</th>
-                <td>@Model?.TolatName</td>
-            </tr>
-            <tr>
-                <th>Stock Grade</th>
-                <td>@(string.IsNullOrWhiteSpace(Model?.ProductGrade) ? "--" : Model?.ProductGrade)</td>
-            </tr>
+                <tr>
+                    <th>Bag</th>
+                    <td>@(Model.Bags == 0 ? "--" : Model.Bags.ToString()) </td>
+                </tr>
+                <tr>
+                    <th>Bag Per Kg</th>
+                    <td>@(Model.BagPerKg == 0 ? "--" : Model.BagPerKg.ToString()) </td>
+                </tr>
+                <tr>
+                    <th>Weight</th>
+                    <td>@Model?.TotalWeight</td>
+                </tr>
+                <tr>
+                    <th>Product Price(₹)</th>
+                    <td>@Model?.ProductPrice.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Total Price(₹)</th>
+                    <td>@Model?.TotalPrice.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th>Vehicle Type</th>
+                    <td>@Model?.VehicleName</td>
+                </tr>
+                <tr>
+                    <th>Vehicle No.</th>
+                    <td>@Model?.VehicleNo</td>
+                </tr>
+                <tr>
+                    <th>Driver Name</th>
+                    <td>@Model?.DriverName</td>
+                </tr>
+                <tr>
+                    <th>Tolat Name</th>
+                    <td>@Model?.TolatName</td>
+                </tr>
+                <tr>
+                    <th>Stock Grade</th>
+                    <td>@(string.IsNullOrWhiteSpace(Model?.ProductGrade) ? "--" : Model?.ProductGrade)</td>
+                </tr>
 
 
 
 
-        </table>
+            </table>
+        </div>
     </div>
-</div>

@@ -204,8 +204,8 @@
                 </div>
             </div>
         </div>
-        
-       
+
+
         <div class="col-lg-3 col-sm-6 col-12 d-flex">
             <div class="dash-count">
                 <div class="dash-counts">
@@ -244,7 +244,7 @@
                 </div>
             </div>
         </div>
-         <div class="col-lg-3 col-sm-6 col-12 d-flex">
+        <div class="col-lg-3 col-sm-6 col-12 d-flex">
             <div class="dash-count">
                 <div class="dash-counts">
                     <h4>
@@ -434,7 +434,7 @@
                     </h4>
                 </div>
 
-                @if (Model.recent_Actions_With_Info != null)
+                @if (Model.Pending_Customers_Payment_Sort_List != null && Model.Pending_Customers_Payment_Sort_List.Any())
                 {
                     <div class="table-responsive dataview">
                         <table class="table datatable">
@@ -452,6 +452,7 @@
                                     <tr onclick="submitForm(this)">
                                         <form asp-action="Account_Details" asp-controller="Account" method="get">
                                             <input type="hidden" value="@UrlEncryptor.Encrypt(Convert.ToString(customers_Payment_Sort_List.CustomerId))" name="Customer_ID" />
+                                            <input type="hidden" value="@customers_Payment_Sort_List.CustomerType" name="Customer_Type" />
                                         </form>
                                         <td>@customers_Payment_Sort_List.StockDate.ToString("dd/MM/yy")</td>
                                         <td>@customers_Payment_Sort_List.CustomerName</td>

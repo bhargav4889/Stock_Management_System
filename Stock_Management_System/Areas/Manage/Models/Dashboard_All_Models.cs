@@ -41,7 +41,7 @@ namespace Stock_Management_System.Areas.Manage.Models
             public decimal AmountOfRemainingPayments { get; set; }
             public decimal AmountOfPendingPayments { get; set; }
         }
-    
+
 
 
 
@@ -59,6 +59,8 @@ namespace Stock_Management_System.Areas.Manage.Models
         public int CustomerId { get; set; }
 
         public string? CustomerName { get; set; }
+
+        public string? CustomerType { get; set; }
 
         public int ProductId { get; set; }
 

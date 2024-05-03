@@ -156,7 +156,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         }
 
 
-        public async Task<IActionResult> Update_Customer_Info_Details(Customers_Model customers_Model)
+        public async Task<IActionResult> Update_Customer_Info_Details(Customer_Model customers_Model)
         {
 
 

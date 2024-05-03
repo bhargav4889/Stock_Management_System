@@ -12,10 +12,13 @@ namespace Stock_Management_System.Areas.Accounts.Models
     {
         public int CustomerId { get; set; }
 
+        [Required(ErrorMessage ="Please Enter Customer Name")]
         public string? CustomerName { get; set; }
 
+        [Required(ErrorMessage ="Please Select Customer Type")]
         public string? CustomerType { get; set; }
 
+        
         public string? CustomerContact { get; set; }
 
         public string? CustomerAddress { get; set; }

@@ -18,6 +18,8 @@ namespace Stock_Management_System.Areas.Sales.Models
 
         public int Receive_Bank_Id { get; set; }
 
+        public int Receive_Information_Id { get; set; }
+
 
         public decimal? Bags { get; set; }
 
@@ -49,6 +51,7 @@ namespace Stock_Management_System.Areas.Sales.Models
 
         public int? Remain_Amount_Receive_Bank_Id { get; set; }
 
+        public int? Remain_Infromation_ID { get; set; }
 
 
 
