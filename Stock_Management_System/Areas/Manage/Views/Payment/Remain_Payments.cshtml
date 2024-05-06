@@ -91,6 +91,25 @@
         });
     </script>
 
+    <script>
+        function showToastNotification(formId) {
+            // Show a success toast notification
+            toastr.success('Download started successfully.', 'Success', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-center',
+                timeOut: 3000, // Display duration
+            });
+
+            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+            setTimeout(function () {
+                document.getElementById(formId).submit();
+            }, 100); // Delay the form submission to allow the toast to render
+
+            return false; // Prevent immediate form submission
+        }
+    </script>
+
 
 }
 
@@ -120,24 +139,18 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Remain_Payments_PDF" asp-controller="Payment" method="get">
-
-
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Remain Payments PDF">
+                            <form id="pdfExportForm" asp-action="Remain_Payments_PDF" asp-controller="Payment" method="get">
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
-
-
                             </form>
                         </li>
 
                         <li>
-                            <form asp-action="Remain_Payments_EXCEL" asp-controller="Payment" method="get">
-
-                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                            <form id="excelExportForm" asp-action="Remain_Payments_EXCEL" asp-controller="Payment" method="get">
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
-
                             </form>
                         </li>
                         <li>

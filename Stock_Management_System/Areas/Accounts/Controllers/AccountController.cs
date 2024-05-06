@@ -37,15 +37,15 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         public Api_Service api_Service = new Api_Service();
 
 
-        private readonly CV _cV; 
+        private readonly CV _cV;
 
-        public AccountController(IConfiguration configuration,CV cV)
+        public AccountController(IConfiguration configuration, CV cV)
         {
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
-            _cV = cV;  
-           
+            _cV = cV;
+
         }
 
 
@@ -86,26 +86,23 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         [HttpPost]
         public async Task<IActionResult> Insert_Customer_Manually(Customer_Model customers)
         {
-            try
+
+
+            var jsonContent = JsonConvert.SerializeObject(customers);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", stringContent);
+
+            if (response.IsSuccessStatusCode)
             {
-                var jsonContent = JsonConvert.SerializeObject(customers);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", stringContent);
-
-                if (response.IsSuccessStatusCode)
-                {
-
-                    return RedirectToAction("Manage_Customers_Account");
-                }
-
+                return Json(new { success = true, redirectUrl = Url.Action("Manage_Customers_Account", "Account") });
             }
-            catch
+            else
             {
-                return null;
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = $"Server error: {errorResponse}" });
             }
 
-            return RedirectToAction("Create_Customer_Account");
 
         }
 
@@ -143,16 +140,21 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Update Customer Account
 
-        public async Task<IActionResult> Update_Customer_Info(string Customer_ID)
+        public async Task<IActionResult> Update_Customer(string Customer_ID, string Customer_Type)
         {
 
+            Customer_Model customer_Model = new Customer_Model();   
+            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
 
-            Customer_Model customers_Model = new Customer_Model();
+            string data = await response.Content.ReadAsStringAsync();
+            dynamic jsonObject = JsonConvert.DeserializeObject(data);
+            var dataObject = jsonObject.data;
+            var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+            customer_Model = JsonConvert.DeserializeObject<Customer_Model>(extractedDataJson);
 
-            customers_Model = await api_Service.Model_Of_Data_Display<Customer_Model>("Customers/Get_Customer", Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID)));
 
 
-            return View(customers_Model);
+            return View(customer_Model);
         }
 
 
@@ -167,13 +169,12 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return RedirectToAction("Manage_Customers_Account");
+                return Json(new { success = true, redirectUrl = Url.Action("Manage_Customers_Account", "Account") });
             }
             else
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                // Log or display the responseContent for more detailed error information
-                return StatusCode((int)response.StatusCode, responseContent);
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = $"Server error: {errorResponse}" });
             }
 
 
@@ -185,7 +186,19 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Delete Customer And Account Statement 
 
-
+        [HttpPost]
+        public IActionResult Delete_Customer(string Customer_ID, string Customer_Type)
+        {
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Customers/Delete_Customer?Customer_ID={UrlEncryptor.Decrypt(Customer_ID)}&Customer_Type={Customer_Type}").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Manage_Customers_Account") });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Error. Please try again." });
+            }
+        }
 
         #endregion
 
@@ -308,11 +321,11 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         public async Task<IActionResult> Manage_Customers_Account()
         {
-           
+
 
             List<Customer_Model> customers = await api_Service.List_Of_Data_Display<Customer_Model>("Customers/Customers_List");
 
-           
+
 
             return View(customers);
         }
@@ -362,7 +375,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         {
 
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customers_Account_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customers_Statement_PDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -406,7 +419,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Accounts Statement PDF And Excel
 
-        public async Task<IActionResult> Customer_Account_Statement_CreatePDF(string Customer_ID, string Customer_Type)
+        public async Task<IActionResult> Customer_Account_Statement_PDF(string Customer_ID, string Customer_Type)
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_PDF/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
@@ -439,7 +452,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             }
         }
 
-        public async Task<IActionResult> Customer_Account_Statement_CreateEXCEL(string Customer_ID, string Customer_Type)
+        public async Task<IActionResult> Customer_Account_Statement_EXCEL(string Customer_ID, string Customer_Type)
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_EXCEL/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 

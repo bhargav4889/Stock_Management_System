@@ -210,7 +210,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-              
+
                 string data = await response.Content.ReadAsStringAsync();
                 show_Payment_Info = JsonConvert.DeserializeObject<Payment_All_Models.Show_Payment_Info>(JsonConvert.SerializeObject(JsonConvert.DeserializeObject<dynamic>(data).data, Formatting.Indented));
                 return PartialView("_ShowPaymentInfo_Box", show_Payment_Info);

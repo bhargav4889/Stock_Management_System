@@ -2,14 +2,23 @@
 {
     public class All_DropDown_Model
     {
+        
+        public All_DropDown_Model()
+        {
+
+            Products_DropDowns_List = new List<Product_DropDown_Model>();
+
+            Products_Grade_DropDowns_List = new List<Product_Grade_DropDown_Model>();
+
+            Vehicle_DropDowns_List = new List<Vehicle_DropDown_Model>();
+
+        }
+
         public List<Product_DropDown_Model> Products_DropDowns_List { get; set; }
 
         public List<Product_Grade_DropDown_Model> Products_Grade_DropDowns_List { get; set; }
 
         public List<Vehicle_DropDown_Model> Vehicle_DropDowns_List { get; set; }
-
-      
-
     }
 
     public class Product_DropDown_Model

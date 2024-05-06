@@ -22,11 +22,12 @@
                     <div class="page-btn">
                         <a href="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)"
                            download="@($"{Model.purchase_Invoice?.CustomerName?.Replace(" ", "_")}_{Model.purchase_Invoice?.ProductName?.Replace(" ", "_")}_Invoice.pdf")"
-                           class="btn btn-added">   
+                           class="btn btn-added" id="downloadInvoice" onclick="notifyDownloadStart()">
                             <img src="~/img/icons/pdf.svg" alt="img" class="me-1">Download Invoice
                         </a>
                     </div>
                 </div>
+
             }
 
         </div>
@@ -46,6 +47,26 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        var UpdateMessage = sessionStorage.getItem('InvoiceStatus');
+        if (UpdateMessage) {
+            toastr.success(UpdateMessage);
+            // Clear the message from session storage so it doesn't reappear on refresh
+            sessionStorage.removeItem('InvoiceStatus');
+        }
+    });
+
+    function notifyDownloadStart() {
+        toastr.success('Download started successfully!', 'Download', {
+            closeButton: true,
+            progressBar: true,
+            positionClass: 'toast-top-center',
+            timeOut: 3000, // 3 seconds
+        });
+    }
+
+</script>
 @*<div id="download-button" class="download-btn text-center">
     @if (Model != null)
     {

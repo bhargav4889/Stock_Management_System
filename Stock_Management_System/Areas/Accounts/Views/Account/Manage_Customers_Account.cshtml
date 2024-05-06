@@ -16,60 +16,104 @@
             function applySearches() {
                 var Type = $("#searchCTType").val();
 
-
-
-
-
-
                 // Clear existing searches
                 table.columns().search('');
 
-                // Apply dropdown search if selected
-
-
-                // Apply individual column searches from input fields
-                table.column(1).search(Type);
-
-
-
-
+                 // Apply dropdown search if selected
+                if (Type) {
+                    table.column(1).search(Type);
+                }
 
                 // Perform a single draw after all search criteria have been applied
                 table.draw();
 
-                // Reset the input values after search
-                $("#searchCTType").val('');
-
-
+                // Reset the input values after search - Optionally you can keep the value
+                 
+                $('#searchCTType').val('').trigger('change');
             }
 
             $('#searchButton').on('click', function () {
                 applySearches();
             });
         });
+
     </script>
 
 
+    <script>
+        function confirmDeletion(deleteUrl, customerName) {
+            Swal.fire({
+                title: 'Are You Sure Want To Delete?',
+                text: `${customerName}"S Account Deleted along with related Stock And payment info.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        success: function (response) {
+                            // Set a success message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Delete Account Successfully!');
+                            // Redirect immediately
+                            window.location.href = response.redirectUrl;
+                        },
+                        error: function () {
+                            // Set an error message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Error. Please try again.');
+                            // You might still want to redirect or handle errors differently here
+                            window.location.href = response.redirectUrl;
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var AddMessage = sessionStorage.getItem('AddStatus');
+            if (AddMessage) {
+                toastr.success(AddMessage);
+                // Clear the message from session storage so it doesn't reappear on refresh
+                sessionStorage.removeItem('AddStatus');
+            }
+        });
+
+
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            var deletionMessage = sessionStorage.getItem('DeleteStatus');
+            if (deletionMessage) {
+                toastr.success(deletionMessage);
+                // Clear the message from session storage so it doesn't reappear on refresh
+                sessionStorage.removeItem('DeleteStatus');
+            }
+        });
+    </script>
 
 
     <script>
-        // Check for TempData message and show Toastr
-        var successMessage = '@TempData["SuccessMessage"]';
-        if (successMessage) {
-            toastr.success(successMessage, 'Success', {
+        function showToastNotification(formId) {
+            // Show a success toast notification
+            toastr.success('Download started successfully.', 'Success', {
                 closeButton: true,
                 progressBar: true,
-                positionClass: 'toast-bottom-right',
-                preventDuplicates: true,
-                showDuration: '300',
-                hideDuration: '1000',
-                timeOut: '5000',
-                extendedTimeOut: '1000',
-                showEasing: 'swing',
-                hideEasing: 'linear',
-                showMethod: 'fadeIn',
-                hideMethod: 'fadeOut'
+                positionClass: 'toast-top-center',
+                timeOut: 3000, // Display duration
             });
+
+            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+            setTimeout(function () {
+                document.getElementById(formId).submit();
+            }, 100); // Delay the form submission to allow the toast to render
+
+            return false; // Prevent immediate form submission
         }
     </script>
 
@@ -102,28 +146,21 @@
                     </div>
                 </div>
                 <div class="wordset">
+                      
                     <ul>
                         <li>
-                            <form asp-action="Customers_Statement_PDF" asp-controller="Account" method="get">
-
-
-
-
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF">
+                            <form id="pdfExportForm" asp-action="Customers_Statement_PDF" asp-controller="Account" method="get">
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
-
-
                             </form>
                         </li>
 
                         <li>
-                            <form asp-action="Customers_Statement_EXCEL" asp-controller="Account" method="get">
-
-                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                            <form id="excelExportForm" asp-action="Customers_Statement_EXCEL" asp-controller="Account" method="get">
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
-
                             </form>
                         </li>
                         <li>
@@ -148,8 +185,12 @@
                             <div class="row">
                                 <div class="col-9 col-sm-4">
                                     <div class="form-group">
-                                        <label for="searchCTType" class="text-truncate"><span style="color: black;">*</span> Search By Type</label>
-                                        <input type="text" class="form-control" placeholder="Enter Customer Type.." oninput="this.value = this.value.toUpperCase()" id="searchCTType">
+                                        <label for="searchCTType"><span style="color: black;">*</span> Search By Type</label>
+                                        <select id="searchCTType" class="select form-control">
+                                            <option value="" selected>-- Select Type --</option>
+                                            <option value="BUYER">BUYER</option>
+                                            <option value="SELLER">SELLER</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-3 col-sm-4 d-flex align-items-end">
@@ -201,14 +242,19 @@
                                             <ul class="dropdown-menu text-center">
                                                 <li>
                                                     <a role="link"
-                                                       href="@Url.Action("Update_Customer_Info", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) , Customer_Type = row.CustomerType })"
+                                                       href="@Url.Action("Update_Customer", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) , Customer_Type = row.CustomerType })"
                                                        onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img"> Edit Customer</a>
                                                 </li>
 
                                                 <li>
                                                     <a role="link"
                                                        href="@Url.Action("Account_Details", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)), Customer_Type = row.CustomerType })"
-                                                       onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/dollar.svg" class="me-2" alt="img">Go to Account</a>
+                                                       onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/dollar-square.svg" class="me-2" alt="img">Account</a>
+                                                </li>
+                                                <li>
+                                                    <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Customer", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(row.CustomerId)) , Customer_Type = row.CustomerType })', '@Html.Encode(row.CustomerName)')" class="dropdown-item delete-stock">
+                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Customer
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </td>
@@ -223,25 +269,7 @@
 
         </div>
 
-        @if (TempData["AddCustomerInfoMsg"] != null)
-        {
-            <script>
-                toastr.success('@TempData["AddCustomerInfoMsg"]', {
-                    closeButton: true,
-                    progressBar: true,
-                    positionClass: 'toast-bottom-right',
-                    preventDuplicates: true,
-                    showDuration: '300',
-                    hideDuration: '1000',
-                    timeOut: '5000',
-                    extendedTimeOut: '1000',
-                    showEasing: 'swing',
-                    hideEasing: 'linear',
-                    showMethod: 'fadeIn',
-                    hideMethod: 'fadeOut',
-                });
-            </script>
-        }
+       
 
 
 

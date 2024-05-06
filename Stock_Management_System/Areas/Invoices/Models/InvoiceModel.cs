@@ -48,7 +48,6 @@ namespace Stock_Management_System.Areas.Invoices.Models
             [Required(ErrorMessage = "Please Enter Driver Name")]
             public string? DriverName { get; set; }
 
-            [Required(ErrorMessage = "Please Enter Tolat Name")]
             public string? TolatName { get; set; }
 
 
@@ -58,88 +57,7 @@ namespace Stock_Management_System.Areas.Invoices.Models
 
         #endregion
 
-        #region Sell_Invoice_Model
-        public class Sell_InvoiceModel
-        {
-            public int INVOICE_ID { get; set; }
-
-            public DateTime? InvoiceDate { get; set; }
-
-
-            [Required(ErrorMessage = "Please Enter Patry Name")]
-            public string? Party_Name { get; set; }
-
-
-            [Required(ErrorMessage = "Please Enter Patry Address")]
-            public string? Party_Address { get; set; }
-
-
-            public string? OtherInvoiceType { get; set; }
-
-
-            public string? Party_GSTNO { get; set; }
-
-
-            public double? SGST { get; set; }
-
-            public double? CGST { get; set; }
-
-
-            public double? SGST_Total { get; set; }
-
-            public double? CGST_Total { get; set; }
-
-            [Required(ErrorMessage = "Please Enter Product Brand Name")]
-            public string? Product_Brand_Name { get; set; }
-
-
-            [Required(ErrorMessage = "Please Select Grain Type")]
-            public string? GrainTypeName { get; set; }
-
-            [Required(ErrorMessage = "Please Select Invoice Type")]
-            public string? InvoiceType { get; set; }
-
-
-            public string? Bag { get; set; }
-            public string? BagPerKg { get; set; }
-
-            [Required(ErrorMessage = "Please Enter Weight !")]
-            public double Weight { get; set; }
-
-            [Required(ErrorMessage = "Please Enter Product Price !")]
-            public double ProductPrice { get; set; }
-
-
-            public double Before_Tax_Total_Price { get; set; }
-
-
-            [Required(ErrorMessage = "Please Calculate Total Price!")]
-            public double TotalPrice { get; set; }
-
-            [Required(ErrorMessage = "Please Select Vehicle Type")]
-            public string? VehicleTypeName { get; set; }
-
-            [Required(ErrorMessage = "Please Enter Vehicle No ! ")]
-            public string? VehicleNo { get; set; }
-
-            [Required(ErrorMessage = "Please Enter Driver Name")]
-            public string? DriverName { get; set; }
-
-
-            public string? Broker_Name { get; set; }
-
-
-            public string? Container_Number { get; set; }
-
-
-
-
-
-        }
-
-        #endregion
-
-        #region Sell_Invoice_Model
+        #region Sales Invoice
 
         public class Sales_Invoice_Model
         {
@@ -148,6 +66,7 @@ namespace Stock_Management_System.Areas.Invoices.Models
 
             public string? BrokerName { get; set; }
 
+            [Required(ErrorMessage ="Please Enter Party Name")]
             public string? PartyName { get; set; }
 
             public string? PartyGstNo { get; set; }
@@ -156,18 +75,25 @@ namespace Stock_Management_System.Areas.Invoices.Models
 
             public string? OtherInvoiceType { get; set; }
 
+            [Required(ErrorMessage ="Please Select Invoice Type")]
             public string? InvoiceType { get; set; }
 
-
+            [Required(ErrorMessage ="Plese Select Product")]
             public int ProductId { get; set; }
+
+      
             public string? ProductName { get; set; }
 
+            [Required(ErrorMessage = "Please Enter Product Brand Name")]
             public string? ProductBrandName { get; set; }
 
             public decimal? Bags { get; set; }
             public decimal? BagPerKg { get; set; }
+
+            [Required(ErrorMessage ="Please Enter Weight or Enter Bag and Bag Per Kg To Get Weight ")]
             public decimal TotalWeight { get; set; }
 
+            [Required(ErrorMessage ="Please Enter Product Price")]
             public decimal ProductPrice { get; set; }
 
             public decimal? CGST { get; set; }
@@ -180,14 +106,17 @@ namespace Stock_Management_System.Areas.Invoices.Models
 
             public decimal? WithoutGSTPrice { get; set; }
 
-
+            [Required(ErrorMessage="Total Price Not Empty")]
             public decimal TotalPrice { get; set; }
+
+            [Required(ErrorMessage ="Please Select Vehicle Type")]
             public int VehicleId { get; set; }
             public string? VehicleName { get; set; }
             public string? VehicleNo { get; set; }
 
             public string? ContainerNo { get; set; }
 
+            [Required(ErrorMessage ="Please Enter Driver Name")]
             public string? DriverName { get; set; }
 
         }

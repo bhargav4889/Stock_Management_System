@@ -8,12 +8,12 @@
 @using System.Text;
 
 @section Scripts
-    {
+{
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    
+
     <script>
         $(document).ready(function () {
             var table = $('#data').DataTable();
@@ -136,11 +136,14 @@
         $(document).ready(function () {
             var AddMessage = sessionStorage.getItem('AddStatus');
             if (AddMessage) {
-                toastr.success(AddMessage
+                toastr.success(AddMessage);
                 // Clear the message from session storage so it doesn't reappear on refresh
-                        sessionStorage.removeItem('AddStatus');
+                sessionStorage.removeItem('AddStatus');
             }
         });
+
+
+
     </script>
 
     <script>
@@ -154,8 +157,29 @@
         });
     </script>
 
+
+
 }
 
+
+<script>
+    function showToastNotification(formId) {
+        // Show a success toast notification
+        toastr.success('Download started successfully.', 'Success', {
+            closeButton: true,
+            progressBar: true,
+            positionClass: 'toast-top-center',
+            timeOut: 3000, // Display duration
+        });
+
+        // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+        setTimeout(function () {
+            document.getElementById(formId).submit();
+        }, 100); // Delay the form submission to allow the toast to render
+
+        return false; // Prevent immediate form submission
+    }
+</script>
 
 
 
@@ -188,39 +212,34 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Purchase_Stocks_Statement_CreatePDF" asp-controller="Stock" method="get">
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
+                            <form id="pdfExportForm" asp-action="Purchase_Stocks_Statement_CreatePDF" asp-controller="Stock" method="get">
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
-
-
                             </form>
                         </li>
 
                         <li>
-                            <form asp-action="Export_Stock_List_To_Excel" asp-controller="Stock" method="get">
-
-                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                            <form id="excelExportForm" asp-action="Export_Stock_List_To_Excel" asp-controller="Stock" method="get">
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
-
                             </form>
                         </li>
                         <li>
                             <form>
-
                                 <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
                                     <img src="~/img/icons/printer.svg" alt="img">
                                 </button>
-
                             </form>
                         </li>
+
 
                     </ul>
                 </div>
             </div>
 
-           
+
 
             <div class="card mb-0" id="filter_inputs">
                 <div class="card-body pb-0">
@@ -314,7 +333,7 @@
                         <th class="text-center">Tolat</th>
                         <th class="text-center">Vehicle</th>
                         <th class="text-center">Actions</th>
-                       
+
 
                     </tr>
                 </thead>
@@ -364,7 +383,7 @@
                                             </li>
 
                                         </ul>
-                                            
+
 
 
                                     </td>

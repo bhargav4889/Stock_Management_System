@@ -12,82 +12,16 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    @* <script>
-        $(document).on("click", "#searchButton", function (event) {
-            event.preventDefault(); // Prevent the default form submission behavior
-
-            console.log("Button Clicked");
-
-            // Get the selected grain name from the dropdown
-            var Grain_Name = $("#graintype").val();
-
-            console.log("Grain Name:", Grain_Name);
-
-            $("tbody tr").each(function (index, element) {
-                var row = $(element);
-                var name = row.find("td:eq(2)").text();
-
-                // Check if the name includes the selected Grain_Name
-                if (!Grain_Name || Grain_Name === null || name.includes(Grain_Name)) {
-                    // Show the row if it meets the search criteria
-                    row.show();
-                } else {
-                    // Hide the row if it doesn't meet the search criteria
-                    row.hide();
-                }
-            });
-
-               // Optionally, you might want to keep the dropdown value
-            // If you want to reset it, uncomment the line below
-            $("#graintype").val('');
-        });
-      </script>*@
-    @*   <script>
-        $(document).ready(function () {
-            var table = $('#data').DataTable({
-                // Your DataTable options here
-            });
-
-            $(document).on("click", "#searchButton", function (event) {
-                event.preventDefault(); // Prevent the default form submission behavior
-
-                // Get the selected grain name from the dropdown
-                var Grain_Name = $("#graintype").val();
-
-                // Use DataTable's search API to filter results
-                table.search(Grain_Name).draw(); // This searches all fields and handles pagination
-
-                // Optionally, reset the dropdown if needed
-                $("#graintype").val('');
-            });
-        });
-          </script>*@
+ 
     <script>
         $(document).ready(function () {
             var table = $('#data').DataTable();
 
-            // Extend DataTable search to include date range filtering
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                var startDateInput = $("#startdate").val();
-                var endDateInput = $("#datepickerend").val();
+            function parseDate(str) {
+                var parts = str.split('-');
+                return new Date(2000 + parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+            }
 
-                // If only the end date is specified, set the start date to the first day of the current month
-                var startDate = startDateInput ? moment(startDateInput, "YYYY-MM-DD") : (endDateInput ? moment().startOf('month') : moment().startOf('month'));
-                // If only the start date is specified, set the end date to today's date
-                var endDate = endDateInput ? moment(endDateInput, "YYYY-MM-DD").endOf('day') : (startDateInput ? moment() : moment().endOf('day'));
-
-                var dateColumn = data[0]; // Adjust if date is in another column
-                var date = moment(dateColumn, "DD-MM-YY");
-
-                if (!date.isValid() || !startDate.isValid() || !endDate.isValid()) {
-                    console.error("Invalid date encountered");
-                    return false;
-                }
-
-                return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
-            });
-
-            // Function to apply all search filters and reset date inputs after search
             function applySearches() {
                 var Name = $("#searchName").val();
                 var VehicleName = $("#vehicletype").val();
@@ -95,43 +29,129 @@
                 var TolatName = $("#searchTolatName").val();
                 var selectedGrain = $("#graintype").val();
                 var selectedGrainText = $("#graintype option:selected").text();
+                var startdate = $('#startdate').val();
+                var enddate = $('#datepickerend').val(); // Ensure this matches your HTML
 
                 // Clear existing searches
-                table.search('').columns().search('');
+                table.columns().search('');
 
-                // Apply text input searches
-                table.column(1).search(Name, true, false);
-                table.column(8).search(TolatName, true, false);
-
-                // Apply dropdown searches
+                // Apply dropdown search if selected
                 if (selectedGrain) {
-                    table.column(2).search(selectedGrainText, false, false);
+                    table.column(2).search(selectedGrainText);
                 }
 
                 if (VehicleName) {
-                    table.column(9).search(selectedVehicle, false, false);
+                    table.column(9).search(selectedVehicle);
                 }
 
-                // Redraw table to apply all filters
-                table.draw();
+                // Apply individual column searches from input fields
+                table.column(1).search(Name);
+                table.column(8).search(TolatName);
 
-                // Reset start and end date values after search
-                $("#startdate, #datepickerend").val('');
+                // Setup date filtering
+                $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                    var dateColumn = data[0]; // Assuming the date is in the first column
+                    var date = parseDate(dateColumn); // Parse the DD-MM-YY format
+
+                    var start = startdate ? parseDate(startdate.split('-').reverse().join('-')) : null;
+                    var end = enddate ? parseDate(enddate.split('-').reverse().join('-')) : new Date();
+
+                    if (enddate && !startdate) {
+                        start = new Date(end.getFullYear(), end.getMonth(), 1); // Set to the first of the month
+                    }
+
+                    if (startdate && !enddate) {
+                        end = new Date(); // Set to current date
+                    }
+
+                    if (!startdate && !enddate) {
+                        return true; // No filtering on dates
+                    }
+
+                    return (start ? date >= start : true) && (end ? date <= end : true);
+                });
+
+                // Perform a single draw after all search criteria have been applied
+                table.draw();
+                $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
+
+                // Reset the input values after search
+                $("#searchName, #searchTolatName").val('');
+                $('#graintype').val('').trigger('change');
+                $('#vehicletype').val('').trigger('change');
             }
 
-            // Bind the search function to the search button click event
             $('#searchButton').on('click', function () {
                 applySearches();
             });
+        });
+
+    </script>
+
+
+
+    <script>
+        function confirmPurchaseInvoiceDeletion(deleteUrl, customerName) {
+            Swal.fire({
+                title: 'Are You Sure You Want To Delete?',
+                text: `${customerName}'s Invoice will be deleted.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        success: function (response) {
+                            // Set a success message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Invoice deleted successfully!');
+                            // Redirect to a specified URL or reload
+                            window.location.href = response.redirectUrl;
+                        },
+                        error: function () {
+                            // Set an error message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Error deleting invoice. Please try again.');
+                            // Redirect or refresh page
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            var deleteMessage = sessionStorage.getItem('DeleteStatus');
+            if (deleteMessage) {
+                toastr.success(deleteMessage);
+                // Clear the message from session storage so it doesn't reappear on refresh
+                sessionStorage.removeItem('DeleteStatus');
+            }
         });
     </script>
 
 
 
+    <script>
+        function showToastNotification(formId) {
+            // Show a success toast notification
+            toastr.success('Download started successfully.', 'Success', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-center',
+                timeOut: 3000, // Display duration
+            });
 
+            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+            setTimeout(function () {
+                document.getElementById(formId).submit();
+            }, 100); // Delay the form submission to allow the toast to render
 
-
-
+            return false; // Prevent immediate form submission
+        }
+    </script>
 
 
 }
@@ -169,13 +189,10 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Purchase_Invoice_Statement_CreatePDF" asp-controller="Invoice" method="get">
+                            <form id="pdfExportForm" asp-action="Purchase_Invoice_Statement_PDF" asp-controller="Invoice" method="get">
 
 
-
-
-
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
 
@@ -184,9 +201,9 @@
                         </li>
 
                         <li>
-                            <form asp-action="Export_Purchase_Invoices_List_To_Excel" asp-controller="Invoice" method="get">
+                            <form id="excelExportForm" asp-action="Purchase_Invoice_Statement_EXCEL" asp-controller="Invoice" method="get">
 
-                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
 
@@ -224,7 +241,7 @@
                             <!-- Adjusted column size for tighter fit -->
                             <div class="form-group">
                                 <label for="datepickerend"><span style="color: black;">*</span> End Date</label>
-                                <input type="date" class="form-control" id="enddate" name="enddate">
+                                <input type="date" class="form-control" id="datepickerend" name="enddate">
                             </div>
                         </div>
 
@@ -232,7 +249,7 @@
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label for="ProductType"><span style="color: black;">*</span> Select Product</label>
-                                <select class="select form-control" id="producttype" asp-items="@(ViewBag.Products)">
+                                <select class="select form-control" id="graintype" asp-items="@(ViewBag.Products)">
                                     <option value="" selected disabled>-- Select Product --</option>
                                 </select>
                             </div>
@@ -319,7 +336,7 @@
                                     <td class="text-center">@item.TotalWeight</td>
                                     <td class="text-center">@item.ProductPrice.ToString("C")</td>
                                     <td class="text-center">@item.TotalPrice.ToString("C")</td>
-                                    <td class="text-center">@item.TolatName</td>
+                                    <td class="text-center">@(string.IsNullOrEmpty(item.TolatName) ? "--" : @item.TolatName)</td>
                                     <td class="text-center">@item.VehicleName</td>
 
 
@@ -341,10 +358,14 @@
                                             </li>
 
                                             <li>
-                                                <a role="link"
-                                                   href="@Url.Action("Delete_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
-                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item confirm-text"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice</a>
+                                                <a role="button"
+                                                   href="javascript:void(0);"
+                                                   onclick="confirmPurchaseInvoiceDeletion('@Url.Action("Delete_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })', '@item.CustomerName')"
+                                                   class="dropdown-item confirm-text">
+                                                    <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice
+                                                </a>
                                             </li>
+
                                         </ul>
                                     </td>
 
@@ -359,69 +380,7 @@
     </div>
 
 
-    <!-- Modal Shell -->
-    <div class="modal fade" id="createpayment" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <!-- Dynamic Content Will Be Loaded Here -->
-            </div>
-        </div>
-    </div>
-
-</div>
 
 
 
-@*<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-
-    function confirmDelete(farmerName) {
-         // Corrected: use .value
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: ` Are You Want This ${farmerName}'s Invoice Delete !`, // Using template literal
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Delete'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('deleteform').submit();
-            }
-        });
-    }
-
-</script>
-
-
-
-<script>
-
-
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        var errorMessage = document.getElementById('toastrErrorMessage').value;
-
-        if (errorMessage) {
-            toastr.error(errorMessage, "Alert !!", {
-                closeButton: true,
-                progressBar: true,
-                positionClass: 'toast-top-right',
-                preventDuplicates: true,
-                showDuration: '300',
-                hideDuration: '1000',
-                timeOut: '2000',
-                extendedTimeOut: '1000',
-                showEasing: 'swing',
-                hideEasing: 'linear',
-                showMethod: 'fadeIn',
-                hideMethod: 'fadeOut'
-            });
-        }
-    });
-    </script>*@
 

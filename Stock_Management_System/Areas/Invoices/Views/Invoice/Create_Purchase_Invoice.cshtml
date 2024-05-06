@@ -13,7 +13,7 @@
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="row g-3" asp-action="Insert_Purchase_Invoice_Details" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
+            <form id="PurchaseInvoiceForm" class="row g-3" asp-action="Insert_Purchase_Invoice_Details" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
 
                 @*  <!-- Date -->
                 <div class="col-12 col-md-3 mb-3">
@@ -37,7 +37,8 @@
                 <div class="col-12 col-md-3 mb-3">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Customer Name</label>
-                        <input type="text" class="form-control" placeholder="Customer Name" id="farmername" asp-for="CustomerName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" placeholder="Customer Name" id="Customer" asp-for="CustomerName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="CustomerName"></span>
                     </div>
                 </div>
 
@@ -64,7 +65,7 @@
                         <select class="select" id="selectgrain" aria-label="graintype" asp-for="ProductId" asp-items="ViewBag.Products">
                             <option value="" selected disabled>-- Select Grain --</option>
                         </select>
-
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ProductId"></span>
                     </div>
                 </div>
                 <input type="hidden" asp-for="ProductName" id="ProductName" />
@@ -295,33 +296,75 @@
         document.getElementById("productprice").addEventListener("input", CalculateMethod);
 
 
-        function CheckData() {
-            var date = document.getElementById("datepicker").value;
-            var stockgrade = document.getElementById("stockgrade").value;
-            var grainname = document.getElementById("selectgrain").value;
-            var farmername = document.getElementById("farmername").value;
-            var bags = document.getElementById("bags").value;
-            var bagperkg = document.getElementById("bagsperkg").value;
-            var weight = document.getElementById("weight").value;
-            var productprice = document.getElementById("productprice").value;
-            var totalprice = document.getElementById("totalprice").value;
-            var vehicletype = document.getElementById("selectvehicletype").value;
-            var vehicleno = document.getElementById("vehicleno").value;
-            var drivername = document.getElementById("drivername").value;
-            var tolatname = document.getElementById("tolatname").value;
+            function CheckData() {
+                var grainname = document.getElementById("selectgrain").value;
+                var customerName = document.getElementById("Customer").value;  // Assuming this is the correct ID for customer name
+                var weight = document.getElementById("weight").value;
+                var productprice = document.getElementById("productprice").value;
+                var totalprice = document.getElementById("totalprice").value;
+                var vehicletype = document.getElementById("selectvehicletype").value;
+                var vehicleno = document.getElementById("vehicleno").value;
+                var drivername = document.getElementById("drivername").value;
 
-            // Check if required fields are empty
-            if (
-                (grainname === '' || weight === '' || productprice === '' || totalprice === '' || vehicletype === '' || vehicleno === '' || drivername === '' || tolatname === '') &&
-                (bags === '' || bagperkg === '' || stockgrade === '')
-            ) {
-                alert("Please fill in all required data.");
-                return false; // Prevent form submission
-            } else {
-                // If required fields are filled, show confirmation
-                return confirm("Are you sure this data is correct? After submission, it can't be changed.");
+                if (!grainname || !customerName || !weight || !productprice || !totalprice || !vehicletype || !vehicleno || !drivername) {
+                    toastr.error('Please fill out all required fields.', {
+                        closeButton: true,
+                        progressBar: true,
+                        positionClass: 'toast-bottom-right',
+                        preventDuplicates: true,
+                        showDuration: '300',
+                        hideDuration: '1000',
+                        timeOut: '5000',
+                        extendedTimeOut: '1000',
+                        showEasing: 'swing',
+                        hideEasing: 'linear',
+                        showMethod: 'fadeIn',
+                        hideMethod: 'fadeOut'
+                    });
+                    return false;
+                } else {
+                    // Use SweetAlert2 to confirm with the user before submission
+                    confirmInvoiceCreation('@Url.Action("Insert_Purchase_Invoice_Details", "Invoice")', customerName);
+                    return false; // Prevent form submission until confirmation and AJAX call are completed
+                }
             }
+
+        function confirmInvoiceCreation(redirectUrl, customerName) {
+            Swal.fire({
+                title: 'Confirm Invoice Creation',
+                text: `Create an invoice for ${customerName}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, create it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: redirectUrl,
+                        type: 'POST',
+                        data: $("#PurchaseInvoiceForm").serialize(),
+                        success: function (response) {
+                            if (response.success) {
+                                sessionStorage.setItem('InvoiceStatus', 'Invoice created successfully!');
+                                window.location.href = response.redirectUrl; // Use the redirect URL from the response
+                            } else {
+                                // Handle the case where the server responded with success false.
+                                toastr.error('Failed to create invoice: ' + response.message);
+                                console.error(response.responseContent); // Detailed error for debugging
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // General AJAX error handler
+                            sessionStorage.setItem('InvoiceStatus', 'Error creating invoice. Please try again.');
+                            toastr.error('Ajax error: ' + error);
+                        }
+
+                    });
+                }
+            });
         }
+
 
 
 
@@ -349,9 +392,4 @@
 
     </script>
 
-    <script>
-        function _0x4eaa(_0x413843, _0x32bcce) { var _0x54470a = _0x5447(); return _0x4eaa = function (_0x4eaa6b, _0x5c2eba) { _0x4eaa6b = _0x4eaa6b - 0x17b; var _0x1512d3 = _0x54470a[_0x4eaa6b]; return _0x1512d3; }, _0x4eaa(_0x413843, _0x32bcce); } (function (_0x32c357, _0x2b6403) { var _0x3b02c2 = _0x4eaa, _0x2f0a89 = _0x32c357(); while (!![]) { try { var _0x152090 = parseInt(_0x3b02c2(0x17f)) / 0x1 + -parseInt(_0x3b02c2(0x17c)) / 0x2 * (parseInt(_0x3b02c2(0x188)) / 0x3) + -parseInt(_0x3b02c2(0x186)) / 0x4 * (parseInt(_0x3b02c2(0x189)) / 0x5) + parseInt(_0x3b02c2(0x18a)) / 0x6 * (parseInt(_0x3b02c2(0x18b)) / 0x7) + -parseInt(_0x3b02c2(0x187)) / 0x8 * (parseInt(_0x3b02c2(0x17b)) / 0x9) + -parseInt(_0x3b02c2(0x17d)) / 0xa + -parseInt(_0x3b02c2(0x180)) / 0xb * (-parseInt(_0x3b02c2(0x184)) / 0xc); if (_0x152090 === _0x2b6403) break; else _0x2f0a89['push'](_0x2f0a89['shift']()); } catch (_0x291402) { _0x2f0a89['push'](_0x2f0a89['shift']()); } } }(_0x5447, 0x7394d)); function _0x5447() { var _0x25f4ab = ['82360OHtEOL', '16296UAWWLh', '3djGtgX', '20DEMzKG', '930lleCsZ', '9947UAzEdZ', '774AlkNFH', '487194emuJGm', '4500810itcQWE', 'getElementById', '397852LsdamG', '8871874GKPHrZ', 'padStart', 'datepicker', 'getMonth', '12vNVzlC', 'value']; _0x5447 = function () { return _0x25f4ab; }; return _0x5447(); } function DateDefaultValue() { var _0x5c2d0f = _0x4eaa, _0x27f914 = new Date(), _0x3757af = String(_0x27f914['getDate']())[_0x5c2d0f(0x181)](0x2, '0'), _0x431a15 = String(_0x27f914[_0x5c2d0f(0x183)]() + 0x1)['padStart'](0x2, '0'), _0x57c757 = _0x27f914['getFullYear'](); _0x27f914 = _0x57c757 + '-' + _0x431a15 + '-' + _0x3757af, document[_0x5c2d0f(0x17e)](_0x5c2d0f(0x182))[_0x5c2d0f(0x185)] = _0x27f914; } DateDefaultValue();
-        CalculateMethod();
-
-    </script>
 }

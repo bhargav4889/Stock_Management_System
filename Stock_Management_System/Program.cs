@@ -39,11 +39,7 @@ builder.Services.AddTransient<IEmailSender>(i => new EmailSender(
 builder.Services.AddWebOptimizer(pipeline =>
 {
     pipeline.AddJavaScriptBundle("/js/bundle/stock-section-bundle.js", new string[] {
-            "/js/Stock/auto-datefunctions.js",
-            "/js/Stock/customer-autocomplete.js",
-            "/js/Stock/form-validate-stock.js",
-            "/js/Stock/stock-calculation.js",
-            "/js/Stock/vehicleno-format-validate.js",
+            "/js/Section/Stock/add-stock-section.js"
         });
 });
 

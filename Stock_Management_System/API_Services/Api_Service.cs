@@ -26,7 +26,7 @@ namespace Stock_Management_System.API_Services
         // Common Function Of List Of Data Display
 
         #region Common Function Of List Of Data Display
-
+        
         public async Task<List<T>> List_Of_Data_Display<T>(string requestUri, int reuqestId = 0)
         {
 

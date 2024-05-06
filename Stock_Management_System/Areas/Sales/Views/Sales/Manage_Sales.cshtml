@@ -119,8 +119,26 @@
             });
         });
     </script>
+
+
+    <script>
+        $(document).ready(function () {
+            var AddMessage = sessionStorage.getItem('SaleStatus');
+            if (AddMessage) {
+                toastr.success(AddMessage);
+                // Clear the message from session storage so it doesn't reappear on refresh
+                sessionStorage.removeItem('SaleStatus');
+            }
+        });
+
+
+
+    </script>
  
 }
+
+
+
 
 
 
@@ -319,7 +337,7 @@
 
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Update_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
+                                                   href="@Url.Action("Update_Sales", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Sale</a>
                                             </li>
                                             <li>

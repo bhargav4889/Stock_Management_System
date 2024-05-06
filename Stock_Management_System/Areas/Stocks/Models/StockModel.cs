@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Stock_Management_System.Areas.Stocks.Models
 {
-   
+
     public class Purchase_Stock
     {
         public int PurchaseStockId { get; set; }
@@ -19,7 +19,7 @@ namespace Stock_Management_System.Areas.Stocks.Models
         public string? CustomerType { get; set; }
 
 
-        
+
         public int ProductId { get; set; }
 
 
@@ -27,18 +27,18 @@ namespace Stock_Management_System.Areas.Stocks.Models
         public int? ProductGradeId { get; set; }
         public string? ProductGrade { get; set; }
 
-     
+
         public string? PurchaseStockLocation { get; set; }
         public decimal? Bags { get; set; }
         public decimal? BagPerKg { get; set; }
 
-    
+
         public decimal? TotalWeight { get; set; }
 
         [Required]
         public decimal ProductPrice { get; set; }
 
-        
+
         public decimal TotalPrice { get; set; }
 
         public int VehicleId { get; set; }
@@ -49,7 +49,7 @@ namespace Stock_Management_System.Areas.Stocks.Models
 
         public string? DriverName { get; set; }
 
-       
+
         public string? TolatName { get; set; }
         public string? PaymentStatus { get; set; }
     }
@@ -90,11 +90,11 @@ namespace Stock_Management_System.Areas.Stocks.Models
         public int PurchaseStockId { get; set; }
         public DateTime PurchaseStockDate { get; set; }
 
-        [Required(ErrorMessage ="Please Select Product")]
+        [Required(ErrorMessage = "Please Select Product")]
         public int ProductId { get; set; }
         public int? ProductGradeId { get; set; }
 
-        [Required(ErrorMessage ="Please Enter Location !")]
+        [Required(ErrorMessage = "Please Enter Location !")]
         public string? PurchaseStockLocation { get; set; }
         public decimal? Bags { get; set; }
         public decimal? BagPerKg { get; set; }
@@ -118,7 +118,7 @@ namespace Stock_Management_System.Areas.Stocks.Models
         [Required(ErrorMessage = "Please Enter Driver Name")]
         public string? DriverName { get; set; }
 
-      
+
         public string? TolatName { get; set; }
         public string? PaymentStatus { get; set; }
     }

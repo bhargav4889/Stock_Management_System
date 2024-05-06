@@ -120,36 +120,7 @@
             });
         });
     </script>
-    <script>
-        $(document).ready(function () {
-            var banks = @Html.Raw(Json.Serialize(ViewBag.Banks));
-
-            console.log(banks);
-
-            $("#bankDropdown").select2({
-
-                allowClear: true,
-
-                data: banks.map(bank => ({
-                    id: bank.bankId,
-                    text: bank.bankName,
-                    image: bank.bankIcon // Ensure this is the correct property for the image URL
-                })),
-
-                templateResult: formatBank,
-                templateSelection: formatBank
-            });
-
-            function formatBank(bank) {
-                if (!bank.id) { return bank.text; }
-                var $bank = $(
-                    '<span><img src="' + bank.image + '" class="img-flag" style="width: 20px; height: 20px;"/> ' + bank.text + '</span>'
-                );
-                return $bank;
-            }
-        });
-    </script>
-
+   
     <script>
         $(document).ready(function () {
             // Correct class name for the button
@@ -172,8 +143,58 @@
         });
     </script>
 
+    <script>
+        function showToastNotification(formId) {
+            // Show a success toast notification
+            toastr.success('Download started successfully.', 'Success', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-center',
+                timeOut: 3000, // Display duration
+            });
+
+            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+            setTimeout(function () {
+                document.getElementById(formId).submit();
+            }, 100); // Delay the form submission to allow the toast to render
+
+            return false; // Prevent immediate form submission
+        }
+    </script>
 
 
+    <script>
+        function confirmDeletion(deleteUrl, customerName) {
+            Swal.fire({
+                title: 'Are You Sure Want To Delete?',
+                text: `${customerName}"S Delete Entry ?.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        success: function (response) {
+                            // Set a success message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Deleted Successfully!');
+                            // Redirect immediately
+                            window.location.reload();
+                        },
+                        error: function () {
+                            // Set an error message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Error. Please try again.');
+                            // You might still want to redirect or handle errors differently here
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+        }
+    </script>
 
 }
 
@@ -184,9 +205,18 @@
             <h4>Account Details</h4>
             <h6>Manage Customer Account Statements </h6>
         </div>
-        <div class="page-btn">
-            <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Entry</a>
-        </div>
+        @if(Model.Customers.CustomerType == "BUYER")
+        {
+            <div class="page-btn">
+                <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Entry</a>
+            </div>
+        }
+        else if(Model.Customers.CustomerType == "SELLER")
+        {
+            <div class="page-btn">
+                <a role="button" asp-action="Create_Sales" asp-controller="Sales" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Entry</a>
+            </div>
+        }
     </div>
 
     <div class="card">
@@ -211,25 +241,22 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Customer_Account_Statement_CreatePDF" asp-controller="Account" method="get">
+                            <form id="pdfExportForm" asp-action="Customer_Account_Statement_PDF" asp-controller="Account" method="get">
                                 <input type="hidden" name="Customer_ID" value="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" />
                                 <input type="hidden" name="Customer_Type" value="@(Model.Customers.CustomerType.ToString())" />
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
-                                    <img src="~/img/icons/pdf.svg" alt="img">
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Account PDF" onclick="return showToastNotification('pdfExportForm');">
+                                    <img src="~/img/icons/pdf.svg" alt="PDF icon">
                                 </button>
-
-
                             </form>
                         </li>
 
                         <li>
-                            <form method="get" asp-action="Customer_Account_Statement_CreateEXCEL" asp-controller="Account">
+                            <form id="excelExportForm" method="get" asp-action="Customer_Account_Statement_EXCEL" asp-controller="Account">
                                 <input type="hidden" name="Customer_ID" value="@UrlEncryptor.Encrypt(Model.Customers.CustomerId.ToString())" />
                                 <input type="hidden" name="Customer_Type" value="@(Model.Customers.CustomerType.ToString())" />
-                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
-                                    <img src="~/img/icons/excel.svg" alt="img">
+                                <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Account Excel" onclick="return showToastNotification('excelExportForm');">
+                                    <img src="~/img/icons/excel.svg" alt="Excel icon">
                                 </button>
-
                             </form>
                         </li>
                         <li>
@@ -279,7 +306,7 @@
 
 
 
-                                <select id="bankDropdown" style="width: 50%;" name="banks"></select>
+                              
 
 
 
@@ -387,12 +414,6 @@
                                         }
 
 
-
-
-
-
-
-
                                         <td class="text-center">
                                             <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
                                                 <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
@@ -417,10 +438,9 @@
 
                                                 </li>
                                                 <li>
-
-                                                    <a role="link"
-                                                       href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)) })"
-                                                       onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock</a>
+                                                    <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)) })', '@Html.Encode(Model.Customers.CustomerName)')" class="dropdown-item delete-stock">
+                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock Entry
+                                                    </a>
                                                 </li>
 
                                             </ul>
@@ -493,9 +513,9 @@
 
                                                 </li>
                                                 <li>
-                                                    <a role="link"
-                                                       href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
-                                                       onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale</a>
+                                                    <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
+                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale Entry
+                                                    </a>
                                                 </li>
 
                                             </ul>

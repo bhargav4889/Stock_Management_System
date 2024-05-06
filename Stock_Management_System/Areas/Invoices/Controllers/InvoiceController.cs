@@ -15,7 +15,6 @@ using Stock_Management_System.All_DropDowns;
 using Font = iTextSharp.text.Font;
 using System.Net.Http.Json;
 using System.Net.Http;
-using PdfSharp.Pdf.Advanced;
 
 namespace Stock_Management_System.Areas.Invoices.Controllers
 {
@@ -73,7 +72,6 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         #region Method : Dropdown Function
 
-
         public async Task All_Dropdowns_Call()
         {
             All_DropDown_Model all_DropDown_Model = new All_DropDown_Model();
@@ -89,14 +87,10 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             if (all_DropDown_Model != null)
             {
                 ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
-
                 ViewBag.ProductsInEnglish = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
-
                 ViewBag.ProductGrade = new SelectList(all_DropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
                 ViewBag.Vehicle = new SelectList(all_DropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
-
-
-
+                
             }
 
 
@@ -104,9 +98,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         }
 
-
-
         #endregion
+
 
 
         #region Method : Create Purchase Invoice 
@@ -122,9 +115,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Insert_Purchase_Invoice_Details(Purchase_Invoice_Model purchase_InvoiceModel)
-            {
-
-
+        {
             var jsonContent = JsonConvert.SerializeObject(purchase_InvoiceModel);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -134,16 +125,23 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             {
                 var token = Guid.NewGuid().ToString();
                 HttpContext.Session.Set($"InvoiceData_{token}", Encoding.UTF8.GetBytes(jsonContent));
-                return RedirectToAction("Preview_Purchase_Invoice", new { preview = token });
+
+                // Using "Url.Action" to generate the URL for redirecting to the preview page
+                var redirectUrl = Url.Action("Preview_Purchase_Invoice", "Invoice", new { preview = token });
+
+                // Return a JSON object with the redirect URL
+                return Json(new { success = true, redirectUrl = redirectUrl });
             }
             else
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 // Log or display the responseContent for more detailed error information
-                return StatusCode((int)response.StatusCode, responseContent);
-            }
 
+                // Returning a status code and a message in JSON format
+                return Json(new { success = false, message = "Failed to create invoice.", responseContent });
+            }
         }
+
 
 
 
@@ -158,14 +156,12 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Invoices/Delete_Purchase_Invoice?Purchase_Invoice_ID={UrlEncryptor.Decrypt(Invoice_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                TempData["DeleteMessage"] = "Invoice Delete Successfully !";
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("History_Purchase_Invoice") });
             }
             else
             {
-                TempData["DeleteMessage"] = "Error. Please try again.";
+                return Json(new { success = false, message = "Error. Please try again." });
             }
-
-            return RedirectToAction("History_Purchase_Invoice");
         }
 
 
@@ -191,7 +187,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
         public async Task<IActionResult> Update_Purchase_Invoice_Details(Purchase_Invoice_Model purchase_Invoice_Details)
         {
 
-           
+
             var jsonContent = JsonConvert.SerializeObject(purchase_Invoice_Details);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -201,18 +197,25 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             {
                 var token = Guid.NewGuid().ToString();
                 HttpContext.Session.Set($"InvoiceData_{token}", Encoding.UTF8.GetBytes(jsonContent));
-                return RedirectToAction("Preview_Purchase_Invoice", new { preview = token });
+
+                // Using "Url.Action" to generate the URL for redirecting to the preview page
+                var redirectUrl = Url.Action("Preview_Purchase_Invoice", "Invoice", new { preview = token });
+
+                // Return a JSON object with the redirect URL
+                return Json(new { success = true, redirectUrl = redirectUrl });
             }
             else
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 // Log or display the responseContent for more detailed error information
-                return StatusCode((int)response.StatusCode, responseContent);
+
+                // Returning a status code and a message in JSON format
+                return Json(new { success = false, message = "Failed to create invoice.", responseContent });
             }
 
 
 
-           
+
         }
 
 
@@ -756,88 +759,88 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             }
         }
 
-       /* public FileContentResult Purchase_Invoice_Statement_CreatePdf()
-        {
+        /* public FileContentResult Purchase_Invoice_Statement_CreatePdf()
+         {
 
-            List<Purchase_Invoice_Model> purchase_Invoices = GetData_From_Session_For_Pdf_And_Excel<Purchase_Invoice_Model>("ListOfPurchaseInvoicesData");
+             List<Purchase_Invoice_Model> purchase_Invoices = GetData_From_Session_For_Pdf_And_Excel<Purchase_Invoice_Model>("ListOfPurchaseInvoicesData");
 
-            // Convert to DataTable
-            DataTable dataTable = Convert_List_To_DataTable_For_Purchase_Invoice_Statement(purchase_Invoices);
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                // Custom page size
-                iTextSharp.text.Rectangle customPageSize = new iTextSharp.text.Rectangle(2300, 1200);
-                using (Document document = new Document(customPageSize))
-                {
-                    PdfWriter pdfWriter = PdfWriter.GetInstance(document, memoryStream);
-                    document.Open();
+             // Convert to DataTable
+             DataTable dataTable = Convert_List_To_DataTable_For_Purchase_Invoice_Statement(purchase_Invoices);
+             using (MemoryStream memoryStream = new MemoryStream())
+             {
+                 // Custom page size
+                 iTextSharp.text.Rectangle customPageSize = new iTextSharp.text.Rectangle(2300, 1200);
+                 using (Document document = new Document(customPageSize))
+                 {
+                     PdfWriter pdfWriter = PdfWriter.GetInstance(document, memoryStream);
+                     document.Open();
 
-                    // Define fonts
-                    BaseFont boldBaseFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
-                    BaseFont gujaratiBaseFont = BaseFont.CreateFont("D:\\Font\\NotoSansGujarati-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true);
-                    Font boldFont = new Font(boldBaseFont, 12);
-                    Font gujaratiFont = new Font(gujaratiBaseFont, 12);
+                     // Define fonts
+                     BaseFont boldBaseFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
+                     BaseFont gujaratiBaseFont = BaseFont.CreateFont("D:\\Font\\NotoSansGujarati-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true);
+                     Font boldFont = new Font(boldBaseFont, 12);
+                     Font gujaratiFont = new Font(gujaratiBaseFont, 12);
 
-                    // Title
-                    Paragraph title = new Paragraph("Statement", new Font(boldBaseFont, 35));
-                    title.Alignment = Element.ALIGN_CENTER;
-                    document.Add(title);
-                    document.Add(new Chunk("\n"));
+                     // Title
+                     Paragraph title = new Paragraph("Statement", new Font(boldBaseFont, 35));
+                     title.Alignment = Element.ALIGN_CENTER;
+                     document.Add(title);
+                     document.Add(new Chunk("\n"));
 
-                    // Image
-                    iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\OneDrive\\Desktop\\Icons\\Backimg.png");
-                    backimage.ScaleToFit(500, 500);
-                    backimage.SetAbsolutePosition(900, 400);
-                    document.Add(backimage);
+                     // Image
+                     iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\OneDrive\\Desktop\\Icons\\Backimg.png");
+                     backimage.ScaleToFit(500, 500);
+                     backimage.SetAbsolutePosition(900, 400);
+                     document.Add(backimage);
 
-                    // Table setup
-                    PdfPTable pdfTable = new PdfPTable(dataTable.Columns.Count)
-                    {
-                        WidthPercentage = 100,
-                        DefaultCell = { Padding = 10 }
-                    };
+                     // Table setup
+                     PdfPTable pdfTable = new PdfPTable(dataTable.Columns.Count)
+                     {
+                         WidthPercentage = 100,
+                         DefaultCell = { Padding = 10 }
+                     };
 
-                    // Headers
-                    foreach (DataColumn column in dataTable.Columns)
-                    {
-                        Font headerFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
-                        PdfPCell headerCell = new PdfPCell(new Phrase(column.ColumnName, headerFont))
-                        {
-                            HorizontalAlignment = Element.ALIGN_CENTER,
-                            Padding = 10
-                        };
-                        pdfTable.AddCell(headerCell);
-                    }
+                     // Headers
+                     foreach (DataColumn column in dataTable.Columns)
+                     {
+                         Font headerFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
+                         PdfPCell headerCell = new PdfPCell(new Phrase(column.ColumnName, headerFont))
+                         {
+                             HorizontalAlignment = Element.ALIGN_CENTER,
+                             Padding = 10
+                         };
+                         pdfTable.AddCell(headerCell);
+                     }
 
-                    // Data rows
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        foreach (DataColumn column in dataTable.Columns)
-                        {
-                            var item = row[column];
-                            Font itemFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
+                     // Data rows
+                     foreach (DataRow row in dataTable.Rows)
+                     {
+                         foreach (DataColumn column in dataTable.Columns)
+                         {
+                             var item = row[column];
+                             Font itemFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
 
-                            PdfPCell dataCell = new PdfPCell(new Phrase(item?.ToString(), itemFont))
-                            {
-                                HorizontalAlignment = Element.ALIGN_CENTER,
-                                Padding = 10
-                            };
-                            pdfTable.AddCell(dataCell);
-                        }
-                    }
+                             PdfPCell dataCell = new PdfPCell(new Phrase(item?.ToString(), itemFont))
+                             {
+                                 HorizontalAlignment = Element.ALIGN_CENTER,
+                                 Padding = 10
+                             };
+                             pdfTable.AddCell(dataCell);
+                         }
+                     }
 
-                    document.Add(pdfTable);
-                    document.Close();
-                }
+                     document.Add(pdfTable);
+                     document.Close();
+                 }
 
-                // File result
-                string fileName = "Purchase-Invoices-Statements.pdf";
-                return File(memoryStream.ToArray(), "application/pdf", fileName);
-            }
-        }*/
+                 // File result
+                 string fileName = "Purchase-Invoices-Statements.pdf";
+                 return File(memoryStream.ToArray(), "application/pdf", fileName);
+             }
+         }*/
 
 
-        public async Task<IActionResult> Purchase_Invoice_Statement_CreatePDF()
+        public async Task<IActionResult> Purchase_Invoice_Statement_PDF()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Invoice_Statement_PDF");
 
@@ -865,7 +868,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         #region Method : Purchase Invoice Excel
 
-        public async Task<IActionResult> Export_Purchase_Invoices_List_To_Excel()
+        public async Task<IActionResult> Purchase_Invoice_Statement_EXCEL()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Invoice_Statement_EXCEL");
 
@@ -972,16 +975,23 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             {
                 var token = Guid.NewGuid().ToString();
                 HttpContext.Session.Set($"InvoiceData_{token}", Encoding.UTF8.GetBytes(jsonContent));
-                return RedirectToAction("Preview_Sales_Invoice", new { preview = token });
+
+                // Using "Url.Action" to generate the URL for redirecting to the preview page
+                var redirectUrl = Url.Action("Preview_Sales_Invoice", "Invoice", new { preview = token });
+
+                // Return a JSON object with the redirect URL
+                return Json(new { success = true, redirectUrl = redirectUrl });
             }
             else
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 // Log or display the responseContent for more detailed error information
-                return StatusCode((int)response.StatusCode, responseContent);
-            }
 
+                // Returning a status code and a message in JSON format
+                return Json(new { success = false, message = "Failed to create invoice.", responseContent });
+            }
         }
+
 
 
         #endregion
@@ -1019,14 +1029,12 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Invoices/Delete_Sales_Invoice?Sales_Invoice_ID={UrlEncryptor.Decrypt(Invoice_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                TempData["DeleteMessage"] = "Delete Successfully !";
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("History_Sales_Invoice") });
             }
             else
             {
-                TempData["DeleteMessage"] = "Error. Please try again.";
+                return Json(new { success = false, message = "Error. Please try again." });
             }
-
-            return RedirectToAction("History_Sales_Invoice");
         }
 
 
@@ -1062,13 +1070,20 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             {
                 var token = Guid.NewGuid().ToString();
                 HttpContext.Session.Set($"InvoiceData_{token}", Encoding.UTF8.GetBytes(jsonContent));
-                return RedirectToAction("Preview_Sales_Invoice", new { preview = token });
+
+                // Using "Url.Action" to generate the URL for redirecting to the preview page
+                var redirectUrl = Url.Action("Preview_Sales_Invoice", "Invoice", new { preview = token });
+
+                // Return a JSON object with the redirect URL
+                return Json(new { success = true, redirectUrl = redirectUrl });
             }
             else
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-               
-                return StatusCode((int)response.StatusCode, responseContent);
+                // Log or display the responseContent for more detailed error information
+
+                // Returning a status code and a message in JSON format
+                return Json(new { success = false, message = "Failed to create invoice.", responseContent });
             }
 
 
@@ -1870,93 +1885,93 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             }
         }
 
-      /*  public FileContentResult Sales_Invoice_Statement_CreatePdf()
-        {
+        /*  public FileContentResult Sales_Invoice_Statement_CreatePdf()
+          {
 
 
-            List<Sales_Invoice_Model> salesInvoices = GetData_From_Session_For_Pdf_And_Excel<Sales_Invoice_Model>("ListOfSalesInvoicesData");
+              List<Sales_Invoice_Model> salesInvoices = GetData_From_Session_For_Pdf_And_Excel<Sales_Invoice_Model>("ListOfSalesInvoicesData");
 
-            // Convert to DataTable
-            DataTable dataTable = Convert_List_To_DataTable_For_Sale_Invoice_Statement(salesInvoices);
-
-
+              // Convert to DataTable
+              DataTable dataTable = Convert_List_To_DataTable_For_Sale_Invoice_Statement(salesInvoices);
 
 
 
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                // Custom page size
-                iTextSharp.text.Rectangle customPageSize = new iTextSharp.text.Rectangle(2300, 1200);
-                using (Document document = new Document(customPageSize))
-                {
-                    PdfWriter pdfWriter = PdfWriter.GetInstance(document, memoryStream);
-                    document.Open();
 
-                    // Define fonts
-                    BaseFont boldBaseFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
-                    BaseFont gujaratiBaseFont = BaseFont.CreateFont("D:\\Font\\NotoSansGujarati-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true);
-                    Font boldFont = new Font(boldBaseFont, 12);
-                    Font gujaratiFont = new Font(gujaratiBaseFont, 12);
 
-                    // Title
-                    Paragraph title = new Paragraph("Statement", new Font(boldBaseFont, 35));
-                    title.Alignment = Element.ALIGN_CENTER;
-                    document.Add(title);
-                    document.Add(new Chunk("\n"));
+              using (MemoryStream memoryStream = new MemoryStream())
+              {
+                  // Custom page size
+                  iTextSharp.text.Rectangle customPageSize = new iTextSharp.text.Rectangle(2300, 1200);
+                  using (Document document = new Document(customPageSize))
+                  {
+                      PdfWriter pdfWriter = PdfWriter.GetInstance(document, memoryStream);
+                      document.Open();
 
-                    // Image
-                    iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\OneDrive\\Desktop\\Icons\\Backimg.png");
-                    backimage.ScaleToFit(500, 500);
-                    backimage.SetAbsolutePosition(900, 400);
-                    document.Add(backimage);
+                      // Define fonts
+                      BaseFont boldBaseFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
+                      BaseFont gujaratiBaseFont = BaseFont.CreateFont("D:\\Font\\NotoSansGujarati-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true);
+                      Font boldFont = new Font(boldBaseFont, 12);
+                      Font gujaratiFont = new Font(gujaratiBaseFont, 12);
 
-                    // Table setup
-                    PdfPTable pdfTable = new PdfPTable(dataTable.Columns.Count)
-                    {
-                        WidthPercentage = 100,
-                        DefaultCell = { Padding = 10 }
-                    };
+                      // Title
+                      Paragraph title = new Paragraph("Statement", new Font(boldBaseFont, 35));
+                      title.Alignment = Element.ALIGN_CENTER;
+                      document.Add(title);
+                      document.Add(new Chunk("\n"));
 
-                    // Headers
-                    foreach (DataColumn column in dataTable.Columns)
-                    {
-                        Font headerFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
-                        PdfPCell headerCell = new PdfPCell(new Phrase(column.ColumnName, headerFont))
-                        {
-                            HorizontalAlignment = Element.ALIGN_CENTER,
-                            Padding = 10
-                        };
-                        pdfTable.AddCell(headerCell);
-                    }
+                      // Image
+                      iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("C:\\Users\\bharg\\OneDrive\\Desktop\\Icons\\Backimg.png");
+                      backimage.ScaleToFit(500, 500);
+                      backimage.SetAbsolutePosition(900, 400);
+                      document.Add(backimage);
 
-                    // Data rows
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        foreach (DataColumn column in dataTable.Columns)
-                        {
-                            var item = row[column];
-                            Font itemFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
+                      // Table setup
+                      PdfPTable pdfTable = new PdfPTable(dataTable.Columns.Count)
+                      {
+                          WidthPercentage = 100,
+                          DefaultCell = { Padding = 10 }
+                      };
 
-                            PdfPCell dataCell = new PdfPCell(new Phrase(item?.ToString(), itemFont))
-                            {
-                                HorizontalAlignment = Element.ALIGN_CENTER,
-                                Padding = 10
-                            };
-                            pdfTable.AddCell(dataCell);
-                        }
-                    }
+                      // Headers
+                      foreach (DataColumn column in dataTable.Columns)
+                      {
+                          Font headerFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
+                          PdfPCell headerCell = new PdfPCell(new Phrase(column.ColumnName, headerFont))
+                          {
+                              HorizontalAlignment = Element.ALIGN_CENTER,
+                              Padding = 10
+                          };
+                          pdfTable.AddCell(headerCell);
+                      }
 
-                    document.Add(pdfTable);
-                    document.Close();
-                }
+                      // Data rows
+                      foreach (DataRow row in dataTable.Rows)
+                      {
+                          foreach (DataColumn column in dataTable.Columns)
+                          {
+                              var item = row[column];
+                              Font itemFont = column.ColumnName.Equals("Product", StringComparison.InvariantCultureIgnoreCase) ? gujaratiFont : boldFont;
 
-                // File result
-                string fileName = "Sales-Invoices-Statements.pdf";
-                return File(memoryStream.ToArray(), "application/pdf", fileName);
-            }
-        }*/
+                              PdfPCell dataCell = new PdfPCell(new Phrase(item?.ToString(), itemFont))
+                              {
+                                  HorizontalAlignment = Element.ALIGN_CENTER,
+                                  Padding = 10
+                              };
+                              pdfTable.AddCell(dataCell);
+                          }
+                      }
 
-        public async Task<IActionResult> Sales_Invoice_Statement_CreatePDF()
+                      document.Add(pdfTable);
+                      document.Close();
+                  }
+
+                  // File result
+                  string fileName = "Sales-Invoices-Statements.pdf";
+                  return File(memoryStream.ToArray(), "application/pdf", fileName);
+              }
+          }*/
+
+        public async Task<IActionResult> Sales_Invoice_Statement_PDF()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Invoice_Statement_PDF");
 
@@ -1984,7 +1999,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
         #region Method : Sales Invoice Excel
 
 
-        public async Task<IActionResult> Export_Sales_Invoices_List_To_Excel()
+        public async Task<IActionResult> Sales_Invoice_Statement_EXCEL()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Invoice_Statement_EXCEL");
 

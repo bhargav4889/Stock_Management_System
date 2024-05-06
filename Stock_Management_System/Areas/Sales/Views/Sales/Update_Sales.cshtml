@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "_Layout";
-    ViewData["Title"] = "Create Sale";
+    ViewData["Title"] = "Update Sale";
 }
 
 
@@ -16,7 +16,7 @@
     <div class="card">
         <div class="card-body">
 
-            <form class="row g-3" id="SalesForm" asp-action="Add_Sale_Details" asp-controller="Sales" onsubmit="return CheckData()" method="post">
+            <form class="row g-3" id="SalesForm" asp-action="Update_Sale_Details" asp-controller="Sales" onsubmit="return CheckData()" method="post">
 
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-
+                <input type="hidden" asp-for="sale.SaleId" value="@Model.sale.SaleId"/>
 
 
                 <!-- Grain Type -->
@@ -128,7 +128,7 @@
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option  data-icon="@bank.BankIcon" value="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Receive_Information_Id" id="informationId" />
@@ -214,10 +214,9 @@
                         <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
                         <select class="select" asp-for="sale.IsFullPaymentReceive" id="isFullAmountReceive" name="Payment_Method">
                             <option value="" selected disabled>-- Options --</option>
-                            <option value="1">YES</option>
-                            <option value="0">NO</option>   
+                            <option value="True">YES</option>
+                            <option value="False">NO</option>
                         </select>
-                        
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.IsFullPaymentReceive"></span>
                     </div>
 
@@ -261,15 +260,17 @@
                 <div class="col-lg-3 col-sm-12" style="display:none" id="RemainbankSelection">
                     <div class="form-group">
                         <label><span style="color:red;">*</span> Select Remain Bank</label>
-                        <select class="form-control" asp-for="sale.Remain_Amount_Receive_Bank_Id" id="remainbankSelect">
+                        <select class="form-control" asp-for="sale.Remain_Infromation_ID" id="remainbankSelect">
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                                <option data-icon="@bank.BankIcon" value="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                                
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Remain_Infromation_ID" id="remainInformationId" />
-                        <span class="text-danger" asp-validation-for="sale.Remain_Amount_Receive_Bank_Id" style="color: red; font-size:11px; font-weight:bold;"></span>
+
+                        <span class="text-danger" asp-validation-for="sale.Remain_Infromation_ID" style="color: red; font-size:11px; font-weight:bold;"></span>
                     </div>
                 </div>
 
@@ -410,19 +411,24 @@
         });
     });
 
-
-
     $(document).ready(function () {
         $('#selectpaymentmethod').change(function () {
-            if ($(this).val() === 'BANK') {
+            var paymentMethod = $(this).val();
+            if (paymentMethod == 'BANK') {
                 $('#bankSelection').show();
             } else {
                 $('#bankSelection').hide();
             }
         });
 
+        if ($('#selectpaymentmethod').val() == 'BANK') {
+            $('#bankSelection').show();
+        }
+
+
+
         $('#isFullAmountReceive').change(function () {
-            if ($(this).val() === "0") {
+            if ($(this).val() === "False") {
                 $('#RemainDate').show();
                 $('#RemainAmount').show();
                 $('#RemainPaymentMethod').show();
@@ -434,6 +440,18 @@
         });
 
 
+
+        if ($('#isFullAmountReceive').val() == 'True') {
+            $('#RemainDate').show();
+            $('#RemainAmount').show();
+            $('#RemainPaymentMethod').show();
+        }
+        else{
+            $('#RemainDate').hide();
+            $('#RemainAmount').hide();
+            $('#RemainPaymentMethod').hide();
+        }
+
         $('#selectremainpaymentmethod').change(function () {
             if ($(this).val() === 'BANK') {
                 $('#RemainbankSelection').show();
@@ -441,6 +459,10 @@
                 $('#RemainbankSelection').hide();
             }
         });
+
+        if ($('#selectremainpaymentmethod').val() == 'BANK') {
+            $('#RemainbankSelection').show();
+        }
 
         function DateDefaultValue() {
             var today = new Date();
@@ -584,14 +606,14 @@
             return false;
         }
 
-        confirmAddition('@Url.Action("Add_Sale_Details", "Sales")', customerName);
+        confirmAddition('@Url.Action("Update_Sale_Details", "Sales")', customerName);
         return false; // Prevent form submission until confirmation and AJAX call are completed
     }
 
     function confirmAddition(addUrl, customerName) {
         Swal.fire({
-            title: 'Are You Sure You Want To Complete This Sale?',
-            text: `${customerName}'s sale completion?`,
+            title: 'Are You Sure You Want To Update This Sale?',
+            text: `${customerName}'s sale Updation?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -604,7 +626,7 @@
                     type: 'POST',
                     data: $("#SalesForm").serialize(), // Adjust to match your form's ID
                     success: function (response) {
-                        sessionStorage.setItem('SaleStatus', 'Sale completed successfully!');
+                        sessionStorage.setItem('SaleStatus', 'Sale Update successfully!');
                         window.location.href = response.redirectUrl; // Redirect using the URL from the server response
                     },
                     error: function () {

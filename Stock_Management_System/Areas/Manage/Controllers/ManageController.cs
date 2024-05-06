@@ -52,17 +52,15 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
             Dashboard_All_Models _All_Models = new Dashboard_All_Models();
 
-           
 
-          
+            _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Features/Pending_Customers_Payment_Sort_List");
 
-            _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Dashbaord_Features/Pending_Customers_Payment_Sort_List");
+            _All_Models.All_Counts_Model = await api_Service.Model_Of_Data_Display<AllCountsModel>("Counts");
 
-            _All_Models.All_Counts_Model = await api_Service.Model_Of_Data_Display<All_Counts_Model>("All_Counts");
+            
+             _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/Recent_Actions_List");
 
-            _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/Recent_Actions_List");
-
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/All_Counts");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Counts");
 
 
             if (response.IsSuccessStatusCode)
@@ -72,7 +70,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 dynamic jsonObject = JsonConvert.DeserializeObject(data);
                 var dataObject = jsonObject.data;
                 var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                _All_Models.All_Counts_Model = JsonConvert.DeserializeObject<All_Counts_Model>(extractedDataJson);
+                _All_Models.All_Counts_Model = JsonConvert.DeserializeObject<AllCountsModel>(extractedDataJson);
                
 
 
@@ -82,6 +80,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
                 return default;
             }
+
+           
+
 
 
             return View(_All_Models);

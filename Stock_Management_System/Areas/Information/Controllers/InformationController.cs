@@ -56,28 +56,25 @@ namespace Stock_Management_System.Areas.Information.Controllers
         [HttpPost]
         public async Task<IActionResult> Insert_Bank_Information(Information_Model information_Model)
         {
-            try
-            {
+            
+            
                 var jsonContent = JsonConvert.SerializeObject(information_Model);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Information/Insert_Bank_Information", stringContent);
 
+
                 if (response.IsSuccessStatusCode)
                 {
-
-                    return RedirectToAction("Dashboard", "Manage");
+                    return Json(new { success = true, redirectUrl = Url.Action("Show_Save_Informations", "Information") });
+                }
+                else
+                {
+                    var errorResponse = await response.Content.ReadAsStringAsync();
+                    return Json(new { success = false, message = $"Server error: {errorResponse}" });
                 }
 
             }
-            catch
-            {
-                return null;
-            }
-
-            return RedirectToAction("Dashboard", "Manage");
-
-        }
 
         public async Task<IActionResult> Show_Save_Informations()
         {
