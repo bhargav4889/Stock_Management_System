@@ -1,0 +1,68 @@
+﻿@using Stock_Management_System.UrlEncryption
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title"><i class="fa fa-bell"></i> Reminder Information</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+</div>
+<style>
+    .table-section {
+        width: 100%;
+        border-right: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<div class="modal-body">
+    <div class="table-section">
+        <table class="table" style="width:100%; text-align:center;">
+            <tr>
+                <th>Reminder Date</th>
+                <td>@Model.ReminderDateTime.ToString("dd/MM/yyyy hh:mm tt")</td>
+            </tr>
+            <tr>
+                <th>Reminder Type</th>
+                <td>@Model.ReminderType</td>
+            </tr>
+            @if (!string.IsNullOrEmpty(Model.ReminderCustomType))
+            {
+                <tr>
+                    <th>Custom Reminder Type</th>
+                    <td>@Model.ReminderCustomType</td>
+                </tr>
+            }
+            <tr>
+                <th>Description</th>
+                <td>@Model.ReminderDescription</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    @if (DateTime.Now > Model.ReminderDateTime)
+                    {
+                        <span class="badges bg-lightred">Expired</span>
+                    }
+                    else
+                    {
+                        <span class="badges bg-lightgreen">Upcoming</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Email Address</th>
+                <td>@Model.SentEmailAddress</td>
+            </tr>
+            <tr>
+                <th>Phone No</th>
+                <td>@Model.SentPhoneNo</td>
+            </tr>
+        </table>
+    </div>
+</div>

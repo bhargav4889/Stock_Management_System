@@ -16,6 +16,8 @@
 
     <link rel="stylesheet" href="~/css/bootstrap.min.css">
 
+
+
     <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
 
     <link rel="stylesheet" href="~/css/animate.css">
@@ -154,8 +156,8 @@
                         <li class="submenu">
                             <a href="~/Stocks"><img src="~/img/icons/product.svg" alt="img"><span> Stock</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a asp-action="Add_Stock" asp-controller="Stock">Add Stock</a></li>
-                                <li><a asp-action="Manage_Stocks" asp-controller="Stock">Stock List</a></li>
+                                <li><a asp-action="AddStock" asp-controller="Stock">Add Stock</a></li>
+                                <li><a asp-action="Stocks" asp-controller="Stock">Stocks</a></li>
 
 
                             </ul>
@@ -174,12 +176,10 @@
                             <a href="~/Invoice"><img src="~/img/icons/purchase1.svg" alt="img"><span> Invoice</span> <span class="menu-arrow"></span></a>
                             <ul>
 
-                                @* <li><a href="addpurchase.html">Purchase List</a></li>
-                                <li><a href="importpurchase.html">Add Purchase</a></li>*@
-                                <li><a asp-action="Create_Purchase_Invoice" asp-controller="Invoice">Create Purchase Invoice</a></li>
-                                <li><a asp-action="History_Purchase_Invoice" asp-controller="Invoice">History Purchase Invoice</a></li>
-                                <li><a asp-action="Create_Sales_Invoice" asp-controller="Invoice">Create Sales Invoice</a></li>
-                                <li><a asp-action="History_Sales_Invoice" asp-controller="Invoice">History Sales Invoice</a></li>
+                                <li><a asp-action="CreatePurchaseInvoice" asp-controller="Invoice">Create Purchase Invoice</a></li>
+                                <li><a asp-action="PurchaseInvoices" asp-controller="Invoice">Purchase Invoices</a></li>
+                                <li><a asp-action="CreateSaleInvoice" asp-controller="Invoice">Create Sale Invoice</a></li>
+                                <li><a asp-action="SaleInvoices" asp-controller="Invoice">Sale Invoices</a></li>
                             </ul>
                         </li>
                         @* <li class="submenu">
@@ -216,6 +216,7 @@
                             <a href="~/Reminder"><img src="~/img/icons/notification-bing.svg" alt="img"><span> Reminder</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a asp-action="Create_Reminder" asp-controller="Reminder">Create Reminder</a></li>
+                                <li><a asp-action="Manage_Reminders" asp-controller="Reminder">Manage Reminder</a></li>
                             </ul>
 
                         </li>

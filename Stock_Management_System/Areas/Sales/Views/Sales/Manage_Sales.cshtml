@@ -13,56 +13,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    @* <script>
-        $(document).on("click", "#searchButton", function (event) {
-            event.preventDefault(); // Prevent the default form submission behavior
-
-            console.log("Button Clicked");
-
-            // Get the selected grain name from the dropdown
-            var Grain_Name = $("#graintype").val();
-
-            console.log("Grain Name:", Grain_Name);
-
-            $("tbody tr").each(function (index, element) {
-                var row = $(element);
-                var name = row.find("td:eq(2)").text();
-
-                // Check if the name includes the selected Grain_Name
-                if (!Grain_Name || Grain_Name === null || name.includes(Grain_Name)) {
-                    // Show the row if it meets the search criteria
-                    row.show();
-                } else {
-                    // Hide the row if it doesn't meet the search criteria
-                    row.hide();
-                }
-            });
-
-               // Optionally, you might want to keep the dropdown value
-            // If you want to reset it, uncomment the line below
-            $("#graintype").val('');
-        });
-      </script>*@
-    @*   <script>
-        $(document).ready(function () {
-            var table = $('#data').DataTable({
-                // Your DataTable options here
-            });
-
-            $(document).on("click", "#searchButton", function (event) {
-                event.preventDefault(); // Prevent the default form submission behavior
-
-                // Get the selected grain name from the dropdown
-                var Grain_Name = $("#graintype").val();
-
-                // Use DataTable's search API to filter results
-                table.search(Grain_Name).draw(); // This searches all fields and handles pagination
-
-                // Optionally, reset the dropdown if needed
-                $("#graintype").val('');
-            });
-        });
-          </script>*@
     <script>
         $(document).ready(function () {
             var table = $('#data').DataTable();
@@ -130,9 +80,70 @@
                 sessionStorage.removeItem('SaleStatus');
             }
         });
+    </script>
+
+    <script>
+        function confirmDeletion(deleteUrl, customerName) {
+            Swal.fire({
+                title: 'Are You Sure Want To Delete?',
+                text: `${customerName} Sale Entry Deleted !`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'POST',
+                        success: function (response) {
+                            // Set a success message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Deleted Successfully!');
+                            // Redirect immediately
+                            window.location.href = response.redirectUrl;
+                        },
+                        error: function () {
+                            // Set an error message in session storage
+                            sessionStorage.setItem('DeleteStatus', 'Error. Please try again.');
+                            // You might still want to redirect or handle errors differently here
+                            window.location.href = response.redirectUrl;
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var deletionMessage = sessionStorage.getItem('DeleteStatus');
+            if (deletionMessage) {
+                toastr.success(deletionMessage);
+                // Clear the message from session storage so it doesn't reappear on refresh
+                sessionStorage.removeItem('DeleteStatus');
+            }
+        });
+    </script>
 
 
+    <script>
+        function showToastNotification(formId) {
+            // Show a success toast notification
+            toastr.success('Download started successfully.', 'Success', {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-center',
+                timeOut: 3000, // Display duration
+            });
 
+            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+            setTimeout(function () {
+                document.getElementById(formId).submit();
+            }, 100); // Delay the form submission to allow the toast to render
+
+            return false; // Prevent immediate form submission
+        }
     </script>
  
 }
@@ -341,10 +352,9 @@
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Sale</a>
                                             </li>
                                             <li>
-
-                                                <a role="link"
-                                                   href="@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
-                                                   onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this?')) { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale</a>
+                                                <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Sale", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
+                                                    <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock
+                                                </a>
                                             </li>
                                         </ul>
 

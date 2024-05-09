@@ -1,0 +1,292 @@
+﻿@model Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Sales_Invoice_Model;
+
+@{
+    ViewData["Title"] = "Update Sale Invoice";
+}
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Create Invoice</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Generate Sale Invoice</h6>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="row g-3" id="SaleInvoiceForm" asp-action="UpdateSaleInvoiceDetails" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
+
+
+                <!-- Date -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: black;">*</span> Invoice Date </label>
+                        <input type="date" placeholder="DD-MM-YYYY" id="datepicker" asp-for="SalesInvoiceDate" class="form-control">
+                    </div>
+                </div>
+
+
+
+
+                <!-- Grain Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Select Product Type</label>
+                        <select class="select" id="selectgrain" aria-label="graintype" asp-for="ProductId" asp-items="ViewBag.ProductsInEnglish">
+                            <option value="" selected disabled>-- Select Grain --</option>
+                        </select>
+
+                    </div>
+                </div>
+                <input type="hidden" asp-for="ProductName" id="ProductName" />
+
+
+
+
+
+
+                <!-- Invoice Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="SelectInvoice"><span style="color: red;">*</span> Select Invoice Type</label>
+                        <select class="select" id="selectinvoice" aria-label="SelectInvoices" asp-for="InvoiceType">
+                            <option selected disabled>-- Select Invoice --</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Pay Later">Pay Later</option>
+                            <option value="Pay in Advance">Pay in Advance</option>
+                            <option value="Credit">On Credit</option>
+                            <option value="other">Other...</option>
+                        </select>
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="InvoiceType"></span>
+
+                    </div>
+                </div>
+
+
+                <div class="col-lg-3 col-sm-6 col-12" id="invoiceTypeField" style="display:none">
+                    <div class="form-group">
+                        <label for="invoiceTypeField"><span style="color: red;">*</span>  Invoice Type</label>
+                        <input type="text" class="form-control" placeholder="Other Invoice Type" asp-for="OtherInvoiceType">
+
+                        <span class="text-danger" style="color: red; font-size: 11px; font-weight: bold;" asp-validation-for="OtherInvoiceType"></span>
+                    </div>
+                </div>
+
+                <!-- Broker Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="Brokername"><span style="color: black;">*</span> Broker Name</label>
+                        <input type="text" class="form-control" placeholder="Broker Name" id="Brokername" asp-for="BrokerName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="BrokerName"></span>
+                    </div>
+                </div>
+
+
+                <!-- Party Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="Partyname"><span style="color: red;">*</span>  Party Name</label>
+                        <input type="text" class="form-control" placeholder="Party Name" id="Partyname" asp-for="PartyName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="PartyName"></span>
+                    </div>
+                </div>
+
+                <!-- Party GST NO  -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="PartyGSTNo"><span style="color: black;">*</span> Party GST NO</label>
+                        <input type="text" class="form-control" placeholder="GST NO" id="PartyGSTNo" asp-for="PartyGstNo" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="PartyGstNo"></span>
+                    </div>
+                </div>
+
+                <!-- Party Address  -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="PartyAddress"><span style="color: red;">*</span> Party Address</label>
+                        <textarea type="text" class="form-control" placeholder="PartyAddress" id="PartyAddress" asp-for="PartyAddress" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()"></textarea>
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="PartyAddress"></span>
+                    </div>
+                </div>
+
+
+
+
+                <!-- Product - Brand- Name  -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="ProductBrandName"><span style="color: red;">*</span> Product Brand Name </label>
+                        <input type="text" class="form-control" placeholder="Brand Name" id="ProductBrandName" asp-for="ProductBrandName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ProductBrandName"></span>
+                    </div>
+                </div>
+
+
+                <!-- CGST -->
+                <div class="col-lg-1 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="CGST"><span style="color: black;">*</span> CGST(%)</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="CGST" id="CGST" oninput="CalculateMethod()" asp-for="CGST">
+
+                    </div>
+                </div>
+
+                <!-- SGST -->
+                <div class="col-lg-1 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="SGST"><span style="color: black;">*</span> SGST(%)</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="SGST" id="SGST" oninput="CalculateMethod()" asp-for="SGST">
+
+
+                    </div>
+                </div>
+
+
+
+                <input type="hidden" id="CGST_Total" asp-for="TotalCGSTPrice" />
+
+                <input type="hidden" id="SGST_Total" asp-for="TotalSGSTPrice" />
+
+
+                <!-- Bags -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="bags"><span style="color: black;">*</span> Bags</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="Bags">
+
+                    </div>
+                </div>
+
+
+                <!-- Bags Per KG -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="bagsperkg"><span style="color: black;">*</span> Bags Per KG</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="BagPerKg">
+
+                    </div>
+                </div>
+
+                <!-- Weight -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="weight"><span style="color: red;">*</span> Weight</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Weight" id="weight" asp-for="TotalWeight">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TotalWeight"></span>
+                    </div>
+                </div>
+
+                <!-- Product Price -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="productprice"><span style="color: red;">*</span> Product Price ⟨₹⟩</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Product Price ⟨₹⟩" id="productprice" oninput="CalculateMethod()" asp-for="ProductPrice">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ProductPrice"></span>
+                    </div>
+                </div>
+
+
+                <input type="hidden" id="beforetaxtotal" asp-for="WithoutGSTPrice" />
+
+                <!-- Total Price -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="totalprice"><span style="color: red;">*</span> Total Price ⟨₹⟩</label>
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Total Price ⟨₹⟩" id="totalprice" asp-for="TotalPrice">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="TotalPrice"></span>
+                    </div>
+                </div>
+
+
+
+                <!-- Vehicle Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="selectvehicletype"><span style="color: red;">*</span> Select Type</label>
+                        <select class="select" id="selectvehicletype" aria-label="vehicletype" asp-for="VehicleId" asp-items="ViewBag.Vehicle">
+                            <option selected disabled>-- Select Vehicle --</option>
+                        </select>
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="VehicleId"></span>
+                    </div>
+                </div>
+
+                <input type="hidden" id="VehicleName" asp-for="VehicleName" />
+
+                <!-- Container Number -->
+                <div class="col-lg-3 col-sm-6 col-12" id="containerNumberField" style="display: none;">
+                    <div class="form-group">
+                        <label for="containerNumber"><span style="color: red;">*</span> Container Number</label>
+                        <input type="text" class="form-control" placeholder="Container Number" id="containerNumber" asp-for="ContainerNo">
+
+                        <span class="text-danger" style="color: red; font-size: 11px; font-weight: bold;" asp-validation-for="ContainerNo"></span>
+                    </div>
+                </div>
+
+
+
+
+
+                <!-- Vehicle No. -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="vehicleno"><span style="color: red;">*</span> Vehicle No.</label>
+                        <input type="text" class="form-control" placeholder="GJ-01-MH-1234" id="vehicleno" oninput="formatVehicleNo(this)" asp-for="VehicleNo">
+
+                    </div>
+                    <span id="error-msg" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="VehicleNo"></span>
+                </div>
+
+                <!-- Truck/Tempo Driver Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="drivername"><span style="color: red;">*</span> Driver Name</label>
+                        <input type="text" class="form-control" placeholder="Driver Name" id="drivername" asp-for="DriverName" pattern="[A-Za-z\s]*" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="DriverName"></span>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-file-invoice"></i>
+                            Update Invoice
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+
+
+    <script src="/js/Section/invoice/s/edit.js"></script>
+
+}

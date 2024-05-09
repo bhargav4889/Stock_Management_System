@@ -6,155 +6,6 @@
 }
 
 @model IEnumerable<Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model>
-@section Scripts
-    {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
- 
-    <script>
-        $(document).ready(function () {
-            var table = $('#data').DataTable();
-
-            function parseDate(str) {
-                var parts = str.split('-');
-                return new Date(2000 + parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-            }
-
-            function applySearches() {
-                var Name = $("#searchName").val();
-                var VehicleName = $("#vehicletype").val();
-                var selectedVehicle = $("#vehicletype option:selected").text();
-                var TolatName = $("#searchTolatName").val();
-                var selectedGrain = $("#graintype").val();
-                var selectedGrainText = $("#graintype option:selected").text();
-                var startdate = $('#startdate').val();
-                var enddate = $('#datepickerend').val(); // Ensure this matches your HTML
-
-                // Clear existing searches
-                table.columns().search('');
-
-                // Apply dropdown search if selected
-                if (selectedGrain) {
-                    table.column(2).search(selectedGrainText);
-                }
-
-                if (VehicleName) {
-                    table.column(9).search(selectedVehicle);
-                }
-
-                // Apply individual column searches from input fields
-                table.column(1).search(Name);
-                table.column(8).search(TolatName);
-
-                // Setup date filtering
-                $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                    var dateColumn = data[0]; // Assuming the date is in the first column
-                    var date = parseDate(dateColumn); // Parse the DD-MM-YY format
-
-                    var start = startdate ? parseDate(startdate.split('-').reverse().join('-')) : null;
-                    var end = enddate ? parseDate(enddate.split('-').reverse().join('-')) : new Date();
-
-                    if (enddate && !startdate) {
-                        start = new Date(end.getFullYear(), end.getMonth(), 1); // Set to the first of the month
-                    }
-
-                    if (startdate && !enddate) {
-                        end = new Date(); // Set to current date
-                    }
-
-                    if (!startdate && !enddate) {
-                        return true; // No filtering on dates
-                    }
-
-                    return (start ? date >= start : true) && (end ? date <= end : true);
-                });
-
-                // Perform a single draw after all search criteria have been applied
-                table.draw();
-                $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
-
-                // Reset the input values after search
-                $("#searchName, #searchTolatName").val('');
-                $('#graintype').val('').trigger('change');
-                $('#vehicletype').val('').trigger('change');
-            }
-
-            $('#searchButton').on('click', function () {
-                applySearches();
-            });
-        });
-
-    </script>
-
-
-
-    <script>
-        function confirmPurchaseInvoiceDeletion(deleteUrl, customerName) {
-            Swal.fire({
-                title: 'Are You Sure You Want To Delete?',
-                text: `${customerName}'s Invoice will be deleted.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: deleteUrl,
-                        type: 'POST',
-                        success: function (response) {
-                            // Set a success message in session storage
-                            sessionStorage.setItem('DeleteStatus', 'Invoice deleted successfully!');
-                            // Redirect to a specified URL or reload
-                            window.location.href = response.redirectUrl;
-                        },
-                        error: function () {
-                            // Set an error message in session storage
-                            sessionStorage.setItem('DeleteStatus', 'Error deleting invoice. Please try again.');
-                            // Redirect or refresh page
-                            window.location.reload();
-                        }
-                    });
-                }
-            });
-        }
-
-        $(document).ready(function () {
-            var deleteMessage = sessionStorage.getItem('DeleteStatus');
-            if (deleteMessage) {
-                toastr.success(deleteMessage);
-                // Clear the message from session storage so it doesn't reappear on refresh
-                sessionStorage.removeItem('DeleteStatus');
-            }
-        });
-    </script>
-
-
-
-    <script>
-        function showToastNotification(formId) {
-            // Show a success toast notification
-            toastr.success('Download started successfully.', 'Success', {
-                closeButton: true,
-                progressBar: true,
-                positionClass: 'toast-top-center',
-                timeOut: 3000, // Display duration
-            });
-
-            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
-            setTimeout(function () {
-                document.getElementById(formId).submit();
-            }, 100); // Delay the form submission to allow the toast to render
-
-            return false; // Prevent immediate form submission
-        }
-    </script>
-
-
-}
 
 
 
@@ -165,13 +16,9 @@
             <h6>Manage Invoices Purchases </h6>
         </div>
         <div class="page-btn">
-            <a role="button" asp-action="Add_Stock" asp-controller="Stock" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
+            <a role="button" asp-action="CreatePurchaseInvoice" asp-controller="Invoice" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
         </div>
     </div>
-    @if (TempData["DeleteMessage"] != null)
-    {
-        <input type="hidden" id="toastrErrorMessage" value="@TempData["DeleteMessage"]" />
-    }
     <div class="card">
         <div class="card-body">
             <div class="table-top">
@@ -189,7 +36,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form id="pdfExportForm" asp-action="Purchase_Invoice_Statement_PDF" asp-controller="Invoice" method="get">
+                            <form id="pdfExportForm" asp-action="GeneratePurchaseInvoicesPDFStatement" asp-controller="Invoice" method="get">
 
 
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
@@ -201,7 +48,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="Purchase_Invoice_Statement_EXCEL" asp-controller="Invoice" method="get">
+                            <form id="excelExportForm" asp-action="GeneratePurchaseInvoicesEXCELStatement" asp-controller="Invoice" method="get">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
@@ -348,19 +195,19 @@
                                         <ul class="dropdown-menu text-center">
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Purchase_Invoice_Details", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
+                                                   href="@Url.Action("PurchaseInvoiceDetailsView", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
                                                    onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Invoice Info</a>
                                             </li>
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Update_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
+                                                   href="@Url.Action("EditPurchaseInvoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })"
                                                    onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Edit Invoice</a>
                                             </li>
 
                                             <li>
                                                 <a role="button"
                                                    href="javascript:void(0);"
-                                                   onclick="confirmPurchaseInvoiceDeletion('@Url.Action("Delete_Purchase_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })', '@item.CustomerName')"
+                                                   onclick="confirmPurchaseInvoiceDeletion('@Url.Action("DeletePurchaseInvoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseInvoiceId)) })', '@item.CustomerName')"
                                                    class="dropdown-item confirm-text">
                                                     <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice
                                                 </a>
@@ -380,7 +227,18 @@
     </div>
 
 
+    @section Scripts
+    {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
 
+
+
+        <script src="/js/Section/invoice/p/purchases.js"></script>
+
+
+    }
 
 
 

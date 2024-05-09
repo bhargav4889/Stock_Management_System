@@ -13,7 +13,7 @@
             <h6>Manage Invoices Sales </h6>
         </div>
         <div class="page-btn">
-            <a role="button" asp-action="Create_Sales_Invoice" asp-controller="Invoice" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
+            <a role="button" asp-action="CreateSaleInvoice" asp-controller="Invoice" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice</a>
         </div>
     </div>
     <div class="card">
@@ -33,7 +33,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form id="pdfExportForm" asp-action="Sales_Invoice_Statement_PDF" asp-controller="Invoice" method="get">
+                            <form id="pdfExportForm" asp-action="GenerateSaleInvoicesPDFStatement" asp-controller="Invoice" method="get">
 
 
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
@@ -45,7 +45,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="Sales_Invoice_Statement_EXCEL" asp-controller="Invoice" method="get">
+                            <form id="excelExportForm" asp-action="GenerateSaleInvoicesEXCELStatement" asp-controller="Invoice" method="get">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
@@ -186,19 +186,19 @@
                                         <ul class="dropdown-menu text-center">
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Sales_Invoice_Details", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
+                                                   href="@Url.Action("SaleInvoiceDetailsView", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
                                                    onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Invoice Info</a>
                                             </li>
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Update_Sales_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
+                                                   href="@Url.Action("EditSaleInvoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })"
                                                    onclick="event.preventDefault(); { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img"> Edit Invoice</a>
                                             </li>
 
                                             <li>
                                                 <a role="button"
-                                                   href="javascript:void(0);"
-                                                   onclick="confirmPurchaseInvoiceDeletion('@Url.Action("Delete_Sales_Invoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })', '@item.PartyName')"
+                                                   
+                                                   onclick="confirmPurchaseInvoiceDeletion('@Url.Action("DeleteSaleInvoice", "Invoice", new { Invoice_ID = UrlEncryptor.Encrypt(Convert.ToString(item.SalesInvoiceId)) })', '@item.PartyName')"
                                                    class="dropdown-item confirm-text">
                                                     <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Invoice
                                                 </a>
@@ -223,121 +223,10 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-   
- 
-    <script>
-        $(document).ready(function () {
-            var table = $('#data').DataTable();
-
-            function applySearches() {
-                var BrokerName = $("#searchBrokerName").val();
-                var PartyName = $("#searchPartyName").val();
-                var Brand = $('#searchBrandName').val();
-                var selectedGrain = $("#graintype").val();
-                var selectedGrainText = $("#graintype option:selected").text(); // Get the selected option text
-                var startdate = $('#startdate').val();
-                var enddate = $('#enddate').val();
-
-                console.log(selectedGrain);
-
-                var productColumnIndex = 3;
-
-                // Clear existing searches
-                table.columns().search('');
-
-                // Apply dropdown search if selected
-                if (selectedGrain) {
-                    table.column(productColumnIndex).search(selectedGrainText);
-
-                }
-
-                // Apply individual column searches from input fields
-                table.column(1).search(BrokerName);
-                table.column(2).search(PartyName);
-                table.column(4).search(Brand);
 
 
 
-                // Perform a single draw after all search criteria have been applied
-                table.draw();
-
-                // Reset the input values after search
-                $("#searchBrokerName, #searchPartyName , #searchBrandName").val('');
-                $('#graintype').val('').trigger('change');
-
-            }
-
-            $('#searchButton').on('click', function () {
-                applySearches();
-            });
-        });
-    </script>
+    <script src="/js/Section/invoice/s/sales.js"></script>
 
 
-
-    <script>
-        function confirmPurchaseInvoiceDeletion(deleteUrl, customerName) {
-            Swal.fire({
-                title: 'Are You Sure You Want To Delete?',
-                text: `${customerName}'s Invoice will be deleted.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: deleteUrl,
-                        type: 'POST',
-                        success: function (response) {
-                            // Set a success message in session storage
-                            sessionStorage.setItem('DeleteStatus', 'Invoice deleted successfully!');
-                            // Redirect to a specified URL or reload
-                            window.location.href = response.redirectUrl;
-                        },
-                        error: function () {
-                            // Set an error message in session storage
-                            sessionStorage.setItem('DeleteStatus', 'Error deleting invoice. Please try again.');
-                            // Redirect or refresh page
-                            window.location.reload();
-                        }
-                    });
-                }
-            });
-        }
-
-        $(document).ready(function () {
-            var deleteMessage = sessionStorage.getItem('DeleteStatus');
-            if (deleteMessage) {
-                toastr.success(deleteMessage);
-                // Clear the message from session storage so it doesn't reappear on refresh
-                sessionStorage.removeItem('DeleteStatus');
-            }
-        });
-    </script>
-
-
-    <script>
-        function showToastNotification(formId) {
-            // Show a success toast notification
-            toastr.success('Download started successfully.', 'Success', {
-                closeButton: true,
-                progressBar: true,
-                positionClass: 'toast-top-center',
-                timeOut: 3000, // Display duration
-            });
-
-            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
-            setTimeout(function () {
-                document.getElementById(formId).submit();
-            }, 100); // Delay the form submission to allow the toast to render
-
-            return false; // Prevent immediate form submission
-        }
-    </script>
-
-
-
-
-}
+} 

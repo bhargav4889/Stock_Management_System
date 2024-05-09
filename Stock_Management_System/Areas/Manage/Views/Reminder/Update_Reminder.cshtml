@@ -1,0 +1,97 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Update Reminder";
+}
+@model Stock_Management_System.Areas.Manage.Models.Reminder_Model;
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Update Reminder</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Update Reminder Infromation</h6>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="row g-3" asp-action="Insert_Reminder" asp-controller="Reminder" onsubmit="return CheckData()" method="post">
+
+             
+
+                <!-- Date -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label><span style="color: red;">*</span> Reminder Date </label>
+                        <input type="datetime-local" placeholder="DD-MM-YYYY" id="datepicker" asp-for="ReminderDateTime" class="form-control">
+                    </div>
+                </div>
+
+                <!-- Remainder Type -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="SelectReminder"><span style="color: red;">*</span> Remainder Type</label>
+                        <select class="select" asp-for=ReminderType id="SelectReminder" aria-label="selectReminder">
+                            <option selected disabled value="">-- Select Reminder Type --</option>
+                            <option value="CollectPayment">Collect Payment</option>
+                            <option value="CreateStock">Stock Add</option>
+                            <option value="CreateSale">Sale Create</option>
+                            <option value="CreateInvoice">Invoice Create</option>
+                            <option value="CheckCustomerAccounting">Check Customer Accounting</option>
+                            <option value="Other">Custom..</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Other Type Remainder -->
+                <div class="col-lg-3 col-sm-6 col-12" id="otherReminderType" style="display:none">
+                    <div class="form-group">
+                        <label for="otherTypeReminder"><span style="color: red;">*</span> Custom Reminder </label>
+                        <input type="text" class="form-control" asp-for=ReminderCustomType id="otherTypeReminder" placeholder="Enter Custom Reminder" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                </div>
+
+
+
+                <!-- Remainder Description -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="remainderDescription"><span style="color: red;">*</span> Reminder Description</label>
+                        <textarea class="form-control" asp-for=ReminderDescription id="remainderDescription" placeholder="Enter Description of Reminder" oninput="this.value = this.value.toUpperCase()"></textarea>
+                    </div>
+                </div>
+
+
+
+                <input type="text" value="bhargavkachhela1@gmail.com" name="SentEmailAddress" asp-for="SentEmailAddress" />
+
+                <input type="text" value="9664633122" name="SentPhoneNo" asp-for="SentPhoneNo" />
+
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-bell"></i>
+                            Update Reminder
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#SelectReminder').on('change', function () {
+            if ($(this).val() === 'Other') {
+                $('#otherReminderType').show();
+            } else {
+                $('#otherReminderType').hide();
+            }
+        });
+    });
+</script>

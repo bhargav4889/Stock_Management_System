@@ -40,27 +40,14 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         public async Task All_Dropdowns_Call()
         {
-            All_DropDown_Model all_DropDown_Model = new All_DropDown_Model();
-
-            All_DropDowns_Class all_DropDowns_Class = new All_DropDowns_Class();
-
-            all_DropDown_Model = await all_DropDowns_Class.Get_All_DropdDowns_Data();
-
-
-
-
-
+            DropDown_Model all_DropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
             if (all_DropDown_Model != null)
             {
                 ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
-
+                ViewBag.ProductsInEnglish = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
                 ViewBag.ProductGrade = new SelectList(all_DropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
                 ViewBag.Vehicle = new SelectList(all_DropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
             }
-
-
-
-
         }
 
         #endregion
@@ -85,7 +72,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         public async Task<IActionResult> Create_Sales()
         {
-            await  All_Dropdowns_Call();
+            await All_Dropdowns_Call();
 
             await Dropdown_For_Our_Bank_Names();
 
@@ -154,7 +141,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             if (response.IsSuccessStatusCode)
             {
                 // Return a JSON response to redirect the client to another action
-                return Json(new { redirectUrl = Url.Action("Manage_Sales", "Sales") });
+                return Json(new { success = true, redirectUrl = Url.Action("Manage_Sales", "Sales") });
             }
             else
             {
@@ -206,12 +193,28 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
 
 
-        public  async Task<IActionResult> Manage_Sales()
+        public async Task<IActionResult> Manage_Sales()
         {
             await All_Dropdowns_Call();
 
             List<Show_Sale> sales = await api_Service.List_Of_Data_Display<Show_Sale>("Sales/Sales");
             return View(sales);
+        }
+
+
+
+        [HttpPost]
+        public IActionResult Delete_Sale(string Sale_ID)
+        {
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Sales/Delete_Sale?Sale_ID={UrlEncryptor.Decrypt(Sale_ID)}").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Manage_Sales", "Sales") });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Error. Please try again." });
+            }
         }
 
 
@@ -245,7 +248,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             if (response.IsSuccessStatusCode)
             {
                 // Return a JSON response to redirect the client to another action
-                return Json(new { redirectUrl = Url.Action("Manage_Sales", "Sales") });
+                return Json(new { success = true, redirectUrl = Url.Action("Manage_Sales", "Sales") });
             }
             else
             {
@@ -253,6 +256,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
                 var responseContent = await response.Content.ReadAsStringAsync();
                 return StatusCode((int)response.StatusCode, responseContent);
             }
+
         }
 
         public async Task<IActionResult> Added_Sales_Details(string Sale_ID)

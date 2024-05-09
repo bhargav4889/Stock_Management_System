@@ -507,13 +507,13 @@
                                             </a>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <button class="loadSalesInfoBtn dropdown-item" data-sale-id="@UrlEncryptor.Encrypt(item.saleId.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.CustomerId.ToString())">
+                                                    <button class="loadSalesInfoBtn dropdown-item" data-sale-id="@UrlEncryptor.Encrypt(item.saleId.ToString())">
                                                         <img src="~/img/icons/eye.svg" class="me-2" alt="img"> Show Information
                                                     </button>
 
                                                 </li>
                                                 <li>
-                                                    <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Stock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
+                                                    <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Sale", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
                                                         <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale Entry
                                                     </a>
                                                 </li>

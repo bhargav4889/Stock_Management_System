@@ -84,27 +84,26 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insert_Customer_Manually(Customer_Model customers)
+        public async Task<IActionResult> Insert_Reminder(Reminder_Model reminder)
         {
-
-
-            var jsonContent = JsonConvert.SerializeObject(customers);
+            var jsonContent = JsonConvert.SerializeObject(reminder);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", stringContent);
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Reminder/Create_Reminder", stringContent);
 
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, redirectUrl = Url.Action("Manage_Customers_Account", "Account") });
+                // If the request was successful, return a JSON object including the URL to redirect to
+                return Json(new { success = true, redirectUrl = Url.Action("Manage_Reminders", "Reminder") });
             }
             else
             {
+                // Read the error message from the response if not successful
                 var errorResponse = await response.Content.ReadAsStringAsync();
                 return Json(new { success = false, message = $"Server error: {errorResponse}" });
             }
-
-
         }
+
 
         #endregion
 

@@ -1,0 +1,71 @@
+﻿
+.back-arrow {
+    color: green;
+    font-size: 24px; /* increases the size of the arrow */
+    padding: 10px; /* adds space around the arrow */
+    display: inline-block; /* helps with alignment */
+    vertical-align: middle; /* vertically aligns the icon with text, if any */
+}
+
+    .back-arrow:hover {
+        color: darkgreen; /* changes color on hover for better interaction */
+    }
+
+.back-link {
+    display: flex;
+    align-items: center; /* centers the arrow vertically within the column */
+    justify-content: flex-start; /* aligns the arrow to the left */
+}
+
+
+.table-container {
+    margin: 20px auto;
+    overflow-x: auto;
+    width: 98%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    z-index: 1;
+}
+
+
+
+
+.table-responsive {
+
+    position: relative;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 20px 0;
+}
+
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    color:black;
+    font-weight:bold;
+}
+
+th {
+    background-color: #f4f4f4;
+    color: #333;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #f5f5f5; /* subtle hover effect */
+}
+
+.text-center {
+    text-align: center;
+}
+
+.fa-arrow-left {
+    color: green;
+    transform: scale(1.25);
+}
+

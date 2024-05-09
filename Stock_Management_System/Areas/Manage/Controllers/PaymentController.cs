@@ -35,7 +35,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         public async Task All_Dropdowns_Call()
         {
-            All_DropDown_Model all_DropDown_Model = await new All_DropDowns_Class().Get_All_DropdDowns_Data();
+            DropDown_Model all_DropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
             if (all_DropDown_Model != null)
             {
                 ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
@@ -195,7 +195,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             }
             else
             {
-                return null;
+                return default;
             }
         }
 

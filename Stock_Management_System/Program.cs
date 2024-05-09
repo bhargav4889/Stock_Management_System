@@ -38,9 +38,20 @@ builder.Services.AddTransient<IEmailSender>(i => new EmailSender(
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.AddJavaScriptBundle("/js/bundle/stock-section-bundle.js", new string[] {
-            "/js/Section/Stock/add-stock-section.js"
-        });
+    // stock
+
+    pipeline.AddJavaScriptBundle("/js/bundle/stock/add-bundle.js", "/js/Section/stock/add.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/stock/edit-bundle.js", "/js/Section/stock/edit.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/stock/stocks-bundle.js", "/js/Section/stock/stocks.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/stock/details-bundle.js", "/js/Section/stock/details.js");
+
+    // invoice --> s --> 
+
+    pipeline.AddJavaScriptBundle("/js/bundle/invoice/s/add-bundle.js", "/js/Section/invoice/s/add.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/invoice/s/edit-bundle.js", "/js/Section/invoice/s/edit.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/invoice/s/sales-bundle.js", "/js/Section/invoice/s/sales.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/invoice/s/preview-bundle.js", "/js/Section/invoice/s/preview.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/invoice/s/details-bundle.js", "/js/Section/invoice/s/details.js");
 });
 
 

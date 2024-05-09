@@ -18,7 +18,7 @@
 }
 
 <div class="modal-header">
-    <h5 class="modal-title"><i class="fa fa-credit-card"></i> Sale Information</h5>
+    <h5 class="modal-title"><i class="fa fa-shopping-cart"></i> Sale Information</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 </div>
 
@@ -30,24 +30,26 @@
     }
 
     .table-section {
-        width: 100%;
-        border-right: 1px solid #ddd;
+        flex: 1; /* Takes equal space */
+        padding: 0 15px;
+        width: 100%; /* Ensures full width */
+    }
+
+    table {
+        width: 100%; /* Full width tables */
     }
 
     th, td {
         padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        word-wrap: break-word; /* Ensures text fits the cell */
     }
 
     img.bank-icon {
         width: 20px;
         height: 20px;
         margin-right: 5px;
-    }
-
-    .table-section:last-child {
-        border-right: none;
     }
 </style>
 
@@ -83,20 +85,15 @@
     }
 </script>
 
-
 @if (Model.saleId != 0)
 {
     <div class="container">
         <div class="table-section">
+            <!-- Left section with general sale details -->
             <table class="table" style="text-align:center;">
-
                 <tr>
                     <th>Sale Creation Date</th>
                     <td>@Model.Create_Sales.ToString("dd-MM-yyyy")</td>
-                </tr>
-                <tr>
-                    <th>Received Payment Date</th>
-                    <td>@Model.Receive_Payment_Date.ToString("dd-MM-yyyy")</td>
                 </tr>
                 <tr>
                     <th>Customer Name</th>
@@ -122,10 +119,6 @@
                     <td>@(Model.Bags?.ToString() ?? "--")</td>
                 </tr>
                 <tr>
-                    <th>Bag Per Kg</th>
-                    <td>@(Model.BagPerKg?.ToString() ?? "--")</td>
-                </tr>
-                <tr>
                     <th>Weight</th>
                     <td>@Model.Total_Weight</td>
                 </tr>
@@ -133,14 +126,21 @@
                     <th>Rate(₹)</th>
                     <td>@Model.Rate.ToString("C")</td>
                 </tr>
+
                 <tr>
-                    <th>Total Amount(₹)</th>
+                    <th>Total Price(₹)</th>
                     <td>@Model.Total_Price.ToString("C")</td>
+                </tr>
+
+                <tr>
+                    <th>Receive Payment Date</th>
+                    <td>@Model.Receive_Payment_Date.ToString("dd-MM-yyyy")</td>
                 </tr>
                 <tr>
                     <th>Received Amount(₹)</th>
                     <td>@Model.Receive_Amount.ToString("C")</td>
                 </tr>
+
                 <tr>
                     <th>Discount (₹)</th>
                     <td>@Model.Discount?.ToString("C")</td>
@@ -149,72 +149,61 @@
                     <th>Receive Payment Method</th>
                     <td>@Model.Payment_Method</td>
                 </tr>
+            </table>
+        </div>
+
+        <div class="table-section">
+            <!-- Right section with payment and bank details -->
+            <table class="table">
 
                 @if (Model.Receive_Information_ID != 0)
                 {
-                   
-
                     <tr>
-                        <th> Bank Account No</th>
-                        <td>XXXXX@(Model.Receive_Account_No.Substring(Model.Receive_Account_No.Length - 4)) <img src="@BankIcon" class="bank-icon" /></td>
-                        <span class="fas toggle-password fa-eye-slash" onclick="toggleAccountNo()"></span>
+                        <th>Bank Account No</th>
+                        <td>
+                            XXXXX@(Model.Receive_Account_No.Substring(Model.Receive_Account_No.Length - 4)) <img src="@BankIcon" class="bank-icon" />
+                            <span class="fas toggle-password fa-eye-slash" onclick="toggleMainAccountNo()"></span>
+                        </td>
                     </tr>
-
                     <tr>
                         <th>Account Holder Name</th>
                         <td>@Model.Account_Holder_Name</td>
                     </tr>
                 }
-
-                <tr>
-                    <th>Deducted Amount(₹)</th>
-                    <td>@Model.Deducted_Amount.Value.ToString("C")</td>
-                </tr>
-
                 <tr>
                     <th>Is Full Amount Payment Received?</th>
-                    <td>@(Model.IsFullPaymentReceive ? "Yes" : "No")</td>
+                    <td>@(Model.IsFullPaymentReceive ? "No" : "Yes")</td>
                 </tr>
+                @{
+                    string IsSucess = Convert.ToString(Model.IsFullPaymentReceive ? "No" : "Yes");
                 }
-            </table>
-        </div>
-        @if (Model.IsFullPaymentReceive == false)
-        {
-            <div class="table-section">
-                <table class="table">
+
+                @if (IsSucess == "No")
+                {
                     <tr>
                         <th>Remain Payment Date</th>
                         <td>@Model.Remain_Payment_Date?.ToString("dd-MM-yyyy")</td>
                     </tr>
                     <tr>
-                        <th>Remain Amount(₹)</th>
+                        <th>Received Remain Amount(₹)</th>
                         <td>@Model.Receive_Remain_Amount?.ToString("C")</td>
                     </tr>
-                    <tr>
-                        <th>Remain Payment Method</th>
-                        <td>@Model.Remain_Payment_Method</td>
-                    </tr>
-
-                    @if (Model.Remain_Receive_Information_ID != 0)
+                    @if(Model.Remain_Receive_Information_ID != 0)
                     {
-                        
-
                         <tr>
-                            <th> Remain Bank Account No</th>
-                            <td>XXXXX@(Model.Receive_Remain_Account_No.Substring(Model.Receive_Remain_Account_No.Length - 4))  <img src="@RemainBankIcon" class="bank-icon" /></td>
-                            <span class="fas toggle-password fa-eye-slash" onclick="toggleRemainAccountNo()"></span>
+                            <th>Bank Account No</th>
+                            <td>
+                                XXXXX@(Model.Receive_Remain_Account_No.Substring(Model.Receive_Remain_Account_No.Length - 4)) <img src="@RemainBankIcon" class="bank-icon" />
+                                <span class="fas toggle-password fa-eye-slash" onclick="toggleRemainAccountNo()"></span>
+                            </td>
                         </tr>
-
                         <tr>
-                            <th>Remain Account Holder Name</th>
+                            <th>Account Holder Name</th>
                             <td>@Model.Remain_Account_Holder_Name</td>
                         </tr>
-
-
                     }
-                </table>
-            </div>
-        }
-
+                }
+            </table>
+        </div>
     </div>
 }

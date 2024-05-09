@@ -16,7 +16,7 @@ namespace Stock_Management_System.Areas.Accounts.Models
         public string? CustomerName { get; set; }
 
         [Required(ErrorMessage ="Please Select Customer Type")]
-        public string? CustomerType { get; set; }
+        public string CustomerType { get; set; }
 
         [Required(ErrorMessage ="Please Enter Contact No")]
         public string? CustomerContact { get; set; }

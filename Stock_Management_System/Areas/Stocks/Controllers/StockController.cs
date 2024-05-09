@@ -22,78 +22,79 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
     [Route("~/[controller]/[action]")]
     public class StockController : Controller
     {
+
+        #region Section: Constructor and Configuration
+
         public IConfiguration Configuration;
 
         Uri baseaddress = new Uri("https://localhost:7024/api");
 
         public readonly HttpClient _Client;
 
-
         private readonly Api_Service api_Service = new Api_Service();
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StockController"/> class.
+        /// </summary>
+        /// <param name="configuration">Configuration settings to be used by the controller.</param>
+        /// <remarks>
+        /// Sets up the HttpClient with a base address and initializes the Api_Service.
+        /// </remarks>
         public StockController(IConfiguration configuration)
         {
             Configuration = configuration;
 
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
-
-
-
-        }
-
-
-        #region Method : Dropdown Function
-
-        public async Task All_Dropdowns_Call()
-        {
-            All_DropDown_Model all_DropDown_Model = new All_DropDown_Model();
-
-            All_DropDowns_Class all_DropDowns_Class = new All_DropDowns_Class();
-
-            all_DropDown_Model = await all_DropDowns_Class.Get_All_DropdDowns_Data();
-
-
-
-
-
-            if (all_DropDown_Model != null)
-            {
-                ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
-
-                ViewBag.ProductGrade = new SelectList(all_DropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
-                ViewBag.Vehicle = new SelectList(all_DropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
-            }
-
-
-
-
         }
 
         #endregion
 
+        #region Section: Dropdown Function
 
+        /// <summary>
+        /// Populates dropdown lists for the stock views.
+        /// </summary>
 
-        #region Method : Add Stock Function 
+        public async Task PopulateDropdownLists()
+        {
+            DropDown_Model dropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
+            if (dropDown_Model != null)
+            {
+                ViewBag.Products = new SelectList(dropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
+                ViewBag.ProductsInEnglish = new SelectList(dropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
+                ViewBag.ProductGrade = new SelectList(dropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
+                ViewBag.Vehicle = new SelectList(dropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
+            }
+        }
 
-        public async Task<IActionResult> Add_Stock()
+        #endregion
+
+        #region Section: Add Purchase Stock
+
+        /// <summary>
+        /// Initiates the process to add a new stock entry.
+        /// </summary>
+
+        public async Task<IActionResult> AddStock()
         {
 
-            await All_Dropdowns_Call();
+            await PopulateDropdownLists();
 
             return View();
         }
 
-
-        public async Task<IActionResult> Add_Stock_Details(Customers_Stock_Combined_Model model)
+        /// <summary>
+        /// Adds details for a new stock entry.
+        /// </summary>
+        public async Task<IActionResult> InsertStockAndCustomerDetails(Customers_Stock_Combined_Model model)
         {
             // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await Existing_Customer_Details(model.Customers.CustomerId, model.Customers.CustomerType);
+            Customer_Model customerInfo = await GetCustomerProfile(model.Customers.CustomerId, model.Customers.CustomerType);
             if (customerInfo == null)
             {
                 // Add the new customer and directly use the returned model
-                customerInfo = await Add_New_Customer(model.Customers);
+                customerInfo = await CreateCustomer(model.Customers);
                 if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
                     return BadRequest("Failed to create a new customer.");
@@ -112,50 +113,39 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             // Post the model to the "Stock/Insert_Purchase_Stock" endpoint
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/Insert_Purchase_Stock", content);
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/AddPurchaseStockWithCustomerDetails", content);
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { redirectUrl = Url.Action("Manage_Stocks", "Stock") });
+                // If the request was successful, redirect to the Stocks action.
+                return Json(new
+                {
+                    redirectUrl = Url.Action("Stocks", "Stock")
+                });
             }
             else
             {
-                // Handle failures, possibly returning an error status or message
-                return StatusCode((int)response.StatusCode, "Error message here");
+                // If the request failed, return an error message and the URL to redirect back to Add_Stock.
+                return Json(new
+                {
+                    errorMessage = "Something went wrong!!",
+                    redirectUrl = Url.Action("AddStock", "Stock")
+                });
             }
 
         }
-
-
-        private async Task<Customer_Model> Existing_Customer_Details(int Customer_ID, string Customer_Type)
-        {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}&{Customer_Type}");
-            if (response.IsSuccessStatusCode)
-            {
-                string data = await response.Content.ReadAsStringAsync();
-                dynamic jsonObject = JsonConvert.DeserializeObject(data);
-                Customer_Model customerInfo = JsonConvert.DeserializeObject<Customer_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
-                return customerInfo;
-            }
-            return null;
-        }
-
 
         #endregion
 
+        #region Section: Update Purchase Stock
 
-        #region Method : Update Stock 
-
-        public async Task<IActionResult> Update_Stock(string TN_ID, string Customer_ID)
+        public async Task<IActionResult> EditStock(string TN_ID, string Customer_ID)
         {
 
-            await All_Dropdowns_Call();
-
+            await PopulateDropdownLists();
 
             Customers_Stock_Combined_Model customers_Stock_Combined_Model = new Customers_Stock_Combined_Model();
 
-
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Stock/Fetch_Stock_And_Customer_Details/{UrlEncryptor.Decrypt(TN_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
-
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Stock/GetPurchaseStockAndCustomerDetails/{UrlEncryptor.Decrypt(TN_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -166,29 +156,20 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
                 var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
                 customers_Stock_Combined_Model = JsonConvert.DeserializeObject<Customers_Stock_Combined_Model>(extractedDataJson);
 
-
-
             }
 
             return View(customers_Stock_Combined_Model);
 
-
-
-
-
-
         }
 
-        public async Task<IActionResult> Update_Stock_Details(Customers_Stock_Combined_Model model)
+        public async Task<IActionResult> UpdateStockAndCustomerDetails(Customers_Stock_Combined_Model model)
         {
-
-
 
             // Check if the customer is new; if so, add them
             if (model.Customers.CustomerId == 0)
             {
                 // Add the new customer and directly use the returned model
-                Customer_Model customerInfo = await Add_New_Customer(model.Customers);
+                Customer_Model customerInfo = await CreateCustomer(model.Customers);
                 if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
                     return BadRequest("Failed to create a new customer.");
@@ -208,11 +189,14 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             // Send the PUT request to the "Stock/Update_Purchase_Stock" endpoint
-            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Stock/Update_Purchase_Stock", stringContent);
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Stock/UpdatePurchaseStock", stringContent);
 
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { redirectUrl = Url.Action("Manage_Stocks", "Stock") });
+                return Json(new
+                {
+                    redirectUrl = Url.Action("Stocks", "Stock")
+                });
             }
             else
             {
@@ -221,19 +205,43 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             }
         }
 
-
-
         #endregion
 
-        #region Method : Get Customer Details From AutoComplete
-        public async Task<JsonResult> Get_Buyer_Customer_Data(string CustomerName)
+        #region Section: Get Customer Details From AutoComplete
+
+        /// <summary>
+        /// Retrieves customer data by name for autocomplete feature.
+        /// </summary>
+        private async Task<Customer_Model> GetCustomerProfile(int Customer_ID, string Customer_Type)
         {
-            List<Customer_Model> customerModels = await fetch_buyer_customer_name(CustomerName);
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}&{Customer_Type}");
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                Customer_Model customerInfo = JsonConvert.DeserializeObject<Customer_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
+                return customerInfo;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a list of customer models matching a specified name, intended for use with an autocomplete feature.
+        /// </summary>
+        /// <param name="CustomerName">The name of the customer to search for.</param>
+        /// <returns>A JsonResult containing a list of matching customer models.</returns>
+        public async Task<JsonResult> GetBuyerCustomerData(string CustomerName)
+        {
+            List<Customer_Model> customerModels = await FetchBuyerCustomerByName(CustomerName);
             return Json(customerModels);
         }
 
-
-        private async Task<List<Customer_Model>> fetch_buyer_customer_name(string CustomerName)
+        /// <summary>
+        /// Asynchronously fetches customer models by name from a remote API, intended to check if the buyer customer exists in the system.
+        /// </summary>
+        /// <param name="CustomerName">The name of the customer to be fetched.</param>
+        /// <returns>A list of customer models that match the provided name.</returns>
+        private async Task<List<Customer_Model>> FetchBuyerCustomerByName(string CustomerName)
         {
             List<Customer_Model> customer_Models = new List<Customer_Model>();
 
@@ -251,77 +259,60 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             return customer_Models;
         }
 
-
-
-
-
-
         #endregion
 
+        #region Section: Stocks
 
-        #region Method : Manage Stock
-
-
-
-        public async Task<IActionResult> Manage_Stocks()
+        public async Task<IActionResult> Stocks()
         {
 
+            await PopulateDropdownLists();
 
-
-
-            await All_Dropdowns_Call();
-
-
-
-            List<Purchase_Stock> stockModels = await api_Service.List_Of_Data_Display<Purchase_Stock>("Stock/Purchase_Stocks");
-
+            List<Purchase_Stock> stockModels = await api_Service.List_Of_Data_Display<Purchase_Stock>("Stock/GetAllPurchaseStocks");
 
             return View(stockModels);
         }
 
-
         #endregion
 
+        #region Section: Check Customer Exist Or Not
 
-        #region Method : Check Customer Exist Or Not 
-
-
-
-
-
-        private Customer_Model CHECK_CUSTOMER_INFO_IN_SYSTEM(int Customer_ID)
+        /// <summary>
+        /// Synchronously checks if a customer exists in the system by their ID.
+        /// </summary>
+        /// <param name="Customer_ID">The ID of the customer to check.</param>
+        /// <returns>A Customer_Model if the customer exists; otherwise, null.</returns>
+        private Customer_Model FindCustomer(int Customer_ID)
         {
-
-
-
             HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}").Result;
-
             Customer_Model Customer_Info = new Customer_Model();
 
             if (response.IsSuccessStatusCode)
             {
-
-
                 string data = response.Content.ReadAsStringAsync().Result;
                 dynamic jsonObject = JsonConvert.DeserializeObject(data);
                 var DataObject = jsonObject.data;
-                var extractedDtaJson = JsonConvert.SerializeObject(DataObject, Formatting.Indented);
-                Customer_Info = JsonConvert.DeserializeObject<Customer_Model>(extractedDtaJson);
+                var extractedDataJson = JsonConvert.SerializeObject(DataObject, Formatting.Indented);
+                Customer_Info = JsonConvert.DeserializeObject<Customer_Model>(extractedDataJson);
                 return Customer_Info;
             }
             else
             {
                 return null;
             }
-
-
         }
 
+        #endregion
 
+        #region Section: Create New Customer
 
-
+        /// <summary>
+        /// Asynchronously adds a new customer to the system.
+        /// </summary>
+        /// <param name="customerModel">The customer model to add.</param>
+        /// <returns>The added Customer_Model with updated details (e.g., new ID), or null if the operation fails.</returns>
         [HttpPost]
-        public async Task<Customer_Model> Add_New_Customer(Customer_Model customerModel)
+        public async Task<Customer_Model> CreateCustomer(Customer_Model customerModel)
         {
             var jsonContent = JsonConvert.SerializeObject(customerModel);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -330,7 +321,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
-                var responseObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(responseString);
+                var responseObject = JsonConvert.DeserializeObject<Dictionary<string,
+                  dynamic>>(responseString);
 
                 if (responseObject != null && responseObject["status"] == true)
                 {
@@ -341,106 +333,101 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             return null;
         }
 
-
-
-
-
         #endregion
 
+        #region Section: Delete Stock
 
-        #region Method : Delete Stock
-
+        /// <summary>
+        /// Synchronously deletes a stock item based on its transaction ID (TN_ID).
+        /// </summary>
+        /// <param name="TN_ID">The encrypted transaction ID of the stock item to delete.</param>
+        /// <returns>A JsonResult indicating success or failure of the operation.</returns>
         [HttpPost]
-        public IActionResult Delete_Stock(string TN_ID)
+        public IActionResult DeleteStock(string TN_ID)
         {
-            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Stock/Delete_Purchase_Stock?TN_ID={UrlEncryptor.Decrypt(TN_ID)}").Result;
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Stock/RemovePurchaseStock?TN_ID={UrlEncryptor.Decrypt(TN_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Manage_Stocks") });
+                return Json(new
+                {
+                    success = true,
+                    message = "Deleted Successfully!",
+                    redirectUrl = Url.Action("Stocks")
+                });
             }
             else
             {
-                return Json(new { success = false, message = "Error. Please try again." });
+                return Json(new
+                {
+                    success = false,
+                    message = "Error. Please try again."
+                });
             }
         }
 
-
-
-
-
         #endregion
 
+        #region Section: Stock Details Show By Stock ID
 
-        #region Method : Stock Details Show By Stock ID 
-
-
-
-
-        public async Task<IActionResult> Added_Stock_Details(string TN_ID)
+        /// <summary>
+        /// Displays the details of a stock item identified by a transaction ID.
+        /// </summary>
+        /// <param name="TN_ID">The encrypted transaction ID of the stock item.</param>
+        /// <returns>An IActionResult that renders a view to show detailed stock information.</returns>
+        public async Task<IActionResult> StockDetailsView(string TN_ID)
         {
             if (HttpContext.Request.Headers["Referer"].ToString() == "")
             {
-                return RedirectToAction("Manage_Stocks");
+                return RedirectToAction("Stocks");
             }
 
-
-
             Purchase_Stock purchase_Stock = new Purchase_Stock();
-
-
-            purchase_Stock = await api_Service.Model_Of_Data_Display<Purchase_Stock>("Stock/Get_Purchase_Stock_By_Id", Convert.ToInt32(UrlEncryptor.Decrypt(TN_ID)));
-
-
-
-
+            purchase_Stock = await api_Service.Model_Of_Data_Display<Purchase_Stock>("Stock/GetPurchaseStockById", Convert.ToInt32(UrlEncryptor.Decrypt(TN_ID)));
             return View(purchase_Stock);
-
-
-
-
         }
 
         #endregion
 
+        #region Section: Download Statement PDF & EXCEL
 
-        #region Method : Download Statement PDF & EXCEL 
-        public async Task<IActionResult> Purchase_Stocks_Statement_CreatePDF()
+        /// <summary>
+        /// Generates a PDF statement for purchased stocks and sends it to the client.
+        /// </summary>
+        /// <returns>An IActionResult containing the PDF file or an error message.</returns>
+        public async Task<IActionResult> GenerateStocksPDFStatement()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_PDF");
 
             if (response.IsSuccessStatusCode)
             {
-                // Extract filename from Content-Disposition header
                 var contentDisposition = response.Content.Headers.ContentDisposition;
                 string filename = contentDisposition?.FileName;
-
                 var pdfContent = await response.Content.ReadAsByteArrayAsync();
                 return File(pdfContent, "application/pdf", filename);
             }
             else
             {
-                // Handle error or return an error response
                 return BadRequest("Could not generate PDF.");
             }
         }
 
-
-        public async Task<IActionResult> Export_Stock_List_To_Excel()
+        /// <summary>
+        /// Exports a list of all purchased stocks to an Excel file and sends it to the client.
+        /// </summary>
+        /// <returns>An IActionResult containing the Excel file or an error message.</returns>
+        public async Task<IActionResult> GenerateStocksExcelStatement()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_EXCEL");
 
             if (response.IsSuccessStatusCode)
             {
-                // Extract filename from Content-Disposition header
                 var contentDisposition = response.Content.Headers.ContentDisposition;
                 string filename = contentDisposition?.FileName;
-
                 var ExcelContent = await response.Content.ReadAsByteArrayAsync();
                 return File(ExcelContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename);
             }
             else
             {
-                // Handle error or return an error response
                 return BadRequest("Could not generate Excel.");
             }
         }
@@ -448,10 +435,5 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         #endregion
 
     }
-
-
-
-
-
 
 }

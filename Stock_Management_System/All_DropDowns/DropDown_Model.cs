@@ -1,9 +1,9 @@
 ﻿namespace Stock_Management_System.All_DropDowns
 {
-    public class All_DropDown_Model
+    public class DropDown_Model
     {
         
-        public All_DropDown_Model()
+        public DropDown_Model()
         {
 
             Products_DropDowns_List = new List<Product_DropDown_Model>();

@@ -43,33 +43,6 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function () {
-        var UpdateMessage = sessionStorage.getItem('InvoiceStatus');
-        if (UpdateMessage) {
-            toastr.success(UpdateMessage);
-            // Clear the message from session storage so it doesn't reappear on refresh
-            sessionStorage.removeItem('InvoiceStatus');
-        }
-    });
 
-    function notifyDownloadStart() {
-        toastr.success('Download started successfully!', 'Download', {
-            closeButton: true,
-            progressBar: true,
-            positionClass: 'toast-top-center',
-            timeOut: 3000, // 3 seconds
-        });
-    }
-</script>
-@*<div id="download-button" class="download-btn text-center">
-    @if (Model != null)
-    {
-        <!-- Anchor tag styled as a button for download -->
-        <a href="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)"
-           download="@($"{Model.sell_Invoice?.Party_Name?.Replace(" ", "_")}_{Model.sell_Invoice?.GrainTypeName?.Replace(" ", "_")}_Invoice.pdf")"
-           class="btn btn-outline-success">
-            <i class="bi bi-download"></i> Download
-        </a>
-    }
-</div>*@
+
+<script src="/js/Section/invoice/s/preview.js"></script>
