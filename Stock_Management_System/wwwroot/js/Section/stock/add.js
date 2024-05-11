@@ -114,6 +114,8 @@ function CheckData() {
 }
 
 function confirmStockAddition(addUrl, customerName) {
+    console.log("Requesting URL: " + addUrl);  // This will log the full URL used in the AJAX request
+
     Swal.fire({
         title: 'Are You Sure You Want To Add This Stock?',
         text: `${customerName}'s Stock Add?`,
@@ -124,23 +126,26 @@ function confirmStockAddition(addUrl, customerName) {
         confirmButtonText: 'Yes, add it!'
     }).then((result) => {
         if (result.isConfirmed) {
+            console.log("Confirmed URL: " + addUrl);  // This will log the URL upon user confirmation
             $.ajax({
-                url: addUrl, // Make sure addUrl is defined and not undefined
+                url: addUrl, // Make sure addUrl is correctly defined
                 type: 'POST',
                 data: $("#AddStockForm").serialize(), // Ensure this form ID matches your form
                 success: function (response) {
-                    // Assuming the server sends a JSON response with a redirectUrl field
+                    console.log("Success, redirecting to: " + response.redirectUrl);  // This will log the redirect URL on successful AJAX response
                     sessionStorage.setItem('AddStatus', 'Stock added successfully!');
                     window.location.href = response.redirectUrl; // Use the redirect URL from the response
                 },
                 error: function () {
-                    sessionStorage.setItem('ErrorMsg', 'Somthing Went Wrong !');
-                    window.location.href = window.location.reload(); // Use the redirect URL from the response
+                    console.error("Error in AJAX request to: " + addUrl);  // This will log errors with more detail
+                    sessionStorage.setItem('ErrorMsg', 'Something Went Wrong !');
+                  
                 }
             });
         }
     });
 }
+
 
 function formatVehicleNo(input) {
     // Remove non-alphanumeric characters and convert to uppercase
@@ -230,7 +235,6 @@ $(function () {
         sessionStorage.removeItem('ErrorMsg');
     }
 });
-
 
 
 

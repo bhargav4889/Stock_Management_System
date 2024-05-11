@@ -37,19 +37,20 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         public Api_Service api_Service = new Api_Service();
 
 
-        private readonly CV _cV;
+      
 
-        public AccountController(IConfiguration configuration, CV cV)
+        public AccountController(IConfiguration configuration)
         {
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
-            _cV = cV;
+          
 
         }
 
 
 
+        #region Section : Dropdown Function
         public async Task Dropdown_For_Bank_Names()
         {
             List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/GetBanksList");
@@ -72,10 +73,15 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             }
         }
 
+        #endregion
 
 
+        #region Section : Create Customer Account
 
-        #region Method : Create Customer Account
+        /// <summary>
+        /// Displays the view for adding a new customer.
+        /// </summary>
+        /// <returns>Returns the view for adding a new customer.</returns>
 
         public IActionResult AddCustomer()
         {
@@ -83,6 +89,11 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Inserts a new customer into the system based on the provided model.
+        /// </summary>
+        /// <param name="customers_Model">The customer model containing data to be inserted.</param>
+        /// <returns>A JSON response indicating success or failure.</returns>
         public async Task<IActionResult> InsertCustomer(Customer_Model customers_Model)
         {
 
@@ -111,7 +122,8 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
 
 
-        #region Method : Update Customer Account
+        #region Section : Update Customer Account
+
 
         public async Task<IActionResult> EditCustomer(string Customer_ID, string Customer_Type)
         {
@@ -175,11 +187,15 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #endregion
 
-     
 
 
-        #region Method : Show All Customers Account 
 
+        #region Section : Show All Customers Account 
+
+        /// <summary>
+        /// Retrieves and displays a list of all customers.
+        /// </summary>
+        /// <returns>A view displaying a list of customers.</returns>
         public async Task<IActionResult> Customers()
         {
 
@@ -195,7 +211,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         #endregion
 
 
-        #region Method : Account Information
+        #region Section : Account Information
 
         public async Task<IActionResult> CustomerAccount(string Customer_ID, string Customer_Type)
         {

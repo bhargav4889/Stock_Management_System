@@ -130,7 +130,7 @@ function CheckData() {
         return false;
     } else {
         // Use SweetAlert2 to confirm with the user before submission
-        confirmInvoiceCreation("/Invoice/InsertPurchaseInvoice", customerName);
+        confirmInvoiceCreation("/Invoice/UpdatePurchaseInvoiceDetails", customerName);
         return false; // Prevent form submission until confirmation and AJAX call are completed
     }
 }

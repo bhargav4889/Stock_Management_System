@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "_Layout";
-    ViewData["Title"] = "Create Sale";
+    ViewData["Title"] = "Add Sale";
 }
 
 
@@ -62,7 +62,6 @@
 
                 <input type="hidden" id="CustomerId" asp-for="customer.CustomerId" />
 
-
                 <!-- Customer Type -->
                 <div id="newcustomertype" class="col-lg-3 col-sm-6 col-12" style="display: none;">
                     <div class="form-group">
@@ -72,6 +71,7 @@
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="customer.CustomerType"></span>
                     </div>
                 </div>
+
 
                 <!-- Customer City -->
                 <div id="newcustomercity" class="col-lg-3 col-sm-6 col-12" style="display: none;">
@@ -176,6 +176,7 @@
                 </div>
 
 
+
                 <!-- CGST -->
                 <div class="col-lg-1 col-sm-6 col-12">
                     <div class="form-group">
@@ -234,20 +235,20 @@
                 </div>
 
 
-                <!--Full Amount Payment Receive -->
+                <!-- Full Amount Payment Receive -->
                 <div class="col-lg-3 col-sm-12">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
-                        <select class="select" asp-for="sale.IsFullPaymentReceive" id="isFullAmountReceive" name="Payment_Method">
+                        <select class="select" id="isFullAmountReceive" name="Payment_Method">
                             <option value="" selected disabled>-- Options --</option>
                             <option value="1">YES</option>
-                            <option value="0">NO</option>   
+                            <option value="0">NO</option>
                         </select>
-                        
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.IsFullPaymentReceive"></span>
-                    </div>
 
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" id="isFullPaymentReceiveValidation"></span>
+                    </div>
                 </div>
+
 
                 <!--Remain Payment Date-->
                 <div class="col-lg-3 col-sm-6 col-12" id="RemainDate" style="display:none">

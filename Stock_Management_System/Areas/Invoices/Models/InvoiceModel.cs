@@ -71,14 +71,16 @@ namespace Stock_Management_System.Areas.Invoices.Models
 
             public string? PartyGstNo { get; set; }
 
+            [Required(ErrorMessage = "Please Enter Address ")]
             public string? PartyAddress { get; set; }
 
+            [Required(ErrorMessage = "Please Enter Other Type")]
             public string? OtherInvoiceType { get; set; }
 
             [Required(ErrorMessage ="Please Select Invoice Type")]
             public string? InvoiceType { get; set; }
 
-            [Required(ErrorMessage ="Plese Select Product")]
+            [Required(ErrorMessage ="Please Select Grain")]
             public int ProductId { get; set; }
 
       
@@ -112,8 +114,12 @@ namespace Stock_Management_System.Areas.Invoices.Models
             [Required(ErrorMessage ="Please Select Vehicle Type")]
             public int VehicleId { get; set; }
             public string? VehicleName { get; set; }
+
+            [Required(ErrorMessage ="Please Enter Vehicle No")]
+
             public string? VehicleNo { get; set; }
 
+            [Required(ErrorMessage ="Please Enter Container Number")]
             public string? ContainerNo { get; set; }
 
             [Required(ErrorMessage ="Please Enter Driver Name")]

@@ -124,23 +124,23 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         public async Task<IActionResult> InsertSale(Sale_Customer_Combied_Model model)
         {
-            // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await GetCustomerProfile(model.customer.CustomerId, model.customer.CustomerType);
-            if (customerInfo == null)
+            // Check if the customer is new; if so, add them
+            if (model.customer.CustomerId == 0)
             {
                 // Add the new customer and directly use the returned model
-                customerInfo = await CreateCustomer(model.customer);
+                Customer_Model customerInfo = await CreateCustomer(model.customer);
                 if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
                     return BadRequest("Failed to create a new customer.");
                 }
+                model.customer = customerInfo; // Update the model with the new customer info
             }
 
             // Prepare the data object for posting sale details
             var dataObject = new
             {
                 sale = model.sale,
-                customer = customerInfo // Use the updated or existing customer details
+                customer = model.customer // Use the updated or existing customer details
             };
 
             // Serialize the anonymous object to JSON

@@ -16,7 +16,7 @@
     <div class="card">
         <div class="card-body">
 
-            <form class="row g-3" id="SalesForm" asp-action="Update_Sale_Details" asp-controller="Sales" onsubmit="return CheckData()" method="post">
+            <form class="row g-3" id="SaleForm" asp-action="InsertSale" asp-controller="Sale" onsubmit="return CheckData()" method="post">
 
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <input type="hidden" asp-for="sale.SaleId" value="@Model.sale.SaleId"/>
+
 
 
                 <!-- Grain Type -->
@@ -62,7 +62,6 @@
 
                 <input type="hidden" id="CustomerId" asp-for="customer.CustomerId" />
 
-
                 <!-- Customer Type -->
                 <div id="newcustomertype" class="col-lg-3 col-sm-6 col-12" style="display: none;">
                     <div class="form-group">
@@ -72,6 +71,7 @@
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="customer.CustomerType"></span>
                     </div>
                 </div>
+
 
                 <!-- Customer City -->
                 <div id="newcustomercity" class="col-lg-3 col-sm-6 col-12" style="display: none;">
@@ -128,7 +128,7 @@
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                                <option data-icon="@bank.BankIcon" value="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Receive_Information_Id" id="informationId" />
@@ -142,7 +142,7 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label><span style="color: black;">*</span> Bags</label>
-                        <input type="number" inputmode="numeric" asp-for="sale.Bags" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="SaleModel.Bags">
+                        <input type="number" inputmode="numeric" asp-for="sale.Bags" class="form-control" placeholder="Bags" id="bags" asp-for="SaleModel.Bags">
 
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label for="bagsperkg"><span style="color: black;">*</span> Bags Per KG</label>
-                        <input type="number" inputmode="numeric" class="form-control" asp-for=sale.BagPerKg placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="SaleModel.BagPerKg">
+                        <input type="number" inputmode="numeric" class="form-control" asp-for=sale.BagPerKg placeholder="Bags per KG" id="bagsperkg" asp-for="SaleModel.BagPerKg">
 
                     </div>
                 </div>
@@ -170,10 +170,37 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label for="Rate"><span style="color: red;">*</span> Rate⟨₹⟩</label>
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Enter Rate⟨₹⟩" id="rate" oninput="CalculateMethod()" asp-for="sale.Rate">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Enter Rate⟨₹⟩" id="rate" asp-for="sale.Rate">
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Rate"></span>
                     </div>
                 </div>
+
+
+
+                <!-- CGST -->
+                <div class="col-lg-1 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="CGST"><span style="color: black;">*</span> CGST(%)</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="CGST" id="CGST" asp-for="sale.CGST">
+
+                    </div>
+                </div>
+
+                <!-- SGST -->
+                <div class="col-lg-1 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="SGST"><span style="color: black;">*</span> SGST(%)</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="SGST" id="SGST" asp-for="sale.SGST">
+                    </div>
+                </div>
+
+
+
+                <input type="hidden" id="CGST_Total" asp-for="sale.TotalCGSTPrice" />
+
+                <input type="hidden" id="SGST_Total" asp-for="sale.TotalSGSTPrice" />
+
+                <input type="hidden" id="beforetaxtotal" asp-for="sale.WithoutGSTPrice" />
 
                 <!-- Total Price -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -208,19 +235,20 @@
                 </div>
 
 
-                <!--Full Amount Payment Receive -->
+                <!-- Full Amount Payment Receive -->
                 <div class="col-lg-3 col-sm-12">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
-                        <select class="select" asp-for="sale.IsFullPaymentReceive" id="isFullAmountReceive" name="Payment_Method">
+                        <select class="select" id="isFullAmountReceive" name="Payment_Method">
                             <option value="" selected disabled>-- Options --</option>
-                            <option value="True">YES</option>
-                            <option value="False">NO</option>
+                            <option value="1">YES</option>
+                            <option value="0">NO</option>
                         </select>
-                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.IsFullPaymentReceive"></span>
-                    </div>
 
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" id="isFullPaymentReceiveValidation"></span>
+                    </div>
                 </div>
+
 
                 <!--Remain Payment Date-->
                 <div class="col-lg-3 col-sm-6 col-12" id="RemainDate" style="display:none">
@@ -260,17 +288,15 @@
                 <div class="col-lg-3 col-sm-12" style="display:none" id="RemainbankSelection">
                     <div class="form-group">
                         <label><span style="color:red;">*</span> Select Remain Bank</label>
-                        <select class="form-control" asp-for="sale.Remain_Infromation_ID" id="remainbankSelect">
+                        <select class="form-control" asp-for="sale.Remain_Amount_Receive_Bank_Id" id="remainbankSelect">
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option data-icon="@bank.BankIcon" value="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
-                                
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Remain_Infromation_ID" id="remainInformationId" />
-
-                        <span class="text-danger" asp-validation-for="sale.Remain_Infromation_ID" style="color: red; font-size:11px; font-weight:bold;"></span>
+                        <span class="text-danger" asp-validation-for="sale.Remain_Amount_Receive_Bank_Id" style="color: red; font-size:11px; font-weight:bold;"></span>
                     </div>
                 </div>
 
@@ -313,16 +339,18 @@
 
 
 
+
+
 <!-- Load jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 
 
-<script src="/js/bundle/sale/edit-bundle.js"></script>
 
-
-
+@section Scripts {
+    <script src="/js/bundle/sale/edit-bundle.js"></script>
+}
 
 <style>
     .img-flag {

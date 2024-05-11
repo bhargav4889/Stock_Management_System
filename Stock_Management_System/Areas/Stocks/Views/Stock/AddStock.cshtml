@@ -1,4 +1,4 @@
-﻿@using System.Data;
+﻿﻿@using System.Data;
 @model Stock_Management_System.Areas.Stocks.Models.Customers_Stock_Combined_Model;
 @{
     ViewData["Title"] = "Add Stock";
@@ -58,16 +58,17 @@
                     </div>
                 </div>
                 <input type="hidden" id="CustomerId" asp-for="Customers.CustomerId" />
-                <!-- Customer Type -->
                 <div id="newcustomertype" class="col-lg-3 col-sm-6 col-12" style="display: none;">
                     <div class="form-group">
                         <label>
                             <span style="color: red;">*</span> New Customer Type
                         </label>
-                        <input type="text" class="form-control" placeholder="Customer Type"  id="cttype" asp-for="Customers.CustomerType" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" placeholder="Customer Type" value="BUYER" name="CustomerType" disabled id="cttype" asp-for="Customers.CustomerType" oninput="this.value = this.value.toUpperCase()">
+                        <input type="hidden" name="Customers.CustomerType" value="BUYER">
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerType"></span>
                     </div>
                 </div>
+
                 <!-- Customer City -->
                 <div id="newcustomercity" class="col-lg-3 col-sm-6 col-12" style="display: none;">
                     <div class="form-group">
@@ -168,7 +169,7 @@
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.VehicleId"></span>
                     </div>
                 </div>
-               
+
                 <!-- Vehicle No. -->
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">

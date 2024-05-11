@@ -121,7 +121,7 @@ $(function () {
         var saleId = $(this).data('sale-id');
 
         $.ajax({
-            url: '/Sales/Get_Sale_Info',
+            url: '/Sale/GetSaleInfo',
             type: 'GET',
             data: { Sale_ID: saleId },
             success: function (response) {

@@ -31,14 +31,23 @@ $(function () {
         var bags = document.getElementById('bags').value.trim();
         var bagsperkg = document.getElementById('bagsperkg').value.trim();
         var weightInput = document.getElementById('weight');
-        var rate = document.getElementById('rate').value.trim();
-        var totalprice = 0;
-        var weight = (bags !== '' && bagsperkg !== '') ? bags * bagsperkg : parseFloat(weightInput.value) || 0;
-
-        weightInput.value = weight === 0 ? '' : weight.toFixed(2);  // Ensuring weight is also shown with two decimals if needed
-
+        var rate = parseFloat(document.getElementById('rate').value.trim()) || 0;
+        var cgst = parseFloat(document.getElementById('CGST').value.trim()) || 0;
+        var sgst = parseFloat(document.getElementById('SGST').value.trim()) || 0;
         var selectGrain = document.getElementById("selectgrain");
         var selectedValue = selectGrain.value;
+
+        // Calculate weight either from bags or directly from the input
+        var weight = (bags !== '' && bagsperkg !== '') ? bags * bagsperkg : parseFloat(weightInput.value) || 0;
+        weightInput.value = weight === 0 ? '' : weight.toFixed(2);  // Display weight with two decimal places if needed
+
+        // Initialize variables for pricing
+        var priceBeforeTax = 0;
+        var totalCGST = 0;
+        var totalSGST = 0;
+        var totalPrice = 0;
+
+        // Only calculate prices if selectedValue matches certain conditions
         switch (selectedValue) {
             case "1":
             case "2":
@@ -48,39 +57,93 @@ $(function () {
             case "7":
             case "8":
             case "3":  // Combined case since all these cases do the same thing
-                totalprice = weight * rate;
+                priceBeforeTax = weight * rate;
+                totalCGST = priceBeforeTax * (cgst / 100);
+                totalSGST = priceBeforeTax * (sgst / 100);
+                totalPrice = priceBeforeTax + totalCGST + totalSGST;
+                break;
+            default:
+                // Optionally handle cases where no valid selection is made
                 break;
         }
 
-        document.getElementById('totalprice').value = totalprice === 0 ? '' : totalprice.toFixed(2);
+        // Displaying the calculated prices
+        document.getElementById('beforetaxtotal').value = priceBeforeTax.toFixed(2);
+        document.getElementById('CGST_Total').value = totalCGST.toFixed(2);
+        document.getElementById('SGST_Total').value = totalSGST.toFixed(2);
+        document.getElementById('totalprice').value = totalPrice.toFixed(2);
     }
 
+    // Event listeners
     document.getElementById("selectgrain").addEventListener("change", CalculateMethod);
     document.getElementById("bags").addEventListener("input", CalculateMethod);
     document.getElementById("bagsperkg").addEventListener("input", CalculateMethod);
+    document.getElementById("weight").addEventListener("input", CalculateMethod);
     document.getElementById("rate").addEventListener("input", CalculateMethod);
+    document.getElementById("CGST").addEventListener("input", CalculateMethod);
+    document.getElementById("SGST").addEventListener("input", CalculateMethod);
 
 
+
+   
+});
+
+$(function () {
+    // Function to calculate Deducted Amount
     function calculateDeductedAmount() {
         var totalPrice = parseFloat($('#totalprice').val()) || 0;
         var receivedAmount = parseFloat($('#ReceivedAmount').val()) || 0;
         var discount = parseFloat($('#DiscountAmount').val()) || 0;
         var remainAmount = parseFloat($('#remainAmount').val()) || 0;
 
+        // Ensure Received Amount does not exceed Total Price
+        if (receivedAmount > totalPrice) {
+            $('#ReceivedAmount').val(totalPrice.toFixed(2));
+            receivedAmount = totalPrice;
+        }
+
+        // Calculate max Remain Amount as Total Price - Received Amount
+        var maxRemainAmount = totalPrice - receivedAmount;
+
+        // Ensure Remain Amount does not exceed max Remain Amount
+        if (remainAmount > maxRemainAmount) {
+            $('#remainAmount').val(maxRemainAmount.toFixed(2));
+            remainAmount = maxRemainAmount;
+        }
+
+        // Applying the formula
         var deductedAmount = totalPrice - receivedAmount - discount - remainAmount;
+
+        // Setting the value of Deducted Amount
         $('#DeductedAmount').val(deductedAmount.toFixed(2));
     }
 
-    // Event listeners for inputs triggering CalculateMethod and therefore calculateDeductedAmount as well
-    document.getElementById("selectgrain").addEventListener("change", CalculateMethod);
-    document.getElementById("bags").addEventListener("input", CalculateMethod);
-    document.getElementById("bagsperkg").addEventListener("input", CalculateMethod);
-    document.getElementById("rate").addEventListener("input", CalculateMethod);
-    document.getElementById("CGST").addEventListener("input", CalculateMethod);
-    document.getElementById("SGST").addEventListener("input", CalculateMethod);
-    $('#totalprice, #ReceivedAmount, #DiscountAmount, #remainAmount').on('input', CalculateMethod);
-});
+    // Event listeners for input fields to recalculate on change
+    $('#totalprice, #ReceivedAmount, #DiscountAmount, #remainAmount').on('input', function () {
+        calculateDeductedAmount();
+    });
 
+    // Additional checks when user changes the value in Received and Remain Amount fields
+    $('#ReceivedAmount').change(function () {
+        var receivedAmount = parseFloat($(this).val()) || 0;
+        var totalPrice = parseFloat($('#totalprice').val()) || 0;
+        if (receivedAmount > totalPrice) {
+            $(this).val(totalPrice.toFixed(2));
+        }
+        calculateDeductedAmount();
+    });
+
+    $('#remainAmount').change(function () {
+        var remainAmount = parseFloat($(this).val()) || 0;
+        var totalPrice = parseFloat($('#totalprice').val()) || 0;
+        var receivedAmount = parseFloat($('#ReceivedAmount').val()) || 0;
+        var maxRemainAmount = totalPrice - receivedAmount;
+        if (remainAmount > maxRemainAmount) {
+            $(this).val(maxRemainAmount.toFixed(2));
+        }
+        calculateDeductedAmount();
+    });
+});
 
 
 $(function () {
@@ -92,17 +155,23 @@ $(function () {
         }
     });
 
-    $('#isFullAmountReceive').change(function () {
-        if ($(this).val() === "0") {
-            $('#RemainDate').show();
-            $('#RemainAmount').show();
-            $('#RemainPaymentMethod').show();
-        } else {
-            $('#RemainDate').hide();
-            $('#RemainAmount').hide();
-            $('#RemainPaymentMethod').hide();
-        }
+    $(function () {
+        $('#isFullAmountReceive').change(function () {
+            if ($(this).val() === "0") {
+                // If "NO" is selected (value "0"), show the fields
+                $('#RemainDate').show();
+                $('#RemainAmount').show();
+                $('#RemainPaymentMethod').show(); // Ensure this element exists or remove this line if unnecessary
+            } else {
+                // If "YES" is selected (value "1") or nothing is selected, hide the fields
+                $('#RemainDate').hide();
+                $('#RemainAmount').hide();
+                $('#RemainPaymentMethod').hide(); // Ensure this element exists or remove this line if unnecessary
+            }
+        });
     });
+
+
 
 
     $('#selectremainpaymentmethod').change(function () {
@@ -124,7 +193,7 @@ $(function () {
 
     window.onload = function () {
         DateDefaultValue();
-        CalculateMethod();
+       
     };
 
 
@@ -170,12 +239,29 @@ $(function () {
         },
         select: function (event, ui) {
             isSuggestionSelected = true;
-            event.preventDefault();
-            $("#Customer").val(ui.item.value);
-            $("#CustomerId").val(ui.item.id);
-            $("#cttype").val(ui.item.type); // Update the customer type field
-            toggleNewCustomerFields(false);
+            event.preventDefault(); // Prevent default to avoid placing label in the input.
+            $("#Customer").val(ui.item.value); // Set the input to the customer name.
+            $("#CustomerId").val(ui.item.id); // Update hidden field with selected customer ID.
+            $("#cttype").val(ui.item.type).trigger('change'); // Set the customer type and trigger change for any attached handlers.
+            toggleNewCustomerFields(false); // Hide new customer fields as a selection has been made.
         }
+    });
+
+    // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
+    $("#Customer").on('input', function () {
+        var enteredValue = $(this).val().trim();
+        if (!enteredValue) {
+            toggleNewCustomerFields(false);
+            isSuggestionSelected = false;
+        } else {
+            isSuggestionSelected = false;
+            // Since we are still typing, check if any item matches exactly from the last search.
+            $("#Customer").autocomplete("search", enteredValue);
+        }
+    });
+    // Optionally, reset the form state when the page is refreshed or navigated away.
+    $(window).on('beforeunload', function () {
+        toggleNewCustomerFields(false);
     });
 });
 
@@ -299,4 +385,4 @@ $(function () {
             $('#isFullAmountReceive').val("").trigger('change');
         }, 1);
     });
-}); // Correctly closed $(document).ready function
+}); 

@@ -88,37 +88,37 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <summary>
         /// Adds details for a new stock entry.
         /// </summary>
-       
+
         public async Task<IActionResult> InsertStockAndCustomerDetails(Customers_Stock_Combined_Model model)
         {
-            // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await GetCustomerProfile(model.Customers.CustomerId, model.Customers.CustomerType);
-            if (customerInfo == null)
+            // Check if the customer is new; if so, add them
+            if (model.Customers.CustomerId == 0)
             {
                 // Add the new customer and directly use the returned model
-                customerInfo = await CreateCustomer(model.Customers);
+                Customer_Model customerInfo = await CreateCustomer(model.Customers);
                 if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
                     return BadRequest("Failed to create a new customer.");
                 }
+                model.Customers = customerInfo; // Update the model with the new customer info
             }
 
-            // Prepare the data object for posting stock details
+            // Prepare the data object for updating stock details
             var dataObject = new
             {
                 purchase_Stock = model.Insert_Purchase_Stock,
-                customers_Model = customerInfo // Use the updated/existing customer details
+                customers_Model = model.Customers // Use the updated/existing customer details
             };
 
-            // Serialize the anonymous object to JSON
+            // Serialize the data object to JSON
             var jsonContent = JsonConvert.SerializeObject(dataObject);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            // Post the model to the "Stock/Insert_Purchase_Stock" endpoint
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/AddPurchaseStockWithCustomerDetails", content);
+            // Send the PUT request to the "Stock/Update_Purchase_Stock" endpoint
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/AddPurchaseStockWithCustomerDetails", stringContent);
+
             if (response.IsSuccessStatusCode)
             {
-                // If the request was successful, redirect to the Stocks action.
                 return Json(new
                 {
                     redirectUrl = Url.Action("Stocks")
@@ -126,12 +126,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             }
             else
             {
-                // If the request failed, return an error message and the URL to redirect back to Add_Stock.
-                return Json(new
-                {
-                    errorMessage = "Something went wrong!!",
-                    redirectUrl = Url.Action("AddStock")
-                });
+                // Handle failures, possibly returning an error status or message
+                return StatusCode((int)response.StatusCode, "Error message here");
             }
 
         }

@@ -113,7 +113,7 @@ namespace Stock_Management_System.Areas.Sales.Models
 
         public string? Payment_Method { get; set; }
 
-        public int Receive_Information_ID { get; set; }
+        public int? Receive_Information_ID { get; set; }
 
         public string? Receive_Account_No { get; set; }
 

@@ -76,6 +76,27 @@
                 <th>Rate(₹)</th>
                 <td>@Model.Rate.ToString("C")</td>
             </tr>
+            
+            @if(Model.CGST != 0 || Model.CGST != null)
+            {
+                <tr>
+                    <th>CGST (@Model.CGST%)</th>
+                    <td>@Model.TotalCGSTPrice?.ToString("C")</td>
+                </tr>
+            }
+
+            @if (Model.SGST != 0 || Model.SGST != null)
+            {
+                <tr>
+                    <th>SGST (@Model.SGST%)</th>
+                    <td>@Model.TotalSGSTPrice?.ToString("C")</td>
+                </tr>
+
+                <tr>
+                    <th>Without GST Price(₹)</th>
+                    <td>@Model.WithoutGSTPrice?.ToString("C")</td>
+                </tr>
+            }
             <tr>
                 <th>Total Amount(₹)</th>
                 <td>@Model.Total_Price.ToString("C")</td>
@@ -93,7 +114,7 @@
                 <td>@Model.Payment_Method</td>
             </tr>
 
-            @if (Model.Receive_Information_ID != 0)
+            @if (Model.Receive_Information_ID != null)
             {
                 string baseAddress = "https://localhost:7024/";
                 string Icon = Model.Bank_Icon;
