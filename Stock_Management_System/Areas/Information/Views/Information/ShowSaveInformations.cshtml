@@ -26,7 +26,7 @@
 
         </div>
         <div class="page-btn">
-            <a role="button" asp-action="Add_Bank_Information" asp-controller="Information" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Add Information</a>
+            <a role="button" asp-action="AddBankInformation" asp-controller="Information" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Add Information</a>
         </div>
     </div>
 
@@ -62,12 +62,41 @@
                                         }
                                         <td class="text-center">@row.AccountHolderName</td>
                                         <td class="text-center"><img class="bank-icon" src="@BankIcon">@row.BankName</td>
+
                                         <td class="text-center">
-                                            <a class="loadSaveInfo" data-information-id="@UrlEncryptor.Encrypt(row.InformationID.ToString())">
-                                                <img src="~/img/icons/eye.svg" class="me-2" alt="View">
+                                            <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                             </a>
+                                            <ul class="dropdown-menu text-center">
+
+
+
+
+                                                <li>
+                                                    <a role="link"
+                                                       data-information-id="@UrlEncryptor.Encrypt(row.InformationID.ToString())"
+                                                       onclick="event.preventDefault();" class="loadSaveInfo dropdown-item">
+                                                        <img src="~/img/icons/eye1.svg" class="me-2" alt="img">Show Info
+                                                    </a>
+                                                </li>
+
+                                                <li class="dropdown-item">
+                                                    <a role="link" href="@Url.Action("EditBankInformation", "Information", new { Information_ID = UrlEncryptor.Encrypt(Convert.ToString(row.InformationID)) })" onclick="event.preventDefault(); window.location.href = this.href;">
+                                                        <img src="~/img/icons/edit.svg" class="me-2" alt="Edit"> Edit Information
+                                                    </a>
+                                                </li>
+
+                                                <li class="dropdown-item">
+                                                    <a role="button" onclick="confirmDeletion('@Url.Action("DeleteBankInformation", "Information", new { Information_ID = UrlEncryptor.Encrypt(Convert.ToString(row.InformationID)) })')">
+                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="Delete"> Delete Information
+                                                    </a>
+                                                </li>
+
+
+
+                                            </ul>
                                         </td>
-                                      
+
 
                                     </tr>
                                 }
@@ -80,27 +109,7 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        // Use a more specific selector if possible to improve performance
-        $(document).on('click', '.loadSaveInfo', function () {
-            var infoId = $(this).data('information-id'); // Corrected the data attribute usage
 
-            $.ajax({
-                url: '/Information/Get_Information_By_ID', // Ensure the endpoint is correct
-                type: 'GET', // Specify the request type if it's not a POST
-                data: { Information_ID: infoId },
-                success: function (response) {
-                    $('#information .modal-content').html(response);
-                    $('#information').modal('show');
-                },
-                error: function () {
-                    alert('Error loading information'); // Improved error message
-                }
-            });
-        });
-    });
-</script>
 
 
 <!-- Modal Shell -->
@@ -112,6 +121,6 @@
     </div>
 </div>
 
-    </div>
+<script src="/js/bundle/information/saveinformations-bundle.js"></script>
 
 

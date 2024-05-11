@@ -134,8 +134,8 @@ function confirmStockAddition(addUrl, customerName) {
                     window.location.href = response.redirectUrl; // Use the redirect URL from the response
                 },
                 error: function () {
-                    sessionStorage.setItem('AddStatus', 'Error adding stock. Please try again.');
-                    window.location.href = response.redirectUrl; // Use the redirect URL from the response
+                    sessionStorage.setItem('ErrorMsg', 'Somthing Went Wrong !');
+                    window.location.href = window.location.reload(); // Use the redirect URL from the response
                 }
             });
         }
@@ -219,4 +219,19 @@ $(document).ready(function () {
     $(window).on('beforeunload', function () {
         toggleNewCustomerFields(false);
     });
+}); 
+
+
+$(function () {
+    var ErrorMsg = sessionStorage.getItem('ErrorMsg');
+    if (ErrorMsg) {
+        toastr.error(ErrorMsg);
+        // Clear the message from session storage so it doesn't reappear on refresh
+        sessionStorage.removeItem('ErrorMsg');
+    }
 });
+
+
+
+
+

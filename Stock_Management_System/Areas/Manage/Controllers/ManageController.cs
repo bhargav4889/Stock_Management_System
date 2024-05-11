@@ -53,12 +53,14 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             Dashboard_All_Models _All_Models = new Dashboard_All_Models();
 
 
-            _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Features/Pending_Customers_Payment_Sort_List");
+            _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Features/PendingCustomersPaymentSortList");
 
             _All_Models.All_Counts_Model = await api_Service.Model_Of_Data_Display<AllCountsModel>("Counts");
 
             
-             _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/Recent_Actions_List");
+             _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/GetRecentActions");
+
+            _All_Models.upcoming_Reminders = await api_Service.List_Of_Data_Display<Upcoming_Reminders_Model>("Features/UpcomingRemindersList");
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Counts");
 

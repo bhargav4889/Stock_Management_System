@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "_Layout";
-    ViewData["Title"] = "Update Sale";
+    ViewData["Title"] = "Create Sale";
 }
 
 
@@ -16,7 +16,7 @@
     <div class="card">
         <div class="card-body">
 
-            <form class="row g-3" id="SalesForm" asp-action="Update_Sale_Details" asp-controller="Sales" onsubmit="return CheckData()" method="post">
+            <form class="row g-3" id="SaleForm" asp-action="InsertSale" asp-controller="Sale" onsubmit="return CheckData()" method="post">
 
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <input type="hidden" asp-for="sale.SaleId" value="@Model.sale.SaleId"/>
+
 
 
                 <!-- Grain Type -->
@@ -128,7 +128,7 @@
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                                <option  data-icon="@bank.BankIcon" value="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Receive_Information_Id" id="informationId" />
@@ -142,7 +142,7 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label><span style="color: black;">*</span> Bags</label>
-                        <input type="number" inputmode="numeric" asp-for="sale.Bags" class="form-control" placeholder="Bags" id="bags" oninput="CalculateMethod()" asp-for="SaleModel.Bags">
+                        <input type="number" inputmode="numeric" asp-for="sale.Bags" class="form-control" placeholder="Bags" id="bags"  asp-for="SaleModel.Bags">
 
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label for="bagsperkg"><span style="color: black;">*</span> Bags Per KG</label>
-                        <input type="number" inputmode="numeric" class="form-control" asp-for=sale.BagPerKg placeholder="Bags per KG" id="bagsperkg" oninput="CalculateMethod()" asp-for="SaleModel.BagPerKg">
+                        <input type="number" inputmode="numeric" class="form-control" asp-for=sale.BagPerKg placeholder="Bags per KG" id="bagsperkg"  asp-for="SaleModel.BagPerKg">
 
                     </div>
                 </div>
@@ -170,10 +170,36 @@
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label for="Rate"><span style="color: red;">*</span> Rate⟨₹⟩</label>
-                        <input type="number" inputmode="numeric" class="form-control" placeholder="Enter Rate⟨₹⟩" id="rate" oninput="CalculateMethod()" asp-for="sale.Rate">
+                        <input type="number" inputmode="numeric" class="form-control" placeholder="Enter Rate⟨₹⟩" id="rate"  asp-for="sale.Rate">
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.Rate"></span>
                     </div>
                 </div>
+
+
+                <!-- CGST -->
+                <div class="col-lg-1 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="CGST"><span style="color: black;">*</span> CGST(%)</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="CGST" id="CGST"  asp-for="sale.CGST">
+
+                    </div>
+                </div>
+
+                <!-- SGST -->
+                <div class="col-lg-1 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="SGST"><span style="color: black;">*</span> SGST(%)</label>
+                        <input type="number" step="0.01" class="form-control" placeholder="SGST" id="SGST" asp-for="sale.SGST">
+                    </div>
+                </div>
+
+
+
+                <input type="hidden" id="CGST_Total" asp-for="sale.TotalCGSTPrice" />
+
+                <input type="hidden" id="SGST_Total" asp-for="sale.TotalSGSTPrice" />
+
+                <input type="hidden" id="beforetaxtotal" asp-for="sale.WithoutGSTPrice" />
 
                 <!-- Total Price -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -214,9 +240,10 @@
                         <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
                         <select class="select" asp-for="sale.IsFullPaymentReceive" id="isFullAmountReceive" name="Payment_Method">
                             <option value="" selected disabled>-- Options --</option>
-                            <option value="True">YES</option>
-                            <option value="False">NO</option>
+                            <option value="1">YES</option>
+                            <option value="0">NO</option>   
                         </select>
+                        
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="sale.IsFullPaymentReceive"></span>
                     </div>
 
@@ -260,17 +287,15 @@
                 <div class="col-lg-3 col-sm-12" style="display:none" id="RemainbankSelection">
                     <div class="form-group">
                         <label><span style="color:red;">*</span> Select Remain Bank</label>
-                        <select class="form-control" asp-for="sale.Remain_Infromation_ID" id="remainbankSelect">
+                        <select class="form-control" asp-for="sale.Remain_Amount_Receive_Bank_Id" id="remainbankSelect">
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option data-icon="@bank.BankIcon" value="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
-                                
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Remain_Infromation_ID" id="remainInformationId" />
-
-                        <span class="text-danger" asp-validation-for="sale.Remain_Infromation_ID" style="color: red; font-size:11px; font-weight:bold;"></span>
+                        <span class="text-danger" asp-validation-for="sale.Remain_Amount_Receive_Bank_Id" style="color: red; font-size:11px; font-weight:bold;"></span>
                     </div>
                 </div>
 
@@ -310,342 +335,21 @@
     </div>
 </div>
 
-<script>
-
-    $(document).ready(function () {
-        function formatBankOption(bank) {
-            if (!bank.id || bank.text === '-- Select Bank --') return bank.text;
-            var iconUrl = $(bank.element).data('icon');
-            var $bank = $('<span><img src="' + iconUrl + '" class="img-flag" /> ' + bank.text + '</span>');
-            return $bank;
-        }
-
-        $('#bankSelect').select2({
-            minimumResultsForSearch: -1,
-            templateResult: formatBankOption,
-            templateSelection: formatBankOption
-        });
-
-        $('#remainbankSelect').select2({
-            minimumResultsForSearch: -1,
-            templateResult: formatBankOption,
-            templateSelection: formatBankOption
-        });
-
-        $('button[type="reset"]').click(function () {
-            setTimeout(function () {
-                $('#bankSelect').val("").trigger('change');
-            }, 1);
-            setTimeout(function () {
-                $('#selectgrain').val("").trigger('change');
-            }, 1);
-            setTimeout(function () {
-                $('#selectpaymentmethod').val("").trigger('change');
-            }, 1);
-            setTimeout(function () {
-                $('#isFullAmountReceive').val("").trigger('change');
-            }, 1);
-        });
-    }); // Correctly closed $(document).ready function
 
 
 
-
-
-
-</script>
-
-
-<script>
-    $(document).ready(function () {
-        // Function to calculate Deducted Amount
-        function calculateDeductedAmount() {
-            var totalPrice = parseFloat($('#totalprice').val()) || 0;
-            var receivedAmount = parseFloat($('#ReceivedAmount').val()) || 0;
-            var discount = parseFloat($('#DiscountAmount').val()) || 0;
-            var remainAmount = parseFloat($('#remainAmount').val()) || 0;
-
-            // Applying the formula
-            var deductedAmount = totalPrice - receivedAmount - discount - remainAmount;
-
-            // Setting the value of Deducted Amount
-            $('#DeductedAmount').val(deductedAmount.toFixed(2)); // toFixed(2) to format it to two decimal places
-        }
-
-        // Event listeners for the input fields
-        $('#totalprice, #ReceivedAmount, #DiscountAmount, #remainAmount').on('input', function () {
-            calculateDeductedAmount();
-        });
-    });
-</script>
 
 
 <!-- Load jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
-<script>
-    document.getElementById('selectgrain').addEventListener('change', function () {
-        var selectedOption = this.options[this.selectedIndex];
-        var selectedText = selectedOption.text;
-        document.querySelector('input[name="ProductName"]').value = selectedText;
-    });
-
-
-    $(document).ready(function () {
-        // Handle bank selection change
-        $('#bankSelect').change(function () {
-            var selectedOption = $(this).find('option:selected');
-            var informationId = selectedOption.data('info-id'); // Retrieve the InformationId from data attribute
-            $('#informationId').val(informationId); // Set the hidden input value
-        });
-    });
-
-
-    $(document).ready(function () {
-        // Handle change event for the "Remain Bank" select dropdown
-        $('#remainbankSelect').change(function () {
-            var selectedOption = $(this).find('option:selected');
-            var informationId = selectedOption.data('info-id'); // Retrieve the InformationId from data attribute
-            $('#remainInformationId').val(informationId); // Update the hidden input field with the retrieved Information ID
-        });
-    });
-
-    $(document).ready(function () {
-        $('#selectpaymentmethod').change(function () {
-            var paymentMethod = $(this).val();
-            if (paymentMethod == 'BANK') {
-                $('#bankSelection').show();
-            } else {
-                $('#bankSelection').hide();
-            }
-        });
-
-        if ($('#selectpaymentmethod').val() == 'BANK') {
-            $('#bankSelection').show();
-        }
 
 
 
-        $('#isFullAmountReceive').change(function () {
-            if ($(this).val() === "False") {
-                $('#RemainDate').show();
-                $('#RemainAmount').show();
-                $('#RemainPaymentMethod').show();
-            } else {
-                $('#RemainDate').hide();
-                $('#RemainAmount').hide();
-                $('#RemainPaymentMethod').hide();
-            }
-        });
-
-
-
-        if ($('#isFullAmountReceive').val() == 'True') {
-            $('#RemainDate').show();
-            $('#RemainAmount').show();
-            $('#RemainPaymentMethod').show();
-        }
-        else{
-            $('#RemainDate').hide();
-            $('#RemainAmount').hide();
-            $('#RemainPaymentMethod').hide();
-        }
-
-        $('#selectremainpaymentmethod').change(function () {
-            if ($(this).val() === 'BANK') {
-                $('#RemainbankSelection').show();
-            } else {
-                $('#RemainbankSelection').hide();
-            }
-        });
-
-        if ($('#selectremainpaymentmethod').val() == 'BANK') {
-            $('#RemainbankSelection').show();
-        }
-
-        function DateDefaultValue() {
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0');
-            var yyyy = today.getFullYear();
-            today = yyyy + '-' + mm + '-' + dd;
-            document.getElementById('datepicker').value = today;
-        }
-
-        window.onload = function () {
-            DateDefaultValue();
-            CalculateMethod();
-        };
-
-        function CalculateMethod() {
-            var bags = document.getElementById('bags').value.trim();
-            var bagsperkg = document.getElementById('bagsperkg').value.trim();
-            var weightInput = document.getElementById('weight');
-            var rate = document.getElementById('rate').value.trim();
-            var totalprice = 0;
-            var weight = (bags !== '' && bagsperkg !== '') ? bags * bagsperkg : parseFloat(weightInput.value) || 0;
-
-            weightInput.value = weight === 0 ? '' : weight.toFixed(2);  // Ensuring weight is also shown with two decimals if needed
-
-            var selectGrain = document.getElementById("selectgrain");
-            var selectedValue = selectGrain.value;
-            switch (selectedValue) {
-                case "1":
-                case "2":
-                case "4":
-                case "5":
-                case "6":
-                case "7":
-                case "8":
-                case "3":  // Combined case since all these cases do the same thing
-                    totalprice = weight * rate;
-                    break;
-            }
-
-            document.getElementById('totalprice').value = totalprice === 0 ? '' : totalprice.toFixed(2);
-        }
-
-        document.getElementById("selectgrain").addEventListener("change", CalculateMethod);
-        document.getElementById("bags").addEventListener("input", CalculateMethod);
-        document.getElementById("bagsperkg").addEventListener("input", CalculateMethod);
-        document.getElementById("rate").addEventListener("input", CalculateMethod);
-
-    }); // Correctly closed $(document).ready function
-
-</script>
-
-<script>
-    $(document).ready(function () {
-        var isSuggestionSelected = false;
-
-        function toggleNewCustomerFields(show) {
-            $("#newCustomerMessage").toggle(show);
-            $("#newcustomertype").toggle(show);
-            $("#newcustomercity").toggle(show);
-            $("#newcustomerphoneno").toggle(show);
-        }
-
-        toggleNewCustomerFields(false);
-
-        $("#Customer").autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: '@Url.Action("Get_Seller_Customer_Data", "Sales")',
-                    type: "POST",
-                    dataType: "json",
-                    data: { CustomerName: request.term },
-                    success: function (data) {
-                        response($.map(data, function (item) {
-                            return {
-                                label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
-                                value: item.customerName,
-                                id: item.customerId,
-                                type: item.customerType // Ensure 'customerType' is provided by your server
-                            };
-                        }));
-                    }
-                });
-            },
-            minLength: 1,
-            response: function (event, ui) {
-                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
-                toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
-            },
-            select: function (event, ui) {
-                isSuggestionSelected = true;
-                event.preventDefault();
-                $("#Customer").val(ui.item.value);
-                $("#CustomerId").val(ui.item.id);
-                $("#cttype").val(ui.item.type); // Update the customer type field
-                toggleNewCustomerFields(false);
-            }
-        });
-    });
-
-    var toastrSettings = {
-        closeButton: true,
-        progressBar: true,
-        positionClass: 'toast-bottom-right',
-        preventDuplicates: true,
-        showDuration: '300',
-        hideDuration: '1000',
-        timeOut: '5000',
-        extendedTimeOut: '1000',
-        showEasing: 'swing',
-        hideEasing: 'linear',
-        showMethod: 'fadeIn',
-        hideMethod: 'fadeOut'
-    };
-
-    function CheckData() {
-        var date = document.getElementById("datepicker").value;
-        var grainName = document.getElementById("selectgrain").value;
-        var customerName = document.getElementById("Customer").value;
-        var paymentMethod = document.getElementById("selectpaymentmethod").value;
-        var bankSelect = document.getElementById("bankSelect").value;
-        var weight = document.getElementById("weight").value;
-        var rate = document.getElementById("rate").value;
-        var totalPrice = document.getElementById("totalprice").value;
-        var fullAmountReceived = document.getElementById("isFullAmountReceive").value;
-        var remainDate = document.getElementById("RemainDate").value;
-        var remainAmount = document.getElementById("RemainAmount").value;
-        var remainPaymentMethod = document.getElementById("selectremainpaymentmethod").value;
-        var remainBankSelect = document.getElementById("remainbankSelect").value;
-
-        if (!grainName || !customerName || !weight || !rate || !totalPrice || !date) {
-            toastr.error('Please fill out all required fields.', toastrSettings);
-            return false; // Prevent form submission
-        }
-
-        if (paymentMethod === "BANK" && !bankSelect) {
-            toastr.error('Please select a bank.', toastrSettings);
-            return false;
-        }
-
-        if (fullAmountReceived === "False" && (!remainDate || !remainAmount || !remainPaymentMethod || (remainPaymentMethod === "BANK" && !remainBankSelect))) {
-            toastr.error('Please complete all remaining payment details.', toastrSettings);
-            return false;
-        }
-
-        confirmAddition('@Url.Action("Update_Sale_Details", "Sales")', customerName);
-        return false; // Prevent form submission until confirmation and AJAX call are completed
-    }
-
-    function confirmAddition(addUrl, customerName) {
-        Swal.fire({
-            title: 'Are You Sure You Want To Update This Sale?',
-            text: `${customerName}'s sale Updation?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, complete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: addUrl, // Ensure addUrl is correctly defined
-                    type: 'POST',
-                    data: $("#SalesForm").serialize(), // Adjust to match your form's ID
-                    success: function (response) {
-                        sessionStorage.setItem('SaleStatus', 'Sale Update successfully!');
-                        window.location.href = response.redirectUrl; // Redirect using the URL from the server response
-                    },
-                    error: function () {
-                        sessionStorage.setItem('SaleStatus', 'Error completing sale. Please try again.');
-                        window.location.href = response.redirectUrl; // Adjust according to server response
-                    }
-                });
-            }
-        });
-    }
-
-
-</script>
-
-
-
-
+@section Scripts{
+    <script src="/js/bundle/sale/add-bundle.js"></script>
+}
 
 <style>
     .img-flag {

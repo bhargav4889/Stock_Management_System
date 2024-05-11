@@ -154,7 +154,7 @@
                             <a asp-action="Dashboard" asp-controller="Manage"><img src="~/img/icons/dashboard.svg" alt="img"><span> Dashboard</span> </a>
                         </li>
                         <li class="submenu">
-                            <a href="~/Stocks"><img src="~/img/icons/product.svg" alt="img"><span> Stock</span> <span class="menu-arrow"></span></a>
+                            <a href="~/Stock"><img src="~/img/icons/product.svg" alt="img"><span> Stock</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 <li><a asp-action="AddStock" asp-controller="Stock">Add Stock</a></li>
                                 <li><a asp-action="Stocks" asp-controller="Stock">Stocks</a></li>
@@ -163,12 +163,12 @@
                             </ul>
                         </li>
                         <li class="submenu">
-                            <a href="~/Sales"><img src="~/img/icons/sales1.svg" alt="img"><span> Sales</span> <span class="menu-arrow"></span></a>
+                            <a href="~/Sale"><img src="~/img/icons/sales1.svg" alt="img"><span> Sale</span> <span class="menu-arrow"></span></a>
                             <ul>
                                 @* <li><a href="saleslist.html">Sales List</a></li>
                                 <li><a href="pos.html">Create Sale</a></li>*@
-                                <li><a asp-action="Create_Sales" asp-controller="Sales">Create Sales</a></li>
-                                <li><a asp-action="Manage_Sales" asp-controller="Sales">History Sales</a></li>
+                                <li><a asp-action="CreateSale" asp-controller="Sale">Add Sale</a></li>
+                                <li><a asp-action="Sales" asp-controller="Sale">Sales</a></li>
 
                             </ul>
                         </li>
@@ -194,8 +194,8 @@
                         <li class="submenu">
                             <a href="~/Customers"><img src="~/img/icons/users1.svg" alt="img"><span> Customers</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a asp-action="Manage_Customers_Account" asp-controller="Account">Customer List</a></li>
-                                <li><a asp-action="Create_Customer_Account" asp-controller="Account">Add Customer </a></li>
+                                <li><a asp-action="Customers" asp-controller="Account">Customers</a></li>
+                                <li><a asp-action="CreateCustomer" asp-controller="Account">Add Customer</a></li>
                             </ul>
                         </li>
 
@@ -204,9 +204,9 @@
                         <li class="submenu">
                             <a href="~/Payments"><img src="~/img/icons/dollar-square.svg" alt="img"><span> Payments</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a asp-action="Pending_Payments" asp-controller="Payment">Pending Payments</a></li>
-                                <li><a asp-action="Remain_Payments" asp-controller="Payment">Remain Payments</a></li>
-                                <li><a asp-action="Paid_Payments" asp-controller="Payment">Paid Payments</a></li>
+                                <li><a asp-action="PendingPayments" asp-controller="Payment">Pending Payments</a></li>
+                                <li><a asp-action="RemainPayments" asp-controller="Payment">Remain Payments</a></li>
+                                <li><a asp-action="PaidPayments" asp-controller="Payment">Paid Payments</a></li>
                             </ul>
                         </li>
 
@@ -215,8 +215,8 @@
                         <li class="submenu">
                             <a href="~/Reminder"><img src="~/img/icons/notification-bing.svg" alt="img"><span> Reminder</span> <span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a asp-action="Create_Reminder" asp-controller="Reminder">Create Reminder</a></li>
-                                <li><a asp-action="Manage_Reminders" asp-controller="Reminder">Manage Reminder</a></li>
+                                <li><a asp-action="CreateReminder" asp-controller="Reminder">Create Reminder</a></li>
+                                <li><a asp-action="Reminders" asp-controller="Reminder">Reminders</a></li>
                             </ul>
 
                         </li>
@@ -224,8 +224,8 @@
                         <li class="submenu">
                             <a href="~/Information"><img src="~/img/icons/download.svg" alt="img"><span> Save Information</span><span class="menu-arrow"></span></a>
                             <ul>
-                                <li><a asp-action="Add_Bank_Information" asp-controller="Information">Add Bank Details</a></li>
-                                <li><a asp-action="Show_Save_Informations" asp-controller="Information">Show Saved Informations</a></li>
+                                <li><a asp-action="AddBankInformation" asp-controller="Information">Add Bank Details</a></li>
+                                <li><a asp-action="ShowSaveInformations" asp-controller="Information">Show Save Informations</a></li>
                             </ul>
                         </li>
 

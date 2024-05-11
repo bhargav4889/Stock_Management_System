@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Text.Json.Serialization;
 
@@ -16,7 +17,7 @@ namespace Stock_Management_System.Areas.Manage.Models
 
         public IEnumerable<Recent_Action_Model> recent_Actions_With_Info { get; set; }
 
-
+        public IEnumerable <Upcoming_Reminders_Model> upcoming_Reminders { get; set; }
 
     }
 
@@ -110,6 +111,27 @@ namespace Stock_Management_System.Areas.Manage.Models
     }
 
 
+    public class Upcoming_Reminders_Model
+    {
+        public int ReminderId { get; set; }
+
+
+   
+        public DateTime ReminderDateTime { get; set; }
+
+     
+        public string? ReminderType { get; set; }
+
+    
+        public string? ReminderCustomType { get; set; }
+
+      
+        public string? ReminderDescription { get; set; }
+
+        public string? SentEmailAddress { get; set; }
+
+        public string? SentPhoneNo { get; set; }
+    }
 
 }
 

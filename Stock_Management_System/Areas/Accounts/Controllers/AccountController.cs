@@ -52,7 +52,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         public async Task Dropdown_For_Bank_Names()
         {
-            List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/Get_Bank_Names");
+            List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/GetBanksList");
 
             if (bank_Models != null)
             {
@@ -77,73 +77,47 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Create Customer Account
 
-        public IActionResult Create_Customer_Account()
+        public IActionResult AddCustomer()
         {
 
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Insert_Reminder(Reminder_Model reminder)
+        public async Task<IActionResult> InsertCustomer(Customer_Model customers_Model)
         {
-            var jsonContent = JsonConvert.SerializeObject(reminder);
+
+
+            var jsonContent = JsonConvert.SerializeObject(customers_Model);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Reminder/Create_Reminder", stringContent);
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/AddCustomer", stringContent);
 
             if (response.IsSuccessStatusCode)
             {
-                // If the request was successful, return a JSON object including the URL to redirect to
-                return Json(new { success = true, redirectUrl = Url.Action("Manage_Reminders", "Reminder") });
+                return Json(new { success = true, redirectUrl = Url.Action("Customers") });
             }
             else
             {
-                // Read the error message from the response if not successful
                 var errorResponse = await response.Content.ReadAsStringAsync();
                 return Json(new { success = false, message = $"Server error: {errorResponse}" });
             }
-        }
 
+
+
+
+        }
 
         #endregion
 
-        /*
-                #region Method : Customer ID Wise Stock Info
 
-                public IActionResult Customer_Wise_Stock_Details(string TN_ID)
-                {
-                    if (HttpContext.Request.Headers["Referer"].ToString() == "")
-                    {
-                        return RedirectToAction("Manage_Customers_Account");
-                    }
-
-
-
-                    AddStockModel customers_wise_stock_model = new AddStockModel();
-
-                    HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Stock/Add_Stock_Details/{UrlEncryptor.Decrypt(TN_ID)}").Result;
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string data = response.Content.ReadAsStringAsync().Result;
-                        dynamic? jsonObject = JsonConvert.DeserializeObject(data);
-                        var DataObject = jsonObject?.data;
-                        var extractedDtaJson = JsonConvert.SerializeObject(DataObject, Formatting.Indented);
-                        customers_wise_stock_model = JsonConvert.DeserializeObject<AddStockModel>(extractedDtaJson);
-
-                    }
-                    return View(customers_wise_stock_model);
-                }
-
-                #endregion*/
 
         #region Method : Update Customer Account
 
-        public async Task<IActionResult> Update_Customer(string Customer_ID, string Customer_Type)
+        public async Task<IActionResult> EditCustomer(string Customer_ID, string Customer_Type)
         {
 
             Customer_Model customer_Model = new Customer_Model();   
-            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
+            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetCustomerByIDAndType/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
 
             string data = await response.Content.ReadAsStringAsync();
             dynamic jsonObject = JsonConvert.DeserializeObject(data);
@@ -157,18 +131,18 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         }
 
 
-        public async Task<IActionResult> Update_Customer_Info_Details(Customer_Model customers_Model)
+        public async Task<IActionResult> UpdateCustomerDetails(Customer_Model customers_Model)
         {
 
 
             var jsonContent = JsonConvert.SerializeObject(customers_Model);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Customers/Update_Customer", stringContent);
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Customers/UpdateCustomer", stringContent);
 
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, redirectUrl = Url.Action("Manage_Customers_Account", "Account") });
+                return Json(new { success = true, redirectUrl = Url.Action("Customers", "Account") });
             }
             else
             {
@@ -186,12 +160,12 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         #region Method : Delete Customer And Account Statement 
 
         [HttpPost]
-        public IActionResult Delete_Customer(string Customer_ID, string Customer_Type)
+        public IActionResult DeleteCustomer(string Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Customers/Delete_Customer?Customer_ID={UrlEncryptor.Decrypt(Customer_ID)}&Customer_Type={Customer_Type}").Result;
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Customers/DeleteCustomer?Customer_ID={UrlEncryptor.Decrypt(Customer_ID)}&Customer_Type={Customer_Type}").Result;
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Manage_Customers_Account") });
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Customers") });
             }
             else
             {
@@ -201,128 +175,16 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #endregion
 
-        #region Method : Convert List To DataTable For Customer Info
-
-
-        public DataTable Convert_List_To_DataTable_For_Customers_Info_Statement(List<Customer_Model> customers)
-        {
-            DataTable dataTable = new DataTable();
-            dataTable.Columns.Add("Customer-Name", typeof(string));
-            dataTable.Columns.Add("Customer-Type", typeof(string));
-            dataTable.Columns.Add("Customer-Address", typeof(string));
-            dataTable.Columns.Add("Customer-Contact", typeof(string));
-
-
-
-            foreach (var customer in customers)
-            {
-                DataRow row = dataTable.NewRow();
-
-                row["Customer-Name"] = customer.CustomerName;
-                row["Customer-Type"] = customer.CustomerType;
-                row["Customer-Address"] = customer.CustomerAddress;
-                row["Customer-Contact"] = customer.CustomerContact;
-
-
-
-
-
-                dataTable.Rows.Add(row);
-            }
-
-            return dataTable;
-        }
-
-        public (DataTable, DataTable) Convert_Model_To_DataTable_For_Customers_Account_Details_Statement(CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock_)
-        {
-
-
-            DataTable Customers_Info = new DataTable();
-
-            DataTable Statements = new DataTable();
-
-
-            Customers_Info.Columns.Add("Customer-ID", typeof(int));
-
-            Customers_Info.Columns.Add("Customer-Name", typeof(string));
-
-            Customers_Info.Columns.Add("Customer-Type", typeof(string));
-
-            Customers_Info.Columns.Add("Customer-Contact", typeof(string));
-
-            Customers_Info.Columns.Add("Customer-Address", typeof(string));
-
-
-            DataRow customerRow = Customers_Info.NewRow();
-            customerRow["Customer-ID"] = customerDetails_With_Purchased_Stock_.Customers.CustomerId; // Assuming you have CustomerID
-            customerRow["Customer-Name"] = customerDetails_With_Purchased_Stock_.Customers.CustomerName;
-            customerRow["Customer-Type"] = customerDetails_With_Purchased_Stock_.Customers.CustomerType;
-            customerRow["Customer-Contact"] = customerDetails_With_Purchased_Stock_.Customers.CustomerContact;
-            customerRow["Customer-Address"] = customerDetails_With_Purchased_Stock_.Customers.CustomerAddress;
-            Customers_Info.Rows.Add(customerRow);
-
-
-            Statements.Columns.Add("Stock-Date", typeof(string));
-
-            Statements.Columns.Add("Product", typeof(string));
-
-            Statements.Columns.Add("Location", typeof(string));
-            Statements.Columns.Add("Bags", typeof(string));
-            Statements.Columns.Add("Bag-Per-Kg", typeof(string));
-            Statements.Columns.Add("Weight", typeof(string));
-            Statements.Columns.Add("Total-Price", typeof(string));
-            Statements.Columns.Add("Vehicle-Name", typeof(string));
-            Statements.Columns.Add("Vehicle-No", typeof(string));
-            Statements.Columns.Add("Tolat", typeof(string));
-            Statements.Columns.Add("Driver-Name", typeof(string));
-            Statements.Columns.Add("Payment-Status", typeof(string));
-
-
-
-
-
-
-            foreach (var statement in customerDetails_With_Purchased_Stock_.Purchased_Stocks)
-            {
-                DataRow statementRow = Statements.NewRow();
-
-                DateTime date = statement.StockDate; // Your original date
-
-                string formattedDate = date.ToString("dd/MM/yyyy"); // Formatting the date
-
-                statementRow["Stock-Date"] = formattedDate;
-                statementRow["Product"] = statement.ProductName;
-                statementRow["Location"] = statement.PurchaseStockLocation;
-                statementRow["Bags"] = statement.Bags.HasValue ? statement.Bags.Value.ToString() : "--";
-                statementRow["Bag-Per-Kg"] = statement.BagPerKg.HasValue ? statement.BagPerKg.Value.ToString() : "--";
-                statementRow["Weight"] = statement.TotalWeight;
-                statementRow["Total-Price"] = statement.TotalPrice;
-                statementRow["Vehicle-Name"] = statement.VehicleName;
-                statementRow["Vehicle-No"] = statement.VehicleNo;
-                statementRow["Tolat"] = statement.TolatName;
-                statementRow["Driver-Name"] = statement.DriverName;
-                statementRow["Payment-Status"] = string.IsNullOrEmpty(statement.PaymentStatus) ? "--" : statement.PaymentStatus;
-
-
-                Statements.Rows.Add(statementRow);
-
-            }
-
-            return (Customers_Info, Statements);
-        }
-
-
-
-        #endregion
+     
 
 
         #region Method : Show All Customers Account 
 
-        public async Task<IActionResult> Manage_Customers_Account()
+        public async Task<IActionResult> Customers()
         {
 
 
-            List<Customer_Model> customers = await api_Service.List_Of_Data_Display<Customer_Model>("Customers/Customers_List");
+            List<Customer_Model> customers = await api_Service.List_Of_Data_Display<Customer_Model>("Customers/GetAllCustomers");
 
 
 
@@ -333,13 +195,13 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         #endregion
 
 
-        #region Method : Customer Info With Statements
+        #region Method : Account Information
 
-        public async Task<IActionResult> Account_Details(string Customer_ID, string Customer_Type)
+        public async Task<IActionResult> CustomerAccount(string Customer_ID, string Customer_Type)
         {
             if (HttpContext.Request.Headers["Referer"].ToString() == "")
             {
-                return RedirectToAction("Manage_Customers_Account");
+                return RedirectToAction("Customers");
             }
 
             await Dropdown_For_Bank_Names();
@@ -347,7 +209,7 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = new CustomerDetails_With_Purchased_Stock_Model();
 
             /*  CustomerDetails_With_Purchased_Stock_Model customerDetails_With_Purchased_Stock = await api_Service.Model_Of_Data_Display<CustomerDetails_With_Purchased_Stock_Model>("Customers/Account_Details", Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID)),Customer_Type);*/
-            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Account_Details/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
+            HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetAccountDetails/{UrlEncryptor.Decrypt(Customer_ID)}&{Customer_Type}").Result;
 
             string data = await response.Content.ReadAsStringAsync();
             dynamic jsonObject = JsonConvert.DeserializeObject(data);
@@ -366,15 +228,13 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         #endregion
 
 
-
-
         #region Method : Customer Accounts PDF And Excel
 
-        public async Task<IActionResult> Customers_Statement_PDF()
+        public async Task<IActionResult> GenerateCustomersPDFStatement()
         {
 
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customers_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/CustomersStatementPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -392,9 +252,9 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             }
         }
 
-        public async Task<IActionResult> Customers_Statement_EXCEL()
+        public async Task<IActionResult> GenerateCustomersEXCELStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customers_Statement_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/CustomersStatementEXCEL");
 
             if (response.IsSuccessStatusCode)
             {
@@ -418,9 +278,9 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Accounts Statement PDF And Excel
 
-        public async Task<IActionResult> Customer_Account_Statement_PDF(string Customer_ID, string Customer_Type)
+        public async Task<IActionResult> GenerateAccountPDFStatement(string Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_PDF/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/CustomerAccountStatementPDF/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -451,9 +311,9 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
             }
         }
 
-        public async Task<IActionResult> Customer_Account_Statement_EXCEL(string Customer_ID, string Customer_Type)
+        public async Task<IActionResult> GenerateAccountEXCELStatement(string Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Customer_Account_Statement_EXCEL/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/CustomerAccountStatementEXCEL/{Convert.ToInt32(UrlEncryptor.Decrypt(Customer_ID))}&{Customer_Type}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -496,11 +356,11 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
 
         #region Method : Get Data For Payment For Modal
 
-        public async Task<ActionResult> Get_Payment_Info(string Customer_ID, string Stock_ID)
+        public async Task<ActionResult> GetPaymentInfo(string Customer_ID, string Stock_ID)
         {
             Payment_All_Models.Payment_Model payment_Model = new Payment_All_Models.Payment_Model();
             // Assuming _Client is properly initialized HttpClient
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/Get_Payment_Info/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/GetFullPaymentInfo/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
             {

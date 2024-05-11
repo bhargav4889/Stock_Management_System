@@ -92,7 +92,7 @@ document.getElementById("productprice").addEventListener("input", CalculateMetho
 
 function CheckData() {
     var grainname = document.getElementById("selectgrain").value;
-    var customerName = document.getElementById("Customer").value;  // Assuming this is the correct ID for customer name
+    var customerName = document.getElementById("Customer").value;
     var weight = document.getElementById("weight").value;
     var productprice = document.getElementById("productprice").value;
     var totalprice = document.getElementById("totalprice").value;
@@ -100,8 +100,19 @@ function CheckData() {
     var vehicleno = document.getElementById("vehicleno").value;
     var drivername = document.getElementById("drivername").value;
 
-    if (!grainname || !customerName || !weight || !productprice || !totalprice || !vehicletype || !vehicleno || !drivername) {
-        toastr.error('Please fill out all required fields.', {
+    var missingFields = [];
+
+    if (!grainname) missingFields.push('Grain Type');
+    if (!customerName) missingFields.push('Customer Name');
+    if (!weight) missingFields.push('Weight');
+    if (!productprice) missingFields.push('Product Price');
+    if (!totalprice) missingFields.push('Total Price');
+    if (!vehicletype) missingFields.push('Vehicle Type');
+    if (!vehicleno) missingFields.push('Vehicle No');
+    if (!drivername) missingFields.push('Driver Name');
+
+    if (missingFields.length > 0) {
+        toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, {
             closeButton: true,
             progressBar: true,
             positionClass: 'toast-bottom-right',

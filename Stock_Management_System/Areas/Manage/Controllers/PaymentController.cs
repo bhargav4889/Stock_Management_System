@@ -31,26 +31,34 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             _Client.BaseAddress = baseaddress;
         }
 
-        #region Method : All Dropdown 
+      
+        #region Section: Dropdown Function
 
-        public async Task All_Dropdowns_Call()
+        /// <summary>
+        /// Populates dropdown lists for the stock views.
+        /// </summary>
+
+        public async Task PopulateDropdownLists()
         {
-            DropDown_Model all_DropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
-            if (all_DropDown_Model != null)
+            DropDown_Model dropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
+            if (dropDown_Model != null)
             {
-                ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
-                ViewBag.ProductsInEnglish = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
-                ViewBag.ProductGrade = new SelectList(all_DropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
-                ViewBag.Vehicle = new SelectList(all_DropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
+                ViewBag.Products = new SelectList(dropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
+                ViewBag.ProductsInEnglish = new SelectList(dropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
+                ViewBag.ProductGrade = new SelectList(dropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
+                ViewBag.Vehicle = new SelectList(dropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
             }
-        }
 
-        public async Task Dropdown_For_Bank_Names()
-        {
-            List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/Get_Bank_Names");
+            // Bank 
+
+            List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/GetBanksList");
+
             if (bank_Models != null)
             {
+                // Base URL where the images are hosted, ensure this matches the actual location
                 string baseUrl = "https://localhost:7024/";
+
+                // Append the base URL to each bank's icon path
                 foreach (var bank in bank_Models)
                 {
                     if (!string.IsNullOrEmpty(bank.BankIcon))
@@ -58,6 +66,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                         bank.BankIcon = baseUrl + bank.BankIcon;
                     }
                 }
+
                 ViewBag.Banks = bank_Models;
             }
         }
@@ -66,17 +75,17 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Create Payment (PENDING) 
 
-        public async Task<IActionResult> Create_Payment(Payment_All_Models.Payment_Model payment_Model)
+        public async Task<IActionResult> InsertPayment(Payment_All_Models.Payment_Model payment_Model)
         {
             try
             {
                 var jsonContent = JsonConvert.SerializeObject(payment_Model);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Payment/Create_Payment", stringContent);
+                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Payment/AddPayment", stringContent);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Pending_Payments");
+                    return RedirectToAction("PendingPayments");
                 }
                 else
                 {
@@ -94,17 +103,17 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Create Payment (REMAIN) 
 
-        public async Task<IActionResult> Create_Remain_Payment(Remain_Payment_Model remain_Payment_Model)
+        public async Task<IActionResult> InsertRemainPayment(Remain_Payment_Model remain_Payment_Model)
         {
             try
             {
                 var jsonContent = JsonConvert.SerializeObject(remain_Payment_Model);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Payment/Create_Remain_Payment", stringContent);
+                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Payment/AddRemainPayment", stringContent);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return RedirectToAction("Pending_Payments");
+                    return RedirectToAction("RemainPayments");
                 }
                 else
                 {
@@ -122,11 +131,11 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region List of Payment Pendings 
 
-        public async Task<IActionResult> Pending_Payments()
+        public async Task<IActionResult> PendingPayments()
         {
-            await All_Dropdowns_Call();
-            await Dropdown_For_Bank_Names();
-            List<Payment_All_Models.Pending_Customers_Payments> List_of_Pending_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Pending_Customers_Payments>("Payment/Pending_Customers_Payments");
+            await PopulateDropdownLists();
+          
+            List<Payment_All_Models.Pending_Customers_Payments> List_of_Pending_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Pending_Customers_Payments>("Payment/GetPendingCustomersPayments");
             return View(List_of_Pending_Customers_Payments);
         }
 
@@ -134,11 +143,11 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region List of Payment Remain 
 
-        public async Task<IActionResult> Remain_Payments()
+        public async Task<IActionResult> RemainPayments()
         {
-            await All_Dropdowns_Call();
-            await Dropdown_For_Bank_Names();
-            List<Payment_All_Models.Remain_Payment_Model> List_of_Remain_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Remain_Payment_Model>("Payment/Remain_Customers_Payments");
+            await PopulateDropdownLists();
+         
+            List<Payment_All_Models.Remain_Payment_Model> List_of_Remain_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Remain_Payment_Model>("Payment/GetRemainingCustomersPayments");
             return View(List_of_Remain_Customers_Payments);
         }
 
@@ -146,11 +155,11 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region List of Payment PAID 
 
-        public async Task<IActionResult> Paid_Payments()
+        public async Task<IActionResult> PaidPayments()
         {
-            await All_Dropdowns_Call();
-            await Dropdown_For_Bank_Names();
-            List<Payment_All_Models.Show_Payment_Info> List_of_Paid_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Show_Payment_Info>("Payment/Paid_Customers_Payments");
+            await PopulateDropdownLists();
+        
+            List<Payment_All_Models.Show_Payment_Info> List_of_Paid_Customers_Payments = await api_Service.List_Of_Data_Display<Payment_All_Models.Show_Payment_Info>("Payment/GetPaidCustomersPayments");
             return View(List_of_Paid_Customers_Payments);
         }
 
@@ -158,14 +167,14 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Get Data For Payment For Modal
 
-        public async Task<ActionResult> Get_Payment_Info(string Customer_ID, string Stock_ID)
+        public async Task<ActionResult> GetPaymentInfoByCustomerStockID(string Customer_ID, string Stock_ID)
         {
             Payment_All_Models.Payment_Model payment_Model = new Payment_All_Models.Payment_Model();
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/Get_Payment_Info/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/GetPaymentInfoByStockCustomerID/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
             {
-                await Dropdown_For_Bank_Names();
+                await PopulateDropdownLists();
                 string data = await response.Content.ReadAsStringAsync();
                 dynamic jsonObject = JsonConvert.DeserializeObject(data);
                 payment_Model = JsonConvert.DeserializeObject<Payment_All_Models.Payment_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
@@ -181,14 +190,14 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Remain Payment Get Info
 
-        public async Task<IActionResult> Remain_Get_Payment_Info(string Customer_ID, string Stock_ID)
+        public async Task<IActionResult> GetRemainPaymentInfo(string Customer_ID, string Stock_ID)
         {
             Remain_Payment_Model remain_Payment_Model = new Remain_Payment_Model();
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/Get_Remain_Payment_Info/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/RemainGetPaymentInfoByCustomerFKAndStockIdAndPaymentID/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
             {
-                await Dropdown_For_Bank_Names();
+                await PopulateDropdownLists();
                 string data = await response.Content.ReadAsStringAsync();
                 remain_Payment_Model = JsonConvert.DeserializeObject<Remain_Payment_Model>(JsonConvert.SerializeObject(JsonConvert.DeserializeObject<dynamic>(data).data, Formatting.Indented));
                 return PartialView("_RemainPaymentInfo_Box", remain_Payment_Model);
@@ -203,10 +212,10 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Get Payment Info By Customer ID and Stock ID 
 
-        public async Task<ActionResult> Payment_Info_By_Customer_And_Stock(string Customer_ID, string Stock_ID)
+        public async Task<ActionResult> GetPaymentInfo(string Customer_ID, string Stock_ID)
         {
             Payment_All_Models.Show_Payment_Info show_Payment_Info = new Payment_All_Models.Show_Payment_Info();
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/Payment_Info_By_Customer_ID_AND_Stock_ID/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/GetFullPaymentInfo/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -226,11 +235,11 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Pending Payments PDF & Excel
 
-        public async Task<IActionResult> Pending_Payments_PDF()
+        public async Task<IActionResult> PendingPaymentsPDF()
         {
 
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Pending_Payments_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PendingPaymentsPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -248,9 +257,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             }
         }
 
-        public async Task<IActionResult> Pending_Payments_EXCEL()
+        public async Task<IActionResult> PendingPaymentsEXCEL()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Pending_Payments_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PendingPaymentsEXCEL");
 
             if (response.IsSuccessStatusCode)
             {
@@ -272,11 +281,11 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Remain Payments PDF & Excel
 
-        public async Task<IActionResult> Remain_Payments_PDF()
+        public async Task<IActionResult> RemainPaymentsPDF()
         {
 
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Remain_Payments_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/RemainPaymentsPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -294,9 +303,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             }
         }
 
-        public async Task<IActionResult> Remain_Payments_EXCEL()
+        public async Task<IActionResult> RemainPaymentsEXCEL()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Remain_Payments_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/RemainPaymentsEXCEL");
 
             if (response.IsSuccessStatusCode)
             {
@@ -318,11 +327,11 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         #region Method : Paid Payments PDF & Excel
 
-        public async Task<IActionResult> Paid_Payments_PDF()
+        public async Task<IActionResult> PaidPaymentsPDF()
         {
 
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Paid_Payments_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PaidPaymentsPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -340,9 +349,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             }
         }
 
-        public async Task<IActionResult> Paid_Payments_EXCEL()
+        public async Task<IActionResult> PaidPaymentsEXCEL()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Paid_Payments_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PaidPaymentsEXCEL");
 
             if (response.IsSuccessStatusCode)
             {

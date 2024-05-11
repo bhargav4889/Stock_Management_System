@@ -14,6 +14,7 @@ using Stock_Management_System.All_DropDowns;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Customers_Model = Stock_Management_System.Areas.Accounts.Models.Customer_Model;
 using Stock_Management_System.Areas.Accounts.Models;
+using Stock_Management_System.Services;
 
 namespace Stock_Management_System.Areas.Stocks.Controllers
 {
@@ -87,6 +88,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <summary>
         /// Adds details for a new stock entry.
         /// </summary>
+       
         public async Task<IActionResult> InsertStockAndCustomerDetails(Customers_Stock_Combined_Model model)
         {
             // Check if the customer exists; if not, add them
@@ -119,7 +121,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
                 // If the request was successful, redirect to the Stocks action.
                 return Json(new
                 {
-                    redirectUrl = Url.Action("Stocks", "Stock")
+                    redirectUrl = Url.Action("Stocks")
                 });
             }
             else
@@ -128,7 +130,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
                 return Json(new
                 {
                     errorMessage = "Something went wrong!!",
-                    redirectUrl = Url.Action("AddStock", "Stock")
+                    redirectUrl = Url.Action("AddStock")
                 });
             }
 
@@ -195,7 +197,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             {
                 return Json(new
                 {
-                    redirectUrl = Url.Action("Stocks", "Stock")
+                    redirectUrl = Url.Action("Stocks")
                 });
             }
             else
@@ -214,7 +216,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// </summary>
         private async Task<Customer_Model> GetCustomerProfile(int Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}&{Customer_Type}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetCustomerByIDAndType/{Customer_ID}&{Customer_Type}");
             if (response.IsSuccessStatusCode)
             {
                 string data = await response.Content.ReadAsStringAsync();
@@ -245,7 +247,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         {
             List<Customer_Model> customer_Models = new List<Customer_Model>();
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/BUYER_CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/IsBuyerCustomerExist/{CustomerName}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -316,7 +318,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         {
             var jsonContent = JsonConvert.SerializeObject(customerModel);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", content);
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/AddCustomer", content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -396,7 +398,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <returns>An IActionResult containing the PDF file or an error message.</returns>
         public async Task<IActionResult> GenerateStocksPDFStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseStocksStatementPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -417,7 +419,7 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <returns>An IActionResult containing the Excel file or an error message.</returns>
         public async Task<IActionResult> GenerateStocksExcelStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Stocks_Statement_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseStocksStatementEXCEL");
 
             if (response.IsSuccessStatusCode)
             {

@@ -695,7 +695,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GeneratePurchaseInvoicesPDFStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Invoice_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseInvoiceStatementPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -716,7 +716,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GeneratePurchaseInvoicesEXCELStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Purchase_Invoice_Statement_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseInvoiceStatementEXCEL");
 
             if (response.IsSuccessStatusCode)
             {
@@ -1587,7 +1587,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GenerateSaleInvoicesPDFStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Invoice_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesInvoiceStatementPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -1608,7 +1608,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GenerateSaleInvoicesEXCELStatement()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Invoice_Statement_EXCEL");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesInvoiceStatementEXCEL");
 
             if (response.IsSuccessStatusCode)
             {

@@ -13,7 +13,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script src="/js/Section/stock/stocks.js"></script>
+    <script src="/js/bundle/stock/stocks-bundle.js"></script>
 
 }
 
@@ -50,8 +50,8 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form id="pdfExportForm" asp-action="GenerateStocksPDFStatement" asp-controller="Stock" method="get">
-                                <button id="pdfExportButton" type="submit" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF">
+                            <form id="pdfExportForm" asp-action="GenerateStocksPDFStatement" asp-controller="Stock">
+                                <button id="pdfExportButton" type="submit" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
                             </form>
@@ -59,7 +59,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="GenerateStocksExcelStatement" asp-controller="Stock" method="get">
+                            <form id="excelExportForm" asp-action="GenerateStocksExcelStatement" asp-controller="Stock">
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
@@ -162,15 +162,16 @@
 
                         <th class="text-center">Date</th>
                         <th class="text-center">Name</th>
-                        <th class="text-center">Type</th>
+                     
                         <th class="text-center">Product</th>
                         <th class="text-center">Bag</th>
                         <th class="text-center">Bag Per KG</th>
                         <th class="text-center">Weight</th>
-                        <th class="text-center">Product-Price(₹)</th>
+                        <th class="text-center">Price(₹)</th>
                         <th class="text-center">Total-Price(₹)</th>
                         <th class="text-center">Tolat</th>
                         <th class="text-center">Vehicle</th>
+                        <th ciass="text=center">Status</th>
                         <th class="text-center">Actions</th>
 
 
@@ -188,7 +189,7 @@
                                         @((DateTime.TryParse(item.PurchaseStockDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
                                     </td>
                                     <td class="text-center">@item.CustomerName</td>
-                                    <td class="text-center">@item.CustomerType</td>
+                                   
                                     <td class="text-center">@item.ProductName</td>
                                     <td class="text-center">@((item.Bags == 0) ? "--" : item.Bags.ToString())</td>
                                     <td class="text-center">@((item.BagPerKg == 0) ? "--" : item.BagPerKg.ToString())</td>
@@ -197,7 +198,20 @@
                                     <td class="text-center">@item.TotalPrice.ToString("C")</td>
                                     <td class="text-center">@item.TolatName</td>
                                     <td class="text-center">@item.VehicleName</td>
-
+                                    @{
+                                        if (item.PaymentStatus == "PAID")
+                                        {
+                                            <td class="text-center"><span class="badges bg-lightgreen">@item.PaymentStatus</span></td>
+                                        }
+                                        else if (item.PaymentStatus == "PENDING")
+                                        {
+                                            <td class="text-center"><span class="badges bg-lightred">@item.PaymentStatus</span></td>
+                                        }
+                                        else if (item.PaymentStatus == "REMAIN")
+                                        {
+                                            <td class="text-center"><span class="badges bg-lightyellow">@item.PaymentStatus</span></td>
+                                        }
+                                    }
 
                                     <td class="text-center">
                                         <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">

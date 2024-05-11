@@ -16,6 +16,9 @@
             <form class="row g-3" id="SaleInvoiceForm" asp-action="UpdateSaleInvoiceDetails" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
 
 
+
+                <input type="hidden" value="@Model.SalesInvoiceId" asp-for="@Model.SalesInvoiceId" />
+
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">

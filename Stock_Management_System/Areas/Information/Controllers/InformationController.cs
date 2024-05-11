@@ -31,7 +31,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
 
         public async Task Dropdown_For_Bank_Names()
         {
-            List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/Get_Bank_Names");
+            List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/GetBanksList");
             if (bank_Models != null)
             {
                 string baseUrl = "https://localhost:7024/";
@@ -46,7 +46,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
             }
         }
 
-        public async Task<IActionResult> Add_Bank_Information()
+        public async Task<IActionResult> AddBankInformation()
         {
             await Dropdown_For_Bank_Names();
             return View();
@@ -54,19 +54,19 @@ namespace Stock_Management_System.Areas.Information.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Insert_Bank_Information(Information_Model information_Model)
+        public async Task<IActionResult> InsertBankInformation(Information_Model information_Model)
         {
             
             
                 var jsonContent = JsonConvert.SerializeObject(information_Model);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Information/Insert_Bank_Information", stringContent);
+                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Information/AddBankInformation", stringContent);
 
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return Json(new { success = true, redirectUrl = Url.Action("Show_Save_Informations", "Information") });
+                    return Json(new { success = true, redirectUrl = Url.Action("ShowSaveInformations", "Information") });
                 }
                 else
                 {
@@ -76,16 +76,54 @@ namespace Stock_Management_System.Areas.Information.Controllers
 
             }
 
-        public async Task<IActionResult> Show_Save_Informations()
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBankInformationDetails(Information_Model information_Model)
         {
-            List<Information_Model> information_Models = await api_Service.List_Of_Data_Display<Information_Model>("Information/Show_All_Save_Informations");
+
+
+            var jsonContent = JsonConvert.SerializeObject(information_Model);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Information/UpdateBankInformation", stringContent);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true, redirectUrl = Url.Action("ShowSaveInformations") });
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = $"Server error: {errorResponse}" });
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult DeleteBankInformation(string Information_ID)
+        {
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Information/DeleteInformation?Information_ID={UrlEncryptor.Decrypt(Information_ID)}").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("ShowSaveInformations") });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Error. Please try again." });
+            }
+        }
+
+        public async Task<IActionResult> ShowSaveInformations()
+        {
+            List<Information_Model> information_Models = await api_Service.List_Of_Data_Display<Information_Model>("Information/GetAllSaveInformation");
             return View(information_Models);
         }
 
-        public async Task<IActionResult> Get_Information_By_ID(string Information_ID)
+        public async Task<IActionResult> GetInformationByID(string Information_ID)
         {
             Information_Model information_Model = new Information_Model();
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/Information_By_ID/{UrlEncryptor.Decrypt(Information_ID)}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/InformationByID/{UrlEncryptor.Decrypt(Information_ID)}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -98,6 +136,24 @@ namespace Stock_Management_System.Areas.Information.Controllers
             {
                 return null;
             }
+        }
+
+        public async Task<IActionResult> EditBankInformation(string Information_ID)
+        {
+            await Dropdown_For_Bank_Names();
+
+            Information_Model information_Model = new Information_Model();
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/InformationByID/{UrlEncryptor.Decrypt(Information_ID)}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                information_Model = JsonConvert.DeserializeObject<Information_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
+                
+            }
+
+            return View(information_Model);
         }
     }
 }

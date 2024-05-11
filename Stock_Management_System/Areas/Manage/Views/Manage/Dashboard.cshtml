@@ -302,19 +302,19 @@
                     <ul class="list-unstyled">
                         <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                             <i class="fa fa-tasks" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
-                            <a asp-action="Manage_Stocks" asp-controller="Stock" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Stock</a>
+                            <a asp-action="Stocks" asp-controller="Stock" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Stock</a>
                         </li>
                         <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                             <i class="fas fa-file-invoice-dollar" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
-                            <a asp-action="History_Purchase_Invoice" asp-controller="Invoice" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Purchase Invoices</a>
+                            <a asp-action="PurchaseInvoices" asp-controller="Invoice" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Purchase Invoices</a>
                         </li>
                         <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                             <i class="fas fa-file-invoice-dollar" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
-                            <a asp-action="History_Sales_Invoice" asp-controller="Invoice" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Sales Invoices</a>
+                            <a asp-action="SaleInvoices" asp-controller="Invoice" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Manage Sales Invoices</a>
                         </li>
                         <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                             <i class="fa fa-users" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
-                            <a asp-action="Manage_Customers_Account" asp-controller="Account" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Customers Accounts</a>
+                            <a asp-action="Customers" asp-controller="Account" class="quick-link text-decoration-none fs-5 ms-3" style="flex-grow: 1; text-align: left;">Customers Accounts</a>
                         </li>
                         <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                             <i class="fa fa-user-circle" style="font-size: 1.25rem; width: 30px; text-align: center;"></i>
@@ -449,16 +449,13 @@
                             <tbody>
                                 @foreach (var customers_Payment_Sort_List in Model.Pending_Customers_Payment_Sort_List)
                                 {
-                                    <tr onclick="submitForm(this)">
-                                        <form asp-action="Account_Details" asp-controller="Account" method="get">
-                                            <input type="hidden" value="@UrlEncryptor.Encrypt(Convert.ToString(customers_Payment_Sort_List.CustomerId))" name="Customer_ID" />
-                                            <input type="hidden" value="@customers_Payment_Sort_List.CustomerType" name="Customer_Type" />
-                                        </form>
+                                    <tr style="cursor: pointer;" onclick="window.location='@Url.Action("CustomerAccount", "Account", new { Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(customers_Payment_Sort_List.CustomerId)), Customer_Type = customers_Payment_Sort_List.CustomerType })'">
                                         <td>@customers_Payment_Sort_List.StockDate.ToString("dd/MM/yy")</td>
                                         <td>@customers_Payment_Sort_List.CustomerName</td>
                                         <td>@customers_Payment_Sort_List.ProductName</td>
                                         <td>@customers_Payment_Sort_List.TotalPrice</td>
                                     </tr>
+
                                 }
                             </tbody>
                         </table>
@@ -477,36 +474,72 @@
 
 
 
-
         <div class="col-lg-6 col-sm-12 col-12 d-flex">
             <div class="card flex-fill">
                 <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                     <h4 class="card-title mb-0">
                         <span tabindex="0" role="button" class="text-decoration-none" style="color:black; cursor:pointer;" data-bs-toggle="popover" data-bs-placement="right" data-bs-trigger="focus" data-bs-content="Don't forget to complete your payments to avoid service interruptions.">
-                            <i class="fas fa-bell"></i>
-                            Remainder
+                            <i class="fas fa-bell"></i> Reminder
                         </span>
                     </h4>
                 </div>
+                @if (Model.upcoming_Reminders != null && Model.upcoming_Reminders.Any())
+                {
+                    <style>
+                        .reminder-item {
+                            padding: 10px 15px; /* Adjust padding for comfort */
+                            border-bottom: 1px solid #e0e0e0; /* Subtle borders between items */
+                        }
 
-                <div class="card-body">
+                            .reminder-item i {
+                                font-size: 1.25em; /* Adjust icon size */
+                            }
 
-                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                        <i class="fa fa-bell-slash"></i>  No Set Any  Remainder
+                            .reminder-item span, .reminder-item small {
+                                font-size: 0.95em; /* Match text size from Recent Actions */
+                            }
+                    </style>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            @foreach (var reminder in Model.upcoming_Reminders)
+                            {
+                                TimeSpan timeLeft = reminder.ReminderDateTime - DateTime.Now;
+                                string timeUntilReminder = timeLeft.TotalMinutes < 0
+                                ? "Expired"
+                                : $"{(int)timeLeft.TotalHours} hours and {timeLeft.Minutes} minutes left";
 
+                                <a href="@Url.Action("Reminders", "Reminder")" style="text-decoration:none;" class="list-group-item list-group-item-action reminder-item d-flex justify-content-start align-items-center text-decoration-none">
+                                    <i class="fa fa-bell me-2"></i>
+                                    <span class="fw-bold">@reminder.ReminderType</span>
+                                    @if (!string.IsNullOrEmpty(reminder.ReminderCustomType))
+                                    {
+                                        <span class="ms-2">- @reminder.ReminderCustomType</span>
+                                    }
+                                    <span class="ms-auto">
+                                        <small>@reminder.ReminderDateTime.ToString("dd/MM/yyyy hh:mm tt")</small>
+                                        <small class="text-muted ms-2">(@timeUntilReminder)</small>
+                                    </span>
+                                </a>
+                            }
+                        </ul>
                     </div>
-
-
-                    @* <ul class="list-unstyled">
-                    <li class="d-flex align-items-center mb-3" style="border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-
-
-                    </li>
-
-                    </ul>*@
-                </div>
+                }
+                else
+                {
+                    <div class="card-body">
+                        <div class="alert alert-secondary alert-dismissible fade show" role="alert">
+                            <i class="fa fa-bell-slash"></i> No Set Any Reminder
+                        </div>
+                    </div>
+                }
             </div>
         </div>
+
+
+
+
+
+
     </div>
 </div>
 

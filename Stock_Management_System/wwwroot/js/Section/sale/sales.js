@@ -1,28 +1,6 @@
 
-function showToastNotification(formId) {
-    // Show a success toast notification
-    toastr.success('Download started successfully.', 'Success', {
-        closeButton: true,
-        progressBar: true,
-        positionClass: 'toast-top-center',
-        timeOut: 3000, // Display duration
-    });
-
-    // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
-    setTimeout(function () {
-        document.getElementById(formId).submit();
-    }, 100); // Delay the form submission to allow the toast to render
-
-    return false; // Prevent immediate form submission
-}
-
 $(function () {
     var table = $('#data').DataTable();
-
-    function parseDate(str) {
-        var parts = str.split('-');
-        return new Date(2000 + parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-    }
 
     function applySearches() {
         var Name = $("#searchName").val();
@@ -32,55 +10,43 @@ $(function () {
         var selectedGrain = $("#graintype").val();
         var selectedGrainText = $("#graintype option:selected").text();
         var startdate = $('#startdate').val();
-        var enddate = $('#datepickerend').val(); // Ensure this matches your HTML
+        var enddate = $('#enddate').val();
+
+
+
+
+        var productColumnIndex = 3;
+        var VehicleColumnIndex = 10;
 
         // Clear existing searches
         table.columns().search('');
 
         // Apply dropdown search if selected
         if (selectedGrain) {
-            table.column(3).search(selectedGrainText);
+            table.column(productColumnIndex).search(selectedGrainText);
+
         }
 
         if (VehicleName) {
-            table.column(10).search(selectedVehicle);
+            table.column(VehicleColumnIndex).search(selectedVehicle).draw();
         }
 
         // Apply individual column searches from input fields
         table.column(1).search(Name);
+
         table.column(9).search(TolatName);
 
-        // Setup date filtering
-        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-            var dateColumn = data[0]; // Assuming the date is in the first column
-            var date = parseDate(dateColumn); // Parse the DD-MM-YY format
 
-            var start = startdate ? parseDate(startdate.split('-').reverse().join('-')) : null;
-            var end = enddate ? parseDate(enddate.split('-').reverse().join('-')) : new Date();
 
-            if (enddate && !startdate) {
-                start = new Date(end.getFullYear(), end.getMonth(), 1); // Set to the first of the month
-            }
-
-            if (startdate && !enddate) {
-                end = new Date(); // Set to current date
-            }
-
-            if (!startdate && !enddate) {
-                return true; // No filtering on dates
-            }
-
-            return (start ? date >= start : true) && (end ? date <= end : true);
-        });
 
         // Perform a single draw after all search criteria have been applied
         table.draw();
-        $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
 
         // Reset the input values after search
         $("#searchName, #searchTolatName").val('');
         $('#graintype').val('').trigger('change');
         $('#vehicletype').val('').trigger('change');
+
     }
 
     $('#searchButton').on('click', function () {
@@ -88,10 +54,19 @@ $(function () {
     });
 });
 
+$(function () {
+    var AddMessage = sessionStorage.getItem('SaleStatus');
+    if (AddMessage) {
+        toastr.success(AddMessage);
+        // Clear the message from session storage so it doesn't reappear on refresh
+        sessionStorage.removeItem('SaleStatus');
+    }
+});
+
 function confirmDeletion(deleteUrl, customerName) {
     Swal.fire({
         title: 'Are You Sure Want To Delete?',
-        text: `${customerName} Stock Entry Deleted along with related payment info.`,
+        text: `${customerName} Sale Entry Deleted !`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -118,7 +93,6 @@ function confirmDeletion(deleteUrl, customerName) {
         }
     });
 }
-
 $(function () {
     var deletionMessage = sessionStorage.getItem('DeleteStatus');
     if (deletionMessage) {
@@ -128,24 +102,22 @@ $(function () {
     }
 });
 
-$(function () {
-    var AddMessage = sessionStorage.getItem('AddStatus');
-    if (AddMessage) {
-        toastr.success(AddMessage);
-        // Clear the message from session storage so it doesn't reappear on refresh
-        sessionStorage.removeItem('AddStatus');
-    }
-});
+function showToastNotification(formId) {
+    // Show a success toast notification
+    toastr.success('Download started successfully.', 'Success', {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-center',
+        timeOut: 3000, // Display duration
+    });
 
-$(function () {
-    var UpdateMessage = sessionStorage.getItem('UpdateStatus');
-    if (UpdateMessage) {
-        toastr.success(UpdateMessage);
-        // Clear the message from session storage so it doesn't reappear on refresh
-        sessionStorage.removeItem('UpdateStatus');
-    }
-});
+    // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
+    setTimeout(function () {
+        document.getElementById(formId).submit();
+    }, 100); // Delay the form submission to allow the toast to render
 
+    return false; // Prevent immediate form submission
+}
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -187,7 +159,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Optionally, add event listeners or other mechanisms to invoke updateButtonState if the table is dynamically updated.
 });
-
-
-
-

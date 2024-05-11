@@ -46,6 +46,18 @@ namespace Stock_Management_System.Areas.Sales.Models
         [Required(ErrorMessage ="Please Enter Receive Amount")]
         public decimal Receive_Amount { get; set; }
 
+
+        public decimal? CGST { get; set; }
+
+        public decimal? SGST { get; set; }
+
+        public decimal? TotalCGSTPrice { get; set; }
+
+        public decimal? TotalSGSTPrice { get; set; }
+
+        public decimal? WithoutGSTPrice { get; set; }
+
+
         public decimal? Discount { get; set; }
 
         public decimal? Deducted_Amount { get; set; }
@@ -117,6 +129,16 @@ namespace Stock_Management_System.Areas.Sales.Models
         public decimal? Total_Weight { get; set; }
 
         public decimal Rate { get; set; }
+
+        public decimal? CGST { get; set; }
+
+        public decimal? SGST { get; set; }
+
+        public decimal? TotalCGSTPrice { get; set; }
+
+        public decimal? TotalSGSTPrice { get; set; }
+
+        public decimal? WithoutGSTPrice { get; set; }
 
         public decimal Total_Price { get; set; }
 

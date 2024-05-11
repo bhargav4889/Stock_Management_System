@@ -17,7 +17,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 {
     [Area("Sales")]
     [Route("~/[controller]/[action]")]
-    public class SalesController : Controller
+    public class SaleController : Controller
     {
         public IConfiguration Configuration;
 
@@ -28,7 +28,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         public Api_Service api_Service = new Api_Service();
 
 
-        public SalesController(IConfiguration configuration)
+        public SaleController(IConfiguration configuration)
         {
             Configuration = configuration;
             _Client = new HttpClient();
@@ -36,29 +36,34 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         }
 
 
-        #region Method : Dropdown Function
 
-        public async Task All_Dropdowns_Call()
+        #region Section: Dropdown Function
+
+        /// <summary>
+        /// Populates dropdown lists for the stock views.
+        /// </summary>
+
+        public async Task PopulateDropdownLists()
         {
-            DropDown_Model all_DropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
-            if (all_DropDown_Model != null)
+            DropDown_Model dropDown_Model = await new DropDowns_Class().GetAllDropdownsAsync();
+            if (dropDown_Model != null)
             {
-                ViewBag.Products = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
-                ViewBag.ProductsInEnglish = new SelectList(all_DropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
-                ViewBag.ProductGrade = new SelectList(all_DropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
-                ViewBag.Vehicle = new SelectList(all_DropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
+                ViewBag.Products = new SelectList(dropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInGujarati");
+                ViewBag.ProductsInEnglish = new SelectList(dropDown_Model.Products_DropDowns_List, "ProductId", "ProductNameInEnglish");
+                ViewBag.ProductGrade = new SelectList(dropDown_Model.Products_Grade_DropDowns_List, "ProductGradeId", "ProductGrade");
+                ViewBag.Vehicle = new SelectList(dropDown_Model.Vehicle_DropDowns_List, "VehicleId", "VehicleName");
             }
-        }
 
-        #endregion
+            // Bank 
 
+            List<Our_Banks_Dropdown> bank_Models = await api_Service.List_Of_Data_Display<Our_Banks_Dropdown>("Bank/GetOurBanksSelectList");
 
-        public async Task Dropdown_For_Our_Bank_Names()
-        {
-            List<Our_Banks_Dropdown> bank_Models = await api_Service.List_Of_Data_Display<Our_Banks_Dropdown>("Bank/Get_Our_Banks");
             if (bank_Models != null)
             {
+                // Base URL where the images are hosted, ensure this matches the actual location
                 string baseUrl = "https://localhost:7024/";
+
+                // Append the base URL to each bank's icon path
                 foreach (var bank in bank_Models)
                 {
                     if (!string.IsNullOrEmpty(bank.BankIcon))
@@ -66,32 +71,38 @@ namespace Stock_Management_System.Areas.Sales.Controllers
                         bank.BankIcon = baseUrl + bank.BankIcon;
                     }
                 }
+
                 ViewBag.OurBanks = bank_Models;
             }
         }
 
-        public async Task<IActionResult> Create_Sales()
-        {
-            await All_Dropdowns_Call();
+       
 
-            await Dropdown_For_Our_Bank_Names();
+
+        #endregion
+
+        public async Task<IActionResult> AddSale()
+        {
+          
+
+            await PopulateDropdownLists();
 
             return View();
         }
 
 
 
-        public async Task<JsonResult> Get_Seller_Customer_Data(string CustomerName)
+        public async Task<JsonResult> GetSellerCustomerData(string CustomerName)
         {
-            List<Customer_Model> customerModels = await fetch_seller_customer_name(CustomerName);
+            List<Customer_Model> customerModels = await FetchSellerCustomerByName(CustomerName);
             return Json(customerModels);
         }
 
-        private async Task<List<Customer_Model>> fetch_seller_customer_name(string CustomerName)
+        private async Task<List<Customer_Model>> FetchSellerCustomerByName(string CustomerName)
         {
             List<Customer_Model> customer_Models = new List<Customer_Model>();
 
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/SELLER_CUSTOMER_EXIST_IN_SYSTEM/{CustomerName}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/IsSellerCustomerExist/{CustomerName}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -111,14 +122,14 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         #region Insert Sale If Customer Check not Exitst and then Insert Also Customer 
 
 
-        public async Task<IActionResult> Add_Sale_Details(Sale_Customer_Combied_Model model)
+        public async Task<IActionResult> InsertSale(Sale_Customer_Combied_Model model)
         {
             // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await Existing_Customer_Details(model.customer.CustomerId, model.customer.CustomerType);
+            Customer_Model customerInfo = await GetCustomerProfile(model.customer.CustomerId, model.customer.CustomerType);
             if (customerInfo == null)
             {
                 // Add the new customer and directly use the returned model
-                customerInfo = await Add_New_Customer(model.customer);
+                customerInfo = await CreateCustomer(model.customer);
                 if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
                     return BadRequest("Failed to create a new customer.");
@@ -137,11 +148,11 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             // Post the model to the "Sales/Insert_Sale" endpoint
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Sales/Insert_Sale", content);
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Sale/AddSale", content);
             if (response.IsSuccessStatusCode)
             {
                 // Return a JSON response to redirect the client to another action
-                return Json(new { success = true, redirectUrl = Url.Action("Manage_Sales", "Sales") });
+                return Json(new { success = true, redirectUrl = Url.Action("Sales") });
             }
             else
             {
@@ -154,9 +165,9 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
 
 
-        private async Task<Customer_Model> Existing_Customer_Details(int Customer_ID, string Customer_Type)
+        private async Task<Customer_Model> GetCustomerProfile(int Customer_ID, string Customer_Type)
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}&{Customer_Type}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetCustomerByIDAndType/{Customer_ID}&{Customer_Type}");
             if (response.IsSuccessStatusCode)
             {
                 string data = await response.Content.ReadAsStringAsync();
@@ -168,17 +179,30 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         }
 
 
+
+
+        #endregion
+
+
+        #region Section: Create New Customer
+
+        /// <summary>
+        /// Asynchronously adds a new customer to the system.
+        /// </summary>
+        /// <param name="customerModel">The customer model to add.</param>
+        /// <returns>The added Customer_Model with updated details (e.g., new ID), or null if the operation fails.</returns>
         [HttpPost]
-        public async Task<Customer_Model> Add_New_Customer(Customer_Model customerModel)
+        public async Task<Customer_Model> CreateCustomer(Customer_Model customerModel)
         {
             var jsonContent = JsonConvert.SerializeObject(customerModel);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/Insert_Customer", content);
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/AddCustomer", content);
 
             if (response.IsSuccessStatusCode)
             {
                 var responseString = await response.Content.ReadAsStringAsync();
-                var responseObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(responseString);
+                var responseObject = JsonConvert.DeserializeObject<Dictionary<string,
+                  dynamic>>(responseString);
 
                 if (responseObject != null && responseObject["status"] == true)
                 {
@@ -191,25 +215,23 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         #endregion
 
-
-
-        public async Task<IActionResult> Manage_Sales()
+        public async Task<IActionResult> Sales()
         {
-            await All_Dropdowns_Call();
+            await PopulateDropdownLists();
 
-            List<Show_Sale> sales = await api_Service.List_Of_Data_Display<Show_Sale>("Sales/Sales");
+            List<Show_Sale> sales = await api_Service.List_Of_Data_Display<Show_Sale>("Sale/GetAllSales");
             return View(sales);
         }
 
 
 
         [HttpPost]
-        public IActionResult Delete_Sale(string Sale_ID)
+        public IActionResult DeleteSale(string Sale_ID)
         {
-            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Sales/Delete_Sale?Sale_ID={UrlEncryptor.Decrypt(Sale_ID)}").Result;
+            HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Sale/DeleteSale?Sale_ID={UrlEncryptor.Decrypt(Sale_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Manage_Sales", "Sales") });
+                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Sales") });
             }
             else
             {
@@ -218,14 +240,14 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         }
 
 
-        public async Task<IActionResult> Update_Sale_Details(Sale_Customer_Combied_Model model)
+        public async Task<IActionResult> UpdateSaleDetails(Sale_Customer_Combied_Model model)
         {
             // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await Existing_Customer_Details(model.customer.CustomerId, model.customer.CustomerType);
+            Customer_Model customerInfo = await GetCustomerProfile(model.customer.CustomerId, model.customer.CustomerType);
             if (customerInfo == null)
             {
                 // Add the new customer and directly use the returned model
-                customerInfo = await Add_New_Customer(model.customer);
+                customerInfo = await CreateCustomer(model.customer);
                 if (customerInfo == null || customerInfo.CustomerId == 0)
                 {
                     return BadRequest("Failed to create a new customer.");
@@ -244,11 +266,11 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             // Post the model to the "Sales/Insert_Sale" endpoint
-            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Sales/Update_Sale", content);
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Sale/UpdateSale", content);
             if (response.IsSuccessStatusCode)
             {
                 // Return a JSON response to redirect the client to another action
-                return Json(new { success = true, redirectUrl = Url.Action("Manage_Sales", "Sales") });
+                return Json(new { success = true, redirectUrl = Url.Action("Sales") });
             }
             else
             {
@@ -259,36 +281,35 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         }
 
-        public async Task<IActionResult> Added_Sales_Details(string Sale_ID)
+        public async Task<IActionResult> SaleDetailsView(string Sale_ID)
         {
             if (HttpContext.Request.Headers["Referer"].ToString() == "")
             {
-                return RedirectToAction("Manage_Sales");
+                return RedirectToAction("Sales");
             }
 
 
             Show_Sale show_Sale = new Show_Sale();
 
 
-            show_Sale = await api_Service.Model_Of_Data_Display<Show_Sale>("Sales/Get_Sale_By_ID", Convert.ToInt32(UrlEncryptor.Decrypt(Sale_ID)));
+            show_Sale = await api_Service.Model_Of_Data_Display<Show_Sale>("Sale/GetSaleByID", Convert.ToInt32(UrlEncryptor.Decrypt(Sale_ID)));
 
             return View(show_Sale);
         }
 
 
 
-        public async Task<IActionResult> Update_Sales(string Sale_ID, string Customer_ID)
+        public async Task<IActionResult> EditSale(string Sale_ID, string Customer_ID)
         {
 
-            await All_Dropdowns_Call();
+            await PopulateDropdownLists();
 
-            await Dropdown_For_Our_Bank_Names();
-
+           
 
             Sale_Customer_Combied_Model sale_Customer_Combied_Model = new Sale_Customer_Combied_Model();
 
-
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Sales/Fetch_Sale_And_Customer_Details/{UrlEncryptor.Decrypt(Sale_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
+            
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Sale/GetSaleAndCustomerDetails/{UrlEncryptor.Decrypt(Sale_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
 
 
             if (response.IsSuccessStatusCode)
@@ -314,9 +335,9 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         }
 
         #region Method : Download Statement PDF & EXCEL 
-        public async Task<IActionResult> Sales_Statement_CreatePDF()
+        public async Task<IActionResult> SalesStatementPDF()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesStatementPDF");
 
             if (response.IsSuccessStatusCode)
             {
@@ -335,9 +356,9 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         }
 
 
-        public async Task<IActionResult> Export_Sales_To_Excel()
+        public async Task<IActionResult> SalesStatementEXCEL()
         {
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/Sales_Statement_PDF");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesStatementEXCEL");
 
             if (response.IsSuccessStatusCode)
             {
@@ -358,10 +379,10 @@ namespace Stock_Management_System.Areas.Sales.Controllers
         #endregion
 
 
-        public async Task<IActionResult> Get_Sale_Info(string Sale_ID)
+        public async Task<IActionResult> GetSaleInfo(string Sale_ID)
         {
             Show_Sale show_Sale = new Show_Sale();
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Sales/Get_Sale_By_ID/{UrlEncryptor.Decrypt(Sale_ID)}");
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Sale/GetSaleByID/{UrlEncryptor.Decrypt(Sale_ID)}");
 
             if (response.IsSuccessStatusCode)
             {

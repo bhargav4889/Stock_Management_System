@@ -13,138 +13,8 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
-        $(document).ready(function () {
-            var table = $('#data').DataTable();
 
-            function applySearches() {
-                var Name = $("#searchName").val();
-                var VehicleName = $("#vehicletype").val();
-                var selectedVehicle = $("#vehicletype option:selected").text();
-                var TolatName = $("#searchTolatName").val();
-                var selectedGrain = $("#graintype").val();
-                var selectedGrainText = $("#graintype option:selected").text();
-                var startdate = $('#startdate').val();
-                var enddate = $('#enddate').val();
-
-
-
-
-                var productColumnIndex = 3;
-                var VehicleColumnIndex = 10;
-
-                // Clear existing searches
-                table.columns().search('');
-
-                // Apply dropdown search if selected
-                if (selectedGrain) {
-                    table.column(productColumnIndex).search(selectedGrainText);
-
-                }
-
-                if (VehicleName) {
-                    table.column(VehicleColumnIndex).search(selectedVehicle).draw();
-                }
-
-                // Apply individual column searches from input fields
-                table.column(1).search(Name);
-
-                table.column(9).search(TolatName);
-
-
-
-
-                // Perform a single draw after all search criteria have been applied
-                table.draw();
-
-                // Reset the input values after search
-                $("#searchName, #searchTolatName").val('');
-                $('#graintype').val('').trigger('change');
-                $('#vehicletype').val('').trigger('change');
-
-            }
-
-            $('#searchButton').on('click', function () {
-                applySearches();
-            });
-        });
-    </script>
-
-
-    <script>
-        $(document).ready(function () {
-            var AddMessage = sessionStorage.getItem('SaleStatus');
-            if (AddMessage) {
-                toastr.success(AddMessage);
-                // Clear the message from session storage so it doesn't reappear on refresh
-                sessionStorage.removeItem('SaleStatus');
-            }
-        });
-    </script>
-
-    <script>
-        function confirmDeletion(deleteUrl, customerName) {
-            Swal.fire({
-                title: 'Are You Sure Want To Delete?',
-                text: `${customerName} Sale Entry Deleted !`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: deleteUrl,
-                        type: 'POST',
-                        success: function (response) {
-                            // Set a success message in session storage
-                            sessionStorage.setItem('DeleteStatus', 'Deleted Successfully!');
-                            // Redirect immediately
-                            window.location.href = response.redirectUrl;
-                        },
-                        error: function () {
-                            // Set an error message in session storage
-                            sessionStorage.setItem('DeleteStatus', 'Error. Please try again.');
-                            // You might still want to redirect or handle errors differently here
-                            window.location.href = response.redirectUrl;
-                        }
-                    });
-                }
-            });
-        }
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            var deletionMessage = sessionStorage.getItem('DeleteStatus');
-            if (deletionMessage) {
-                toastr.success(deletionMessage);
-                // Clear the message from session storage so it doesn't reappear on refresh
-                sessionStorage.removeItem('DeleteStatus');
-            }
-        });
-    </script>
-
-
-    <script>
-        function showToastNotification(formId) {
-            // Show a success toast notification
-            toastr.success('Download started successfully.', 'Success', {
-                closeButton: true,
-                progressBar: true,
-                positionClass: 'toast-top-center',
-                timeOut: 3000, // Display duration
-            });
-
-            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
-            setTimeout(function () {
-                document.getElementById(formId).submit();
-            }, 100); // Delay the form submission to allow the toast to render
-
-            return false; // Prevent immediate form submission
-        }
-    </script>
+    <script src="/js/bundle/sale/sales-bundle.js"></script>
  
 }
 
@@ -160,7 +30,7 @@
             <h6>Manage Sales </h6>
         </div>
         <div class="page-btn">
-            <a role="button" asp-action="Create_Sales" asp-controller="Sales" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Sale</a>
+            <a role="button" asp-action="CreateSale" asp-controller="Sales" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Sale</a>
         </div>
     </div>
 
@@ -181,7 +51,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="Sales_Statement_CreatePDF" asp-controller="Sales" method="get">
+                            <form asp-action="SalesStatementPDF" asp-controller="Sale">
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
@@ -191,7 +61,7 @@
                         </li>
 
                         <li>
-                            <form asp-action="Export_Sales_To_Excel" asp-controller="Sales" method="get">
+                            <form asp-action="SalesStatementEXCEL" asp-controller="Sale">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
                                     <img src="~/img/icons/excel.svg" alt="img">
@@ -342,18 +212,18 @@
                                         <ul class="dropdown-menu">
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Added_Sales_Details", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
+                                                   href="@Url.Action("SaleDetailsView", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Sale Info</a>
                                             </li>
 
                                             <li>
                                                 <a role="link"
-                                                   href="@Url.Action("Update_Sales", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
+                                                   href="@Url.Action("EditSale", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Sale</a>
                                             </li>
                                             <li>
-                                                <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Sale", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
-                                                    <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock
+                                                <a role="button" onclick="confirmDeletion('@Url.Action("DeleteSale", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
+                                                    <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale
                                                 </a>
                                             </li>
                                         </ul>

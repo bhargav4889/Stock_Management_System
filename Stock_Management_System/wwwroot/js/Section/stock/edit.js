@@ -94,22 +94,21 @@ document.getElementById("productprice").addEventListener("input", CalculateMetho
 
 
 function CheckData() {
-    var date = document.getElementById("datepicker").value;
-    var stockgrade = document.getElementById("stockgrade").value;
-    var grainname = document.getElementById("selectgrain").value;
-    var customername = document.getElementById("Customer").value;
-    var bags = document.getElementById("bags").value;
-    var bagperkg = document.getElementById("bagsperkg").value;
-    var weight = document.getElementById("weight").value;
-    var productprice = document.getElementById("productprice").value;
-    var totalprice = document.getElementById("totalprice").value;
-    var vehicletype = document.getElementById("selectvehicletype").value;
-    var vehicleno = document.getElementById("vehicleno").value;
-    var drivername = document.getElementById("drivername").value;
-    var tolatname = document.getElementById("tolatname").value;
+    var date = document.getElementById("datepicker").value.trim();
+    var stockgrade = document.getElementById("stockgrade").value.trim();
+    var grainname = document.getElementById("selectgrain").value.trim();
+    var customername = document.getElementById("Customer").value.trim();
+    var bags = document.getElementById("bags").value.trim();
+    var bagperkg = document.getElementById("bagsperkg").value.trim();
+    var weight = document.getElementById("weight").value.trim();
+    var productprice = document.getElementById("productprice").value.trim();
+    var totalprice = document.getElementById("totalprice").value.trim();
+    var vehicletype = document.getElementById("selectvehicletype").value.trim();
+    var vehicleno = document.getElementById("vehicleno").value.trim();
+    var drivername = document.getElementById("drivername").value.trim();
 
-    if (!grainname || !customername || !tolatname || !weight || !productprice || !totalprice || !vehicletype || !vehicleno || !drivername) {
-        toastr.error('Please fill out all required fields.', {
+    if (!grainname || !customername || !bags || !bagperkg || !weight || !productprice || !totalprice || !vehicletype || !vehicleno || !drivername) {
+        toastr.error('Please fill all required fields', {
             closeButton: true,
             progressBar: true,
             positionClass: 'toast-bottom-right',
@@ -132,8 +131,9 @@ function CheckData() {
 }
 
 
+
 function confirmStockUpdation(addUrl, customerName) {
-    console.log("URL passed to AJAX:", addUrl); // This will show what URL is being passed
+ 
     Swal.fire({
         title: 'Are You Sure You Want To Update This Stock?',
         text: `${customerName}'s Stock Update?`,
@@ -153,15 +153,22 @@ function confirmStockUpdation(addUrl, customerName) {
                     window.location.href = response.redirectUrl;
                 },
                 error: function () {
-                    sessionStorage.setItem('UpdateStatus', 'Error updating stock. Please try again.');
-                    window.location.href = response.redirectUrl; // Consider changing this to handle different errors
+                    sessionStorage.setItem('ErrorMsg', 'Somthing Went Wrong !');
+                    window.location.href = window.location.reload(); // Consider changing this to handle different errors
                 }
             });
         }
     });
 }
 
-
+$(function () {
+    var ErrorMsg = sessionStorage.getItem('ErrorMsg');
+    if (ErrorMsg) {
+        toastr.error(ErrorMsg);
+        // Clear the message from session storage so it doesn't reappear on refresh
+        sessionStorage.removeItem('ErrorMsg');
+    }
+});
 
 
 
@@ -191,7 +198,7 @@ function formatVehicleNo(input) {
 
 
 
-$(document).ready(function () {
+$(function () {
     var isSuggestionSelected = false; // Flag to track if a suggestion has been chosen.
 
     // Function to toggle visibility of new customer fields and messages.
@@ -208,7 +215,7 @@ $(document).ready(function () {
     $("#Customer").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/Stock/FetchBuyerCustomerByName",
+                url: "/Stock/GetBuyerCustomerData",
                 type: "POST",
                 dataType: "json",
                 data: { CustomerName: request.term },

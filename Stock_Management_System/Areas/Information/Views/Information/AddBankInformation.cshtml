@@ -1,0 +1,92 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Add Bank Information";
+}
+
+@model Stock_Management_System.Areas.Information.Models.Information_Model;
+
+
+<style>
+    .img-flag {
+        height: 20px;
+        width: auto;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="content">
+    <div class="page-header">
+        <div class="page-title">
+            <h4>Add Bank Account Information</h4>
+            <h6 style="font-style:initial; font-weight:bolder; color:gray">Saved Details of Bank Account</h6>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form class="row g-2" id="AddBankInformationForm" asp-action="InsertBankInformation" asp-controller="Information" onsubmit="return CheckData()" method="post">
+                <div class="col-lg-3 col-sm-12" id="bankSelection">
+                    <div class="form-group">
+                        <label><span style="color:red;">*</span> Select Bank</label>
+                        <select class="form-control" asp-for="BankId" id="bankSelect">
+                            <option selected disabled value="">-- Select Bank --</option>
+                            @foreach (var bank in ViewBag.Banks as List<Stock_Management_System.Areas.Manage.Models.Bank_Model>)
+                            {
+                                <option value="@bank.BankId" data-icon="@bank.BankIcon">@bank.BankName</option>
+                            }
+                        </select>
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="BankId"></span>
+                    </div>
+                </div>
+
+
+                <!-- Account No -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="AccountNo"><span style="color: red;">*</span> Account No</label>
+                        <input type="number" asp-for="AccountNo" inputmode="numeric" class="form-control" placeholder="Enter Bank Account No" id="BankAccountNo" oninput="this.value = this.value.toUpperCase()">
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="AccountNo"></span>
+                    </div>
+                </div>
+
+                <!-- BANK IFSC CODE -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="IFSCCODE"><span style="color: red;">*</span> Bank IFSC Code</label>
+                        <input type="text" class="form-control" placeholder="Enter Bank IFSC CODE" asp-for="ifsc_code" id="IFSC_CODE" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="ifsc_code"></span>
+                    </div>
+                </div>
+
+                <!-- Account Holder Name -->
+                <div class="col-lg-3 col-sm-6 col-12">
+                    <div class="form-group">
+                        <label for="AccountHolderName"><span style="color: red;">*</span> Account Holder Name</label>
+                        <input type="text" class="form-control" placeholder="Enter Account Holder Name" asp-for="AccountHolderName" id="AccountHolderName" oninput="this.value = this.value.toUpperCase()">
+
+                        <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="AccountHolderName"></span>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-auto text-center mb-3" style="margin-top:20px;">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-university"></i>
+                            Add Infromation
+                        </button>
+                        <button type="reset" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="/js/bundle/information/add-bundle.js"></script>

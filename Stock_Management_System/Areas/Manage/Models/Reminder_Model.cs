@@ -5,7 +5,7 @@ namespace Stock_Management_System.Areas.Manage.Models
 
     public class Reminder_Model
     {
-        public string? ReminderId { get; set; }
+        public int ReminderId { get; set; }
 
         [Required(ErrorMessage ="Please Select Reminder Date and Time")]
         public DateTime ReminderDateTime { get; set; }

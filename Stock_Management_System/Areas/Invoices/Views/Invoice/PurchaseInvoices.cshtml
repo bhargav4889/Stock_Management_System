@@ -36,7 +36,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form id="pdfExportForm" asp-action="GeneratePurchaseInvoicesPDFStatement" asp-controller="Invoice" method="get">
+                            <form id="pdfExportForm" asp-action="GeneratePurchaseInvoicesPDFStatement" asp-controller="Invoice">
 
 
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
@@ -48,7 +48,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="GeneratePurchaseInvoicesEXCELStatement" asp-controller="Invoice" method="get">
+                            <form id="excelExportForm" asp-action="GeneratePurchaseInvoicesEXCELStatement" asp-controller="Invoice" >
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">

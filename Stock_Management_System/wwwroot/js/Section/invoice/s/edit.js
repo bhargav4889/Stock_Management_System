@@ -214,7 +214,15 @@ function confirmInvoiceCreation(redirectUrl, partyName) {
 
 
 
-$(document).ready(function () {
+if ($('#selectinvoice').val() == 'other') {
+    $('#invoiceTypeField').show();
+}
+
+if ($('#selectvehicletype').val() == 'CONTAINER') {
+    $('#containerNumberField').show();
+}
+
+$(function () {
     // Listen for changes on the #selectoinvoice dropdown
     $('#selectinvoice').change(function () {
         // Check if the selected option's value is 'other'

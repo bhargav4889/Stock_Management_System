@@ -3,27 +3,35 @@
 *@
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Update Reminder";
+    ViewData["Title"] = "Create Reminder";
 }
 @model Stock_Management_System.Areas.Manage.Models.Reminder_Model;
 <div class="content">
     <div class="page-header">
         <div class="page-title">
-            <h4>Update Reminder</h4>
-            <h6 style="font-style:initial; font-weight:bolder;color:gray">Update Reminder Infromation</h6>
+            <h4>Create Reminder</h4>
+            <h6 style="font-style:initial; font-weight:bolder;color:gray">Reminder For Remain Important </h6>
         </div>
     </div>
     <div class="card">
         <div class="card-body">
-            <form class="row g-3" asp-action="Insert_Reminder" asp-controller="Reminder" onsubmit="return CheckData()" method="post">
+            <form class="row g-3" id="ReminderForm" asp-action="InsertReminder" asp-controller="Reminder" onsubmit="return CheckData()" method="post">
 
-             
+                @*  <!-- Date -->
+                <div class="col-12 col-md-3 mb-3">
+                <div class="form-floating">
+                <input type="date" class="form-control" id="datepicker" asp-for="PurchaseInvoiceDate">
+                <label for="datepicker" class="text-truncate"><span style="color: black;">*</span> Select a Date</label>
+
+                </div>
+                </div>*@
 
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Reminder Date </label>
                         <input type="datetime-local" placeholder="DD-MM-YYYY" id="datepicker" asp-for="ReminderDateTime" class="form-control">
+                        <span style="color:red; font-weight:bold" asp-validation-for="ReminderDateTime"></span>
                     </div>
                 </div>
 
@@ -40,6 +48,7 @@
                             <option value="CheckCustomerAccounting">Check Customer Accounting</option>
                             <option value="Other">Custom..</option>
                         </select>
+                        <span style="color:red; font-weight:bold" asp-validation-for="ReminderType"></span>
                     </div>
                 </div>
 
@@ -48,6 +57,7 @@
                     <div class="form-group">
                         <label for="otherTypeReminder"><span style="color: red;">*</span> Custom Reminder </label>
                         <input type="text" class="form-control" asp-for=ReminderCustomType id="otherTypeReminder" placeholder="Enter Custom Reminder" oninput="this.value = this.value.toUpperCase()">
+                        <span style="color:red; font-weight:bold" asp-validation-for="ReminderCustomType"></span>
                     </div>
                 </div>
 
@@ -58,11 +68,12 @@
                     <div class="form-group">
                         <label for="remainderDescription"><span style="color: red;">*</span> Reminder Description</label>
                         <textarea class="form-control" asp-for=ReminderDescription id="remainderDescription" placeholder="Enter Description of Reminder" oninput="this.value = this.value.toUpperCase()"></textarea>
+                        <span style="color:red; font-weight:bold" asp-validation-for="ReminderDescription"></span>
                     </div>
                 </div>
 
 
-
+                
                 <input type="text" value="bhargavkachhela1@gmail.com" name="SentEmailAddress" asp-for="SentEmailAddress" />
 
                 <input type="text" value="9664633122" name="SentPhoneNo" asp-for="SentPhoneNo" />
@@ -71,7 +82,7 @@
                     <div class="col-auto text-center mb-3" style="margin-top:20px;">
                         <button type="submit" class="btn btn-success me-2">
                             <i class="fas fa-bell"></i>
-                            Update Reminder
+                            Create Reminder
                         </button>
                         <button type="reset" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Clear All
@@ -84,14 +95,7 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        $('#SelectReminder').on('change', function () {
-            if ($(this).val() === 'Other') {
-                $('#otherReminderType').show();
-            } else {
-                $('#otherReminderType').hide();
-            }
-        });
-    });
-</script>
+<script src="/js/bundle/reminder/add-bundle.js"></script>
+
+
+

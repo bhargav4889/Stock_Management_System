@@ -8,108 +8,7 @@
 @using Stock_Management_System.UrlEncryption;
 @model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Show_Payment_Info>
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            var table = $('#data').DataTable();
-
-            // Extend DataTable search to include date range filtering
-            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-                var startDateInput = $("#startdate").val();
-                var endDateInput = $("#datepickerend").val();
-
-                // If only the end date is specified, set the start date to the first day of the current month
-                var startDate = startDateInput ? moment(startDateInput, "YYYY-MM-DD") : (endDateInput ? moment().startOf('month') : moment().startOf('month'));
-                // If only the start date is specified, set the end date to today's date
-                var endDate = endDateInput ? moment(endDateInput, "YYYY-MM-DD").endOf('day') : (startDateInput ? moment() : moment().endOf('day'));
-
-                var dateColumn = data[0]; // Adjust if date is in another column
-                var date = moment(dateColumn, "DD-MM-YY");
-
-                if (!date.isValid() || !startDate.isValid() || !endDate.isValid()) {
-                    console.error("Invalid date encountered");
-                    return false;
-                }
-
-                return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
-            });
-
-            // Function to apply all search filters and reset date inputs after search
-            function applySearches() {
-                var Name = $("#searchName").val();
-
-                var location = $("#location").val();
-                var selectedGrain = $("#graintype").val();
-                var selectedGrainText = $("#graintype option:selected").text();
-
-                // Clear existing searches
-                table.search('').columns().search('');
-
-                // Apply text input searches
-                table.column(1).search(Name, true, false);
-                table.column(3).search(location, true, false);
-
-                // Apply dropdown searches
-                if (selectedGrain) {
-                    table.column(2).search(selectedGrainText, false, false);
-                }
-
-
-
-                // Redraw table to apply all filters
-                table.draw();
-
-                // Reset start and end date values after search
-                $("#startdate, #datepickerend").val('');
-            }
-
-            // Bind the search function to the search button click event
-            $('#searchButton').on('click', function () {
-                applySearches();
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            // Attach event to document, delegate to .loadPaymentInfoBtn
-            $(document).on('click', '.loadPaymentInfoBtn', function () {
-                var customerId = $(this).data('customer-id');
-                var stockId = $(this).data('stock-id');
-
-                $.ajax({
-                    url: '/Payment/Payment_Info_By_Customer_And_Stock',
-                    data: { Customer_ID: customerId, Stock_ID: stockId },
-                    success: function (response) {
-                        $('#createpayment .modal-content').html(response);
-                        $('#createpayment').modal('show');
-                    },
-                    error: function () {
-                        alert('Error loading payment information');
-                    }
-                });
-            });
-        });
-    </script>
-
-
-    <script>
-        function showToastNotification(formId) {
-            // Show a success toast notification
-            toastr.success('Download started successfully.', 'Success', {
-                closeButton: true,
-                progressBar: true,
-                positionClass: 'toast-top-center',
-                timeOut: 3000, // Display duration
-            });
-
-            // Use setTimeout to delay form submission for a short period (e.g., 100 ms)
-            setTimeout(function () {
-                document.getElementById(formId).submit();
-            }, 100); // Delay the form submission to allow the toast to render
-
-            return false; // Prevent immediate form submission
-        }
-    </script>
+    <script src="/js/bundle/payment/paid-bundle.js"></script>
 }
 
 
@@ -139,7 +38,7 @@
                     <ul>
 
                         <li>
-                            <form id="pdfExportForm" asp-action="Paid_Payments_PDF" asp-controller="Payment" method="get">
+                            <form id="pdfExportForm" asp-action="PaidPaymentsPDF" asp-controller="Payment">
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
@@ -147,7 +46,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="Paid_Payments_EXCEL" asp-controller="Payment" method="get">
+                            <form id="excelExportForm" asp-action="PaidPaymentsEXCEL" asp-controller="Payment">
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
@@ -285,7 +184,7 @@
 
 
         <!-- Modal Shell -->
-        <div class="modal fade" id="createpayment" tabindex="-1" aria-labelledby="createpaymentLabel" aria-hidden="true">
+        <div class="modal fade" id="payment" tabindex="-1" aria-labelledby="paymentLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
                     <!-- Dynamic Content Will Be Loaded Here -->

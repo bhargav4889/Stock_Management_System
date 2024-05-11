@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Add Stock";
 }
+
 <div class="content">
     <div class="page-header">
         <div class="page-title">
@@ -63,7 +64,7 @@
                         <label>
                             <span style="color: red;">*</span> New Customer Type
                         </label>
-                        <input type="text" class="form-control" placeholder="Customer Type" id="cttype" asp-for="Customers.CustomerType" oninput="this.value = this.value.toUpperCase()">
+                        <input type="text" class="form-control" placeholder="Customer Type"  id="cttype" asp-for="Customers.CustomerType" oninput="this.value = this.value.toUpperCase()">
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerType"></span>
                     </div>
                 </div>
@@ -207,9 +208,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @section Scripts {
- 
 
 
-    <script src="/js/Section/stock/add.js"></script>
+
+    <script src="/js/bundle/stock/add-bundle.js"></script>
 
 }

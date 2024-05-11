@@ -2,13 +2,13 @@
 {
     public class Bank_Model
     {
-        
-            public int BankId { get; set; }
 
-            public string BankName { get; set; }
+        public int BankId { get; set; }
 
-            public string BankIcon { get; set; }
-        
+        public string BankName { get; set; }
+
+        public string BankIcon { get; set; }
+
     }
 
     public class Our_Banks_Dropdown
