@@ -1,6 +1,7 @@
-
 function updateTime() {
     const now = new Date();
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const day = days[now.getDay()];
     let hours = now.getHours();
     let minutes = now.getMinutes();
     let seconds = now.getSeconds();
@@ -11,13 +12,13 @@ function updateTime() {
     minutes = minutes < 10 ? '0' + minutes : minutes;
     seconds = seconds < 10 ? '0' + seconds : seconds;
 
-    const strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+    const strTime = day + ', ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
     document.getElementById('current-time').innerText = strTime;
 
     setTimeout(updateTime, 1000);
 }
 
 // Initialize the updateTime function when the page loads
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', function () {
     updateTime();
-};
+});

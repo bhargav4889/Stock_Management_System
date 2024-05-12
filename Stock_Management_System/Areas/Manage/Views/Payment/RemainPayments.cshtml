@@ -143,7 +143,7 @@
                         <th class="text-center">Payment-Method</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Pay</th>
-
+                        <th class="text-center">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -171,7 +171,11 @@
                                             <i class="fa fa-credit-card"></i>
                                         </a>
                                     </td>
-
+                                    <td class="text-center">
+                                        <a role="button" onclick="confirmRemainDeletion('@Url.Action("DeleteRemainStatusPayment", "Payment", new { Payment_ID = UrlEncryptor.Encrypt(Convert.ToString(item.Payment_Id)), Stock_ID = UrlEncryptor.Encrypt(Convert.ToString(item.Stock_Id)) })')">
+                                            <img src="~/img/icons/delete.svg" class="me-2" alt="Delete">
+                                        </a>
+                                    </td>
 
 
                                 </tr>

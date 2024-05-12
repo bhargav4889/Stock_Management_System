@@ -127,13 +127,12 @@ function CheckData() {
     var grainname = document.getElementById("selectgrain").value;
     var partyName = document.getElementById("Partyname").value.trim();
     var invoiceType = $('#selectinvoice').val();
-    var otherInvoiceType = document.getElementById("otherInvoiceType") ? document.getElementById("otherInvoiceType").value : null;
     var partyAddress = document.getElementById("PartyAddress").value.trim();
     var brandName = document.getElementById("ProductBrandName").value.trim();
     var weight = parseFloat(document.getElementById("weight").value);
     var totalPrice = parseFloat(document.getElementById("totalprice").value);
     var productPrice = parseFloat(document.getElementById("productprice").value);
-    var vehicleType = document.getElementById("selectvehicletype").value;
+    var vehicleType = document.getElementById("VehicleName").value;
     var containerNumber = document.getElementById("containerNumber") ? document.getElementById("containerNumber").value : null;
     var vehicleNo = document.getElementById("vehicleno").value.trim();
     var driverName = document.getElementById("drivername").value.trim();
@@ -166,12 +165,9 @@ function CheckData() {
     if (!vehicleNo) missingFields.push("Vehicle Number");
     if (!driverName) missingFields.push("Driver Name");
 
-    // Conditional fields based on user selection
-    if (invoiceType === 'Other' && !otherInvoiceType) {
-        missingFields.push("Other Invoice Type");
-    }
+   
 
-    if (vehicleType === 'CONTAINER' && !containerNumber) {
+    if (vehicleType === 'CONTAINER' && (!containerNumber || containerNumber.trim() === '')) {
         missingFields.push("Container Number");
     }
 
@@ -185,6 +181,7 @@ function CheckData() {
     confirmInvoiceCreation("/Invoice/InsertSaleInvoice", partyName);
     return false; // Prevent form submission until confirmation and AJAX call are completed
 }
+
 
 
 
@@ -223,19 +220,6 @@ function confirmInvoiceCreation(redirectUrl, partyName) {
 
 
 
-$(function () {
-    // Listen for changes on the #selectoinvoice dropdown
-    $('#selectinvoice').change(function () {
-        // Check if the selected option's value is 'other'
-        if ($(this).val() == 'Other') {
-            // Show the #invoiceTypeField div
-            $('#invoiceTypeField').show();
-        } else {
-            // Hide the #invoiceTypeField div
-            $('#invoiceTypeField').hide();
-        }
-    });
-});
 
 
 $(function () {

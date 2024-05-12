@@ -122,66 +122,77 @@ document.getElementById("CGST")?.addEventListener("input", function () {
 document.getElementById("productprice").addEventListener("input", CalculateMethod);
 
 
+var vehicle = document.getElementById('VehicleName').value;
 
-function CheckData() {
-    var grainname = document.getElementById("selectgrain")?.value || '';
-    var partyName = document.getElementById("Partyname")?.value || '';
-    var invoiceType = $('#selectoinvoice').val();
-    var otherInvoiceType = document.getElementById("otherInvoiceType")?.value || '';
-    var partyAddress = document.getElementById("PartyAddress")?.value || '';
-    var brandName = document.getElementById("ProductBrandName")?.value || '';
-    var weight = document.getElementById("weight")?.value || '';
-    var totalPrice = document.getElementById("totalprice")?.value || '';
-    var productPrice = document.getElementById("productprice")?.value || '';
-    var vehicleType = document.getElementById("selectvehicletype")?.value || '';
-    var containerNumber = document.getElementById("containerNumber")?.value || '';
-    var vehicleNo = document.getElementById("vehicleno")?.value || '';
-    var driverName = document.getElementById("drivername")?.value || '';
+if (vehicle == "CONTAINER") {
 
-    var missingFields = [];
-
-    // Check required fields
-    if (!grainname) missingFields.push('Grain Name');
-    if (!partyName) missingFields.push('Party Name');
-    if (!partyAddress) missingFields.push('Party Address');
-    if (!brandName) missingFields.push('Brand Name');
-    if (!weight) missingFields.push('Weight');
-    if (!totalPrice) missingFields.push('Total Price');
-    if (!productPrice) missingFields.push('Product Price');
-    if (!vehicleType) missingFields.push('Vehicle Type');
-    if (!vehicleNo) missingFields.push('Vehicle Number');
-    if (!driverName) missingFields.push('Driver Name');
-
-    // Check conditional required fields
-    if (invoiceType == 'other' && !otherInvoiceType) missingFields.push('Other Invoice Type');
-    if (vehicleType == 'CONTAINER' && !containerNumber) missingFields.push('Container Number');
-
-    if (missingFields.length > 0) {
-        toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, {
-            closeButton: true,
-            progressBar: true,
-            positionClass: 'toast-bottom-right',
-            preventDuplicates: true,
-            showDuration: '300',
-            hideDuration: '1000',
-            timeOut: '5000',
-            extendedTimeOut: '1000',
-            showEasing: 'swing',
-            hideEasing: 'linear',
-            showMethod: 'fadeIn',
-            hideMethod: 'fadeOut'
-        });
-        return false;
-    } else {
-        // Use SweetAlert2 to confirm with the user before submission
-        confirmInvoiceCreation("/Invoice/UpdateSaleInvoiceDetails", partyName);
-        return false; // Prevent form submission until confirmation and AJAX call are completed
-    }
+    $('#containerNumberField').show();
+  
 }
 
 
 
-function confirmInvoiceCreation(redirectUrl, partyName) {
+function CheckData() {
+    var grainname = document.getElementById("selectgrain").value;
+    var partyName = document.getElementById("Partyname").value.trim();
+    var invoiceType = $('#selectinvoice').val();
+    var partyAddress = document.getElementById("PartyAddress").value.trim();
+    var brandName = document.getElementById("ProductBrandName").value.trim();
+    var weight = parseFloat(document.getElementById("weight").value);
+    var totalPrice = parseFloat(document.getElementById("totalprice").value);
+    var productPrice = parseFloat(document.getElementById("productprice").value);
+    var vehicleType = document.getElementById("VehicleName").value;
+    var containerNumber = document.getElementById("containerNumber") ? document.getElementById("containerNumber").value : null;
+    var vehicleNo = document.getElementById("vehicleno").value.trim();
+    var driverName = document.getElementById("drivername").value.trim();
+
+    var toastrSettings = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-bottom-right',
+        preventDuplicates: true,
+        showDuration: '300',
+        hideDuration: '1000',
+        timeOut: '5000',
+        extendedTimeOut: '1000',
+        showEasing: 'swing',
+        hideEasing: 'linear',
+        showMethod: 'fadeIn',
+        hideMethod: 'fadeOut'
+    };
+
+    // Validate required fields
+    var missingFields = [];
+    if (!grainname) missingFields.push("Grain Type");
+    if (!partyName) missingFields.push("Party Name");
+    if (!partyAddress) missingFields.push("Party Address");
+    if (!brandName) missingFields.push("Brand Name");
+    if (isNaN(weight) || weight <= 0) missingFields.push("Weight");
+    if (isNaN(totalPrice) || totalPrice <= 0) missingFields.push("Total Price");
+    if (isNaN(productPrice) || productPrice <= 0) missingFields.push("Product Price");
+    if (!vehicleType) missingFields.push("Vehicle Type");
+    if (!vehicleNo) missingFields.push("Vehicle Number");
+    if (!driverName) missingFields.push("Driver Name");
+
+   
+    if (vehicleType === 'CONTAINER' && (!containerNumber || containerNumber.trim() === '')) {
+        missingFields.push("Container Number");
+    }
+
+    // Display errors if any fields are missing
+    if (missingFields.length > 0) {
+        toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, toastrSettings);
+        return false;
+    }
+
+    // Use SweetAlert2 to confirm with the user before submission
+    confirmInvoiceUpdation("/Invoice/UpdateSaleInvoiceDetails", partyName);
+    return false; // Prevent form submission until confirmation and AJAX call are completed
+}
+
+
+
+function confirmInvoiceUpdation(redirectUrl, partyName) {
     Swal.fire({
         title: 'Confirm Invoice Update',
         text: `Update an invoice for ${partyName}?`,
@@ -214,27 +225,9 @@ function confirmInvoiceCreation(redirectUrl, partyName) {
 
 
 
-if ($('#selectinvoice').val() == 'other') {
-    $('#invoiceTypeField').show();
-}
 
-if ($('#selectvehicletype').val() == 'CONTAINER') {
-    $('#containerNumberField').show();
-}
 
-$(function () {
-    // Listen for changes on the #selectoinvoice dropdown
-    $('#selectinvoice').change(function () {
-        // Check if the selected option's value is 'other'
-        if ($(this).val() == 'other') {
-            // Show the #invoiceTypeField div
-            $('#invoiceTypeField').show();
-        } else {
-            // Hide the #invoiceTypeField div
-            $('#invoiceTypeField').hide();
-        }
-    });
-});
+
 
 
 $(document).ready(function () {

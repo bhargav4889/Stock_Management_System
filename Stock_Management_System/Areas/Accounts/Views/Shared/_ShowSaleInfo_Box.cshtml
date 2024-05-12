@@ -173,12 +173,12 @@
 
                 <tr>
                     <th>Is Full Amount Payment Received?</th>
-                    <td>@(Model.IsFullPaymentReceive ? "Yes" : "No")</td>
+                    <td>@(Model.IsFullPaymentReceive)</td>
                 </tr>
                 }
             </table>
         </div>
-        @if (Model.IsFullPaymentReceive == false)
+        @if (Model.IsFullPaymentReceive == "NO")
         {
             <div class="table-section">
                 <table class="table">

@@ -21,7 +21,7 @@
                 <div class="col">
                     <div class="page-btn">
                         <a href="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)"
-                           download="@($"{Model.purchase_Invoice?.CustomerName?.Replace(" ", "_")}_{Model.purchase_Invoice?.ProductName?.Replace(" ", "_")}_Invoice.pdf")"
+                           download="@($"{Model.purchase_Invoice?.CustomerName?.Replace(" ", "_")}-{Model.purchase_Invoice?.ProductName?.Replace(" ", "_")}-Invoice.pdf")"
                            class="btn btn-added" id="downloadInvoice" onclick="notifyDownloadStart()">
                             <img src="~/img/icons/pdf.svg" alt="img" class="me-1">Download Invoice
                         </a>

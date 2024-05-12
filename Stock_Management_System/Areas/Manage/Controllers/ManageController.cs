@@ -13,12 +13,10 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
     [Area("Manage")]
     [Route("~/[controller]/[action]")]
-    /*    [CheckAccess]*/
 
     public class ManageController : Controller
     {
-        #region Database Configuration
-
+        #region Section :  Configuration
 
         public IConfiguration Configuration;
 
@@ -26,6 +24,10 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         public readonly HttpClient _Client;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ManageController"/> class with specified configuration.
+        /// </summary>
+        /// <param name="configuration">Configuration interface provided by ASP.NET Core to handle settings.</param>
 
         public ManageController(IConfiguration configuration)
         {
@@ -36,34 +38,38 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         }
 
-        #endregion Database Configuration
+        #endregion
 
-       
+        /// <summary>
+        /// Displays the profile view.
+        /// </summary>
+        /// <returns>The Profile view.</returns>
+
         public IActionResult Profile()
         {
             return View();
         }
 
-   
-        public async Task <IActionResult> Dashboard()
+        /// <summary>
+        /// Asynchronously displays the dashboard view with various models containing system data.
+        /// </summary>
+        /// <returns>The Dashboard view populated with data from various APIs.</returns>
+        public async Task<IActionResult> Dashboard()
         {
 
             Api_Service api_Service = new Api_Service();
 
             Dashboard_All_Models _All_Models = new Dashboard_All_Models();
 
-
             _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Features/PendingCustomersPaymentSortList");
 
             _All_Models.All_Counts_Model = await api_Service.Model_Of_Data_Display<AllCountsModel>("Counts");
 
-            
-             _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/GetRecentActions");
+            _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/GetRecentActions");
 
             _All_Models.upcoming_Reminders = await api_Service.List_Of_Data_Display<Upcoming_Reminders_Model>("Features/UpcomingRemindersList");
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Counts");
-
 
             if (response.IsSuccessStatusCode)
             {
@@ -73,8 +79,6 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 var dataObject = jsonObject.data;
                 var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
                 _All_Models.All_Counts_Model = JsonConvert.DeserializeObject<AllCountsModel>(extractedDataJson);
-               
-
 
             }
             else
@@ -83,20 +87,22 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 return default;
             }
 
-           
-
-
-
             return View(_All_Models);
         }
 
-       
+        /// <summary>
+        /// Displays the error page.
+        /// </summary>
+        /// <returns>The Error Page view.</returns>
         public IActionResult Error_Page()
         {
             return View();
         }
 
-
+        /// <summary>
+        /// Displays the features view.
+        /// </summary>
+        /// <returns>The Features view.</returns>
         public IActionResult Features()
         {
             return View();

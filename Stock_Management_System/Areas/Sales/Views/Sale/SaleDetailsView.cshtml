@@ -15,18 +15,29 @@
     }
 </style>
 
+<!-- Include html2canvas from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+
+<!-- Your custom script file -->
 <script src="/js/bundle/sale/details-bundle.js"></script>
+
 
 <div class="container">
     <br />
     <div class="row">
         <div class="col-2">
-            <a asp-action="Manage_Sales" asp-controller="Sales" class="text-decoration-none">
+            <a asp-action="Sales" asp-controller="Sales" class="text-decoration-none">
                 <i class="fa fa-arrow-left" style="color:green; transform: scale(1.25);"></i> 
             </a>
         </div>
         <div class="col-8 text-center">
             <h5>Sale Details</h5>
+        </div>
+        
+        <div class="col-2 text-right">
+            <a role="button" id="downloadImage" class="btn icon-button">
+                <i class="fa fa-download" aria-hidden="true" style="color:green; transform: scale(1.25);"></i>
+            </a>
         </div>
     </div>
 
@@ -35,7 +46,7 @@
             @* Display sale creation date and other details *@
             <tr>
                 <th>Sale Creation Date</th>
-                <td>@Model.Create_Sales.ToString("dd-MM-yyyy")</td>
+                <td id="saleDate">@Model.Create_Sales.ToString("dd-MM-yyyy")</td>
             </tr>
             <tr>
                 <th>Received Payment Date</th>
@@ -43,7 +54,7 @@
             </tr>
             <tr>
                 <th>Customer Name</th>
-                <td>@Model.CustomerName</td>
+                <td id="customerName">@Model.CustomerName</td>
             </tr>
             <tr>
                 <th>Customer Type</th>
@@ -57,7 +68,7 @@
             {
                 <tr>
                     <th>Brand Name</th>
-                    <td>@Model.Brand_Name</td>
+                    <td id="brandName">@Model.Brand_Name</td>
                 </tr>
             }
             <tr>
@@ -121,6 +132,7 @@
                 string BankIcon = baseAddress + Icon;
 
                 <tr>
+                    <input type="hidden" id="BankIcon" value="@BankIcon" />
                     <th> Bank Account No</th>
                     <td>XXXXX@(Model.Receive_Account_No.Substring(Model.Receive_Account_No.Length - 4)) <img src="@BankIcon" class="bank-icon" /></td>
                 </tr>
@@ -138,10 +150,10 @@
 
             <tr>
                 <th>Is Full Amount Payment Received?</th>
-                <td>@(Model.IsFullPaymentReceive ? "Yes" : "No")</td>
+                <td>@(Model.IsFullPaymentReceive.ToString())</td>
             </tr>
 
-            @if (Model.IsFullPaymentReceive)
+            @if (Model.IsFullPaymentReceive == "NO")
             {
 
 

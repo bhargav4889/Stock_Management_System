@@ -1,5 +1,8 @@
 ﻿@model Stock_Management_System.Areas.Invoices.Models.MutipleModel
 
+@{
+    ViewData["Title"] = "Preview Sale Invoice";
+}
 <div class="content">
     <div class="page-header">
         <div class="page-title">
@@ -19,7 +22,7 @@
                 <div class="col">
                     <div class="page-btn">
                         <a href="data:application/pdf;base64,@Convert.ToBase64String(Model.Pdf)"
-                           download="@($"{Model.sales_Invoice?.PartyName?.Replace(" ", "_")}_{Model.sales_Invoice?.ProductName?.Replace(" ", "_")}_Invoice.pdf")"
+                           download="@($"{Model.sales_Invoice?.PartyName?.Replace(" ", "_")}-{Model.sales_Invoice?.ProductName?.Replace(" ", "_")}-Invoice.pdf")"
                            class="btn btn-added" id="downloadInvoice" onclick="notifyDownloadStart()">
                             <img src="~/img/icons/pdf.svg" alt="img" class="me-1">Download Invoice
                         </a>

@@ -24,7 +24,7 @@
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
                     <label><span style="color:red;">*</span> Customer Name</label>
-                    <input type="text" disabled value="@Model.Customer_Name">
+                    <input type="text" id="customername" disabled value="@Model.Customer_Name">
                 </div>
             </div>
 
@@ -154,7 +154,16 @@
     </div>
 </form>
 
-<script>
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- Include Toastr -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="/js/bundle/payment/m/add-bundle.js"></script>
+
+@* <script>
     document.getElementById('submitBtn').addEventListener('click', function () {
         var confirmSubmission = confirm("Are you sure you want to submit this form?");
         if (confirmSubmission) {
@@ -234,7 +243,7 @@
 
         // Example validation: not empty and length between 8 and 12 characters
         // Adjust the condition based on your validation rules
-        if (accountNumber.length >= 8 && accountNumber.length <= 12) {
+        if (accountNumber.length >= 8 && accountNumber.length <= 18) {
             errorMessageDiv.style.display = 'none';
             // Add more complex validation here if needed, such as checksum validation
         } else {
@@ -274,7 +283,7 @@
     });
 
 
-</script>
+</script> *@
 
 
 <!-- Adjusted CSS for image alignment -->

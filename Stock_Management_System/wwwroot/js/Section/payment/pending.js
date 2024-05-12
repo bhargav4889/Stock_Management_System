@@ -133,3 +133,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Optionally, add event listeners or other mechanisms to invoke updateButtonState if the table is dynamically updated.
 });
+
+
+
+function confirmPendingDeletion(deleteUrl) {
+    Swal.fire({
+        title: 'Are You Sure Want To Delete?',
+        text: `If This Delete Payment Information As Well Stock Details Realeted !!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: deleteUrl,
+                type: 'POST',
+                success: function (response) {
+                    // Set a success message in session storage
+                    sessionStorage.setItem('DeleteStatus', 'Deleted Successfully!');
+                    // Redirect immediately
+                    window.location.href = response.redirectUrl;
+                },
+                error: function () {
+                    // Set an error message in session storage
+                    toastr.error("Somthing Went Wrong !!");
+                    // You might still want to redirect or handle errors differently here
+                    window.location.href = window.location.reload;
+                }
+            });
+        }
+    });
+}
+
+$(function () {
+    var AddMessage = sessionStorage.getItem('DeleteStatus');
+    if (AddMessage) {
+        toastr.success(AddMessage);
+        // Clear the message from session storage so it doesn't reappear on refresh
+        sessionStorage.removeItem('DeleteStatus');
+    }
+});

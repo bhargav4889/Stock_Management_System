@@ -85,7 +85,7 @@ $(function () {
 
 
 
-   
+
 });
 
 $(function () {
@@ -157,30 +157,102 @@ $(function () {
 
     $(function () {
         $('#isFullAmountReceive').change(function () {
-            if ($(this).val() === "0") {
-                // If "NO" is selected (value "0"), show the fields
+            var selectedValue = $(this).val();
+            if (selectedValue === "NO") {
+                // Show fields when "NO" is selected
                 $('#RemainDate').show();
                 $('#RemainAmount').show();
-                $('#RemainPaymentMethod').show(); // Ensure this element exists or remove this line if unnecessary
+                $('#RemainPaymentMethod').show();
             } else {
-                // If "YES" is selected (value "1") or nothing is selected, hide the fields
+                // Hide fields when "YES" is selected or nothing is selected
                 $('#RemainDate').hide();
                 $('#RemainAmount').hide();
-                $('#RemainPaymentMethod').hide(); // Ensure this element exists or remove this line if unnecessary
+                $('#RemainPaymentMethod').hide();
+                $('#RemainbankSelection').hide();  // Also hide bank selection when not needed
             }
         });
+
+        // Handle changes in the remain payment method to potentially show bank selection
+        $('#selectremainpaymentmethod').change(function () {
+            var paymentMethod = $(this).val();
+            if (paymentMethod === "BANK") {
+                $('#RemainbankSelection').show();
+            } else {
+                $('#RemainbankSelection').hide();
+            }
+        });
+
+        // Initialize hidden state based on initial page load values
+        $('#isFullAmountReceive').trigger('change');
+        $('#selectremainpaymentmethod').trigger('change');
     });
 
 
 
-
-    $('#selectremainpaymentmethod').change(function () {
-        if ($(this).val() === 'BANK') {
-            $('#RemainbankSelection').show();
-        } else {
-            $('#RemainbankSelection').hide();
+    $(function () {
+        var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
+        // Function to show or hide new customer fields and a message.
+        function toggleNewCustomerFields(show) {
+            $("#newCustomerMessage").toggle(show);
+            $("#newcustomertype").toggle(show);
+            $("#newcustomercity").toggle(show);
+            $("#newcustomerphoneno").toggle(show);
         }
-    });
+        // Initially hide the new customer message and fields.
+        toggleNewCustomerFields(false);
+        $("#Customer").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/Sale/GetSellerCustomerData", // Correct URL to your controller action.
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        CustomerName: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
+                                value: item.customerName,
+                                id: item.customerId, // Customer ID.
+                                type: item.customerType // Customer Type.
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 1, // Minimum length before searching.
+            response: function (event, ui) {
+                var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
+                toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
+            },
+            select: function (event, ui) {
+                isSuggestionSelected = true;
+                event.preventDefault(); // Prevent default to avoid placing label in the input.
+                $("#Customer").val(ui.item.value); // Set the input to the customer name.
+                $("#CustomerId").val(ui.item.id); // Update hidden field with selected customer ID.
+                $("#cttype").val(ui.item.type).trigger('change'); // Set the customer type and trigger change for any attached handlers.
+                toggleNewCustomerFields(false); // Hide new customer fields as a selection has been made.
+            }
+        });
+        // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
+        $("#Customer").on('input', function () {
+            var enteredValue = $(this).val().trim();
+            if (!enteredValue) {
+                toggleNewCustomerFields(false);
+                isSuggestionSelected = false;
+            } else {
+                isSuggestionSelected = false;
+                // Since we are still typing, check if any item matches exactly from the last search.
+                $("#Customer").autocomplete("search", enteredValue);
+            }
+        });
+        // Optionally, reset the form state when the page is refreshed or navigated away.
+        $(window).on('beforeunload', function () {
+            toggleNewCustomerFields(false);
+        });
+    }); 
+
 
     function DateDefaultValue() {
         var today = new Date();
@@ -193,7 +265,7 @@ $(function () {
 
     window.onload = function () {
         DateDefaultValue();
-       
+
     };
 
 
@@ -201,69 +273,9 @@ $(function () {
 
 }); // Correctly closed $(document).ready function
 
-$(function () {
-    var isSuggestionSelected = false;
 
-    function toggleNewCustomerFields(show) {
-        $("#newCustomerMessage").toggle(show);
-        $("#newcustomertype").toggle(show);
-        $("#newcustomercity").toggle(show);
-        $("#newcustomerphoneno").toggle(show);
-    }
 
-    toggleNewCustomerFields(false);
 
-    $("#Customer").autocomplete({
-        source: function (request, response) {
-            $.ajax({
-                url: '/Sale/GetSellerCustomerData',
-                type: "POST",
-                dataType: "json",
-                data: { CustomerName: request.term },
-                success: function (data) {
-                    response($.map(data, function (item) {
-                        return {
-                            label: item.customerName + ' (' + item.customerType + ') - ' + item.customerAddress,
-                            value: item.customerName,
-                            id: item.customerId,
-                            type: item.customerType // Ensure 'customerType' is provided by your server
-                        };
-                    }));
-                }
-            });
-        },
-        minLength: 1,
-        response: function (event, ui) {
-            var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
-            toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
-        },
-        select: function (event, ui) {
-            isSuggestionSelected = true;
-            event.preventDefault(); // Prevent default to avoid placing label in the input.
-            $("#Customer").val(ui.item.value); // Set the input to the customer name.
-            $("#CustomerId").val(ui.item.id); // Update hidden field with selected customer ID.
-            $("#cttype").val(ui.item.type).trigger('change'); // Set the customer type and trigger change for any attached handlers.
-            toggleNewCustomerFields(false); // Hide new customer fields as a selection has been made.
-        }
-    });
-
-    // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
-    $("#Customer").on('input', function () {
-        var enteredValue = $(this).val().trim();
-        if (!enteredValue) {
-            toggleNewCustomerFields(false);
-            isSuggestionSelected = false;
-        } else {
-            isSuggestionSelected = false;
-            // Since we are still typing, check if any item matches exactly from the last search.
-            $("#Customer").autocomplete("search", enteredValue);
-        }
-    });
-    // Optionally, reset the form state when the page is refreshed or navigated away.
-    $(window).on('beforeunload', function () {
-        toggleNewCustomerFields(false);
-    });
-});
 
 function CheckData() {
     var date = document.getElementById("datepicker").value;
@@ -275,13 +287,49 @@ function CheckData() {
     var rate = document.getElementById("rate").value;
     var totalPrice = document.getElementById("totalprice").value;
     var fullAmountReceived = document.getElementById("isFullAmountReceive").value;
+    var receiveAmount = document.getElementById('receivedAmount').value;
     var remainDate = document.getElementById("RemainDate").value;
     var remainAmount = document.getElementById("RemainAmount").value;
     var remainPaymentMethod = document.getElementById("selectremainpaymentmethod").value;
     var remainBankSelect = document.getElementById("remainbankSelect").value;
 
-    if (!grainName || !customerName || !weight || !rate || !totalPrice || !date) {
-        toastr.error('Please fill out all required fields.', {
+
+    var isNewCustomer = document.getElementById("newcustomertype").style.display !== 'none'; // Checks if new customer fields are visible
+
+    var newCustomerType = document.getElementById("cttype").value; // Use .value for input fields
+    var newCustomerCity = document.getElementById("customercity").value; // Use .value for input fields
+    var newCustomerPhoneNo = document.getElementById("contactno").value; // Use .value for input fields
+
+    var missingFields = [];
+
+    // Check for missing input in essential fields
+    if (!date) missingFields.push("Date");
+    if (!grainName) missingFields.push("Grain Name");
+    if (!customerName) missingFields.push("Customer Name");
+    if (!weight) missingFields.push("Weight");
+    if (!rate) missingFields.push("Rate");
+    if (!totalPrice) missingFields.push("Total Price");
+    if (!receiveAmount) missingFields.push("Received Amount");
+    if (!fullAmountReceived) missingFields.push("Select Full Payment Received or Not")
+    if (paymentMethod === "BANK" && !bankSelect) missingFields.push("Bank Select for Payment");
+
+    // Check for additional fields when full amount is not received
+    if (fullAmountReceived === "NO") {
+        if (!remainDate) missingFields.push("Remaining Payment Date");
+        if (!remainAmount) missingFields.push("Remaining Amount");
+        if (!remainPaymentMethod) missingFields.push("Remaining Payment Method");
+        if (remainPaymentMethod === "BANK" && !remainBankSelect) missingFields.push("Bank Select for Remaining Payment");
+    }
+
+    // Check new customer fields only if it's a new customer
+    if (isNewCustomer) {
+        if (!newCustomerType) missingFields.push('New Customer Type');
+        if (!newCustomerCity) missingFields.push('New Customer City');
+        if (!newCustomerPhoneNo) missingFields.push('New Customer Contact No');
+    }
+    // Display a collective error if any fields are missing
+    if (missingFields.length > 0) {
+        toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, {
             closeButton: true,
             progressBar: true,
             positionClass: 'toast-bottom-right',
@@ -295,22 +343,18 @@ function CheckData() {
             showMethod: 'fadeIn',
             hideMethod: 'fadeOut'
         });
-        return false; // Prevent form submission
-    }
-
-    if (paymentMethod === "BANK" && !bankSelect) {
-        toastr.error('Please select a bank.', toastrSettings);
         return false;
     }
 
-    if (fullAmountReceived === "False" && (!remainDate || !remainAmount || !remainPaymentMethod || (remainPaymentMethod === "BANK" && !remainBankSelect))) {
-        toastr.error('Please complete all remaining payment details.', toastrSettings);
-        return false;
-    }
-
+    // If all checks pass, optionally confirm before proceeding
     confirmAddition("/Sale/InsertSale", customerName);
-    return false; // Prevent form submission until confirmation and AJAX call are completed
+    return false; // Prevent form submission
 }
+
+
+
+
+
 
 function confirmAddition(addUrl, customerName) {
     Swal.fire({

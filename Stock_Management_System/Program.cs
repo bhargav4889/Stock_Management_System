@@ -52,6 +52,7 @@ builder.Services.AddWebOptimizer(pipeline =>
     pipeline.AddJavaScriptBundle("/js/bundle/sale/edit-bundle.js", "/js/Section/sale/edit.js");
     pipeline.AddJavaScriptBundle("/js/bundle/sale/sales-bundle.js", "/js/Section/sale/sales.js");
     pipeline.AddJavaScriptBundle("/js/bundle/sale/details-bundle.js", "/js/Section/sale/details.js");
+   
 
     // invoice --> s --> 
 
@@ -85,6 +86,13 @@ builder.Services.AddWebOptimizer(pipeline =>
     pipeline.AddJavaScriptBundle("/js/bundle/payment/paid-bundle.js", "/js/Section/payment/paid.js");
     pipeline.AddJavaScriptBundle("/js/bundle/payment/pending-bundle.js", "/js/Section/payment/pending.js");
     pipeline.AddJavaScriptBundle("/js/bundle/payment/remain-bundle.js", "/js/Section/payment/remain.js");
+
+
+    // payment --> m
+
+    pipeline.AddJavaScriptBundle("/js/bundle/payment/m/add-bundle.js", "/js/Section/payment/m/add.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/payment/m/edit-bundle.js", "/js/Section/payment/m/edit.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/payment/m/info-bundle.js", "/js/Section/payment/m/info.js");
 
 
     // information

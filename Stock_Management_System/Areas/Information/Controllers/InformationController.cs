@@ -21,7 +21,10 @@ namespace Stock_Management_System.Areas.Information.Controllers
 
         public Api_Service api_Service = new Api_Service();
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InformationController"/> class.
+        /// </summary>
+        /// <param name="configuration">Configuration interface.</param>
         public InformationController(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -29,6 +32,10 @@ namespace Stock_Management_System.Areas.Information.Controllers
             _Client.BaseAddress = baseaddress;
         }
 
+        #region Section: Dropdown Fucntion
+        /// <summary>
+        /// Prepares a dropdown list of bank names by fetching them from the API.
+        /// </summary>
         public async Task Dropdown_For_Bank_Names()
         {
             List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/GetBanksList");
@@ -46,59 +53,122 @@ namespace Stock_Management_System.Areas.Information.Controllers
             }
         }
 
+        #endregion
+
+        #region Section: Add Bank Information
+
+        /// <summary>
+        /// Displays the Add Bank Information view, populated with a dropdown of bank names.
+        /// </summary>
         public async Task<IActionResult> AddBankInformation()
         {
             await Dropdown_For_Bank_Names();
             return View();
         }
 
+        /// <summary>
+        /// Inserts bank information into the system.
+        /// </summary>
+        /// <param name="information_Model">The bank information to insert.</param>
 
         [HttpPost]
         public async Task<IActionResult> InsertBankInformation(Information_Model information_Model)
         {
-            
-            
-                var jsonContent = JsonConvert.SerializeObject(information_Model);
-                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Information/AddBankInformation", stringContent);
+            var jsonContent = JsonConvert.SerializeObject(information_Model);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Information/AddBankInformation", stringContent);
 
-                if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new
                 {
-                    return Json(new { success = true, redirectUrl = Url.Action("ShowSaveInformations", "Information") });
-                }
-                else
+                    success = true,
+                    redirectUrl = Url.Action("ShowSaveInformations", "Information")
+                });
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                return Json(new
                 {
-                    var errorResponse = await response.Content.ReadAsStringAsync();
-                    return Json(new { success = false, message = $"Server error: {errorResponse}" });
-                }
+                    success = false,
+                    message = $"Server error: {errorResponse}"
+                });
+            }
+
+        }
+
+        #endregion
+
+        #region Section: Update Bank Information
+
+        /// <summary>
+        /// Displays the Edit Bank Information view, populated based on the specified ID.
+        /// </summary>
+        /// <param name="Information_ID">The encrypted ID of the information to edit.</param>
+
+        public async Task<IActionResult> EditBankInformation(string Information_ID)
+        {
+            await Dropdown_For_Bank_Names();
+
+            Information_Model information_Model = new Information_Model();
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/InformationByID/{UrlEncryptor.Decrypt(Information_ID)}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                information_Model = JsonConvert.DeserializeObject<Information_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
 
             }
 
+            return View(information_Model);
+        }
+
+        /// <summary>
+        /// Updates bank information details in the system.
+        /// </summary>
+        /// <param name="information_Model">The updated bank information model to be saved.</param>
 
         [HttpPost]
         public async Task<IActionResult> UpdateBankInformationDetails(Information_Model information_Model)
         {
-
 
             var jsonContent = JsonConvert.SerializeObject(information_Model);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Information/UpdateBankInformation", stringContent);
 
-
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, redirectUrl = Url.Action("ShowSaveInformations") });
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("ShowSaveInformations")
+                });
             }
             else
             {
                 var errorResponse = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = $"Server error: {errorResponse}" });
+                return Json(new
+                {
+                    success = false,
+                    message = $"Server error: {errorResponse}"
+                });
             }
 
         }
+
+        #endregion
+
+        #region Section: Delete Information
+
+        /// <summary>
+        /// Deletes bank information based on the specified ID.
+        /// </summary>
+        /// <param name="Information_ID">The encrypted ID of the bank information to delete.</param>
 
         [HttpPost]
         public IActionResult DeleteBankInformation(string Information_ID)
@@ -106,19 +176,44 @@ namespace Stock_Management_System.Areas.Information.Controllers
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Information/DeleteInformation?Information_ID={UrlEncryptor.Decrypt(Information_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("ShowSaveInformations") });
+                return Json(new
+                {
+                    success = true,
+                    message = "Delete Successfully!",
+                    redirectUrl = Url.Action("ShowSaveInformations")
+                });
             }
             else
             {
-                return Json(new { success = false, message = "Error. Please try again." });
+                return Json(new
+                {
+                    success = false,
+                    message = "Error. Please try again."
+                });
             }
         }
+
+        #endregion
+
+        #region Section: Show All Saved Information
+
+        /// <summary>
+        /// Displays all saved bank information.
+        /// </summary>
 
         public async Task<IActionResult> ShowSaveInformations()
         {
             List<Information_Model> information_Models = await api_Service.List_Of_Data_Display<Information_Model>("Information/GetAllSaveInformation");
             return View(information_Models);
         }
+
+        #endregion
+
+        #region Section: Get Information By ID
+        /// <summary>
+        /// Retrieves detailed information about a bank by its ID.
+        /// </summary>
+        /// <param name="Information_ID">The encrypted ID of the bank information to retrieve.</param>
 
         public async Task<IActionResult> GetInformationByID(string Information_ID)
         {
@@ -137,23 +232,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
                 return null;
             }
         }
+        #endregion
 
-        public async Task<IActionResult> EditBankInformation(string Information_ID)
-        {
-            await Dropdown_For_Bank_Names();
-
-            Information_Model information_Model = new Information_Model();
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/InformationByID/{UrlEncryptor.Decrypt(Information_ID)}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                string data = await response.Content.ReadAsStringAsync();
-                dynamic jsonObject = JsonConvert.DeserializeObject(data);
-                information_Model = JsonConvert.DeserializeObject<Information_Model>(JsonConvert.SerializeObject(jsonObject.data, Formatting.Indented));
-                
-            }
-
-            return View(information_Model);
-        }
     }
 }

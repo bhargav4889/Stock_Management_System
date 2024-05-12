@@ -166,6 +166,8 @@ namespace Stock_Management_System.Areas.Manage.Models
 
         public class Pending_Customers_Payments
         {
+            public int PaymentId { get; set; }
+
             public int StockId { get; set; }
 
             public DateTime StockDate { get; set; }

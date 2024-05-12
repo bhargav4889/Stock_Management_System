@@ -76,22 +76,46 @@ document.getElementById("bagsperkg")?.addEventListener("input", function () {
 // Attach the event listener to the input field for product price
 document.getElementById("productprice").addEventListener("input", CalculateMethod);
 
+
+
 function CheckData() {
-    var date = document.getElementById("datepicker").value;
-    var stockgrade = document.getElementById("stockgrade").value;
     var grainname = document.getElementById("selectgrain").value;
-    var customername = document.getElementById("Customer").value;
-    var bags = document.getElementById("bags").value;
-    var bagperkg = document.getElementById("bagsperkg").value;
+    var customerName = document.getElementById("Customer").value;
     var weight = document.getElementById("weight").value;
     var productprice = document.getElementById("productprice").value;
     var totalprice = document.getElementById("totalprice").value;
     var vehicletype = document.getElementById("selectvehicletype").value;
     var vehicleno = document.getElementById("vehicleno").value;
     var drivername = document.getElementById("drivername").value;
-    // Removed check for 'tolatname'
-    if (!grainname || !customername || !weight || !productprice || !totalprice || !vehicletype || !vehicleno || !drivername) {
-        toastr.error('Please fill out all required fields.', {
+    var newCustomerMessage = document.getElementById("newCustomerMessage").innerText.trim();
+    var isNewCustomer = document.getElementById("newcustomertype").style.display !== 'none'; // Checks if new customer fields are visible
+
+    var newCustomerType = document.getElementById("cttype").value; // Use .value for input fields
+    var newCustomerCity = document.getElementById("customercity").value; // Use .value for input fields
+    var newCustomerPhoneNo = document.getElementById("contactno").value; // Use .value for input fields
+
+    var missingFields = [];
+
+    // Always required fields
+    if (!grainname) missingFields.push('Grain Type');
+    if (!customerName) missingFields.push('Customer Name');
+    if (!weight) missingFields.push('Weight');
+    if (!productprice) missingFields.push('Product Price');
+    if (!totalprice) missingFields.push('Total Price');
+    if (!vehicletype) missingFields.push('Vehicle Type');
+    if (!vehicleno) missingFields.push('Vehicle No');
+    if (!drivername) missingFields.push('Driver Name');
+
+    // Check new customer fields only if it's a new customer
+    if (isNewCustomer) {
+        if (!newCustomerType) missingFields.push('New Customer Type');
+        if (!newCustomerCity) missingFields.push('New Customer City');
+        if (!newCustomerPhoneNo) missingFields.push('New Customer Contact No');
+    }
+
+    // Display missing fields using toastr
+    if (missingFields.length > 0) {
+        toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, {
             closeButton: true,
             progressBar: true,
             positionClass: 'toast-bottom-right',
@@ -107,11 +131,13 @@ function CheckData() {
         });
         return false; // Prevent form submission
     } else {
-        // If all fields are filled, use SweetAlert2 to confirm with the user before submission
-        confirmStockAddition("/Stock/InsertStockAndCustomerDetails", customername);
+        // Use SweetAlert2 to confirm with the user before submission
+        confirmInvoiceCreation("/Stock/InsertStockAndCustomerDetails", customerName);
         return false; // Prevent form submission until confirmation and AJAX call are completed
     }
 }
+
+
 
 function confirmStockAddition(addUrl, customerName) {
     console.log("Requesting URL: " + addUrl);  // This will log the full URL used in the AJAX request

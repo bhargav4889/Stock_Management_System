@@ -57,7 +57,7 @@
                             <option value="Pay Later">Pay Later</option>
                             <option value="Pay in Advance">Pay in Advance</option>
                             <option value="Credit">On Credit</option>
-                            <option value="other">Other...</option>
+                            <option value="Other">Other...</option>
                         </select>
 
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="InvoiceType"></span>
@@ -66,14 +66,7 @@
                 </div>
 
 
-                <div class="col-lg-3 col-sm-6 col-12" id="invoiceTypeField" style="display:none">
-                    <div class="form-group">
-                        <label for="invoiceTypeField"><span style="color: red;">*</span>  Invoice Type</label>
-                        <input type="text" class="form-control" placeholder="Other Invoice Type" asp-for="OtherInvoiceType">
-
-                        <span class="text-danger" style="color: red; font-size: 11px; font-weight: bold;" asp-validation-for="OtherInvoiceType"></span>
-                    </div>
-                </div>
+            
 
                 <!-- Broker Name -->
                 <div class="col-lg-3 col-sm-6 col-12">

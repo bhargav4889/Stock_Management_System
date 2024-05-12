@@ -16,7 +16,9 @@
     <div class="card">
         <div class="card-body">
 
-            <form class="row g-3" id="SaleForm" asp-action="InsertSale" asp-controller="Sale" onsubmit="return CheckData()" method="post">
+            <form class="row g-3" id="SaleForm" asp-action="UpdateSaleDetails" asp-controller="Sale" onsubmit="return CheckData()" method="post">
+
+                <input type="hidden" value="@Model.sale.SaleId" name="sale.SaleId" />
 
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -239,10 +241,10 @@
                 <div class="col-lg-3 col-sm-12">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
-                        <select class="select" id="isFullAmountReceive" name="Payment_Method">
+                        <select class="select" id="isFullAmountReceive" asp-for=sale.IsFullPaymentReceive>
                             <option value="" selected disabled>-- Options --</option>
-                            <option value="1">YES</option>
-                            <option value="0">NO</option>
+                            <option value="YES">YES</option>
+                            <option value="NO">NO</option>
                         </select>
 
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" id="isFullPaymentReceiveValidation"></span>
@@ -347,10 +349,8 @@
 
 
 
+<script src="/js/bundle/sale/edit-bundle.js"></script>
 
-@section Scripts {
-    <script src="/js/bundle/sale/edit-bundle.js"></script>
-}
 
 <style>
     .img-flag {

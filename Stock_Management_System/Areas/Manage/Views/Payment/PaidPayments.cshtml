@@ -141,7 +141,7 @@
                         <th class="text-center">Total Remain Paid</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Info</th>
-
+                        <th class="text-center">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,6 +167,11 @@
                                     <td class="text-center">
                                         <a class="loadPaymentInfoBtn" data-customer-id="@UrlEncryptor.Encrypt(item.CustomerID.ToString())" data-stock-id="@UrlEncryptor.Encrypt(item.StockID.ToString())">
                                             <img src="~/img/icons/eye.svg" class="me-2" alt="img">
+                                        </a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a role="button" onclick="confirmDeletion('@Url.Action("DeletePaidStatusPayment", "Payment", new { Payment_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PaymentID)), Stock_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockID)) })')">
+                                            <img src="~/img/icons/delete.svg" class="me-2" alt="Delete">
                                         </a>
                                     </td>
 

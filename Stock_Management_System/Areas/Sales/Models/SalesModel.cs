@@ -27,7 +27,9 @@ namespace Stock_Management_System.Areas.Sales.Models
 
         public int Receive_Bank_Id { get; set; }
 
-        public int Receive_Information_Id { get; set; }
+
+        [Required(ErrorMessage ="Please Select Bank")]
+        public int? Receive_Information_Id { get; set; }
 
 
         public decimal? Bags { get; set; }
@@ -63,7 +65,7 @@ namespace Stock_Management_System.Areas.Sales.Models
         public decimal? Deducted_Amount { get; set; }
 
         [Required(ErrorMessage ="Please Select Full Payment Receive or Not !")]
-        public bool IsFullPaymentReceive { get; set; }
+        public string? IsFullPaymentReceive { get; set; }
 
 
         [Required(ErrorMessage ="Please Select Remain Payment Date")]
@@ -148,7 +150,7 @@ namespace Stock_Management_System.Areas.Sales.Models
 
         public decimal? Deducted_Amount { get; set; }
 
-        public bool IsFullPaymentReceive { get; set; }
+        public string? IsFullPaymentReceive { get; set; }
 
         public DateTime? Remain_Payment_Date { get; set; }
 

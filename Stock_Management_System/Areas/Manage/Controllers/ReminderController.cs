@@ -26,11 +26,21 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             _Client.BaseAddress = baseaddress;
         }
 
+        #region Section: Create Reminder
+
+        /// <summary>
+        /// Returns the Create Reminder view.
+        /// </summary>
 
         public IActionResult CreateReminder()
         {
             return View();
         }
+
+        /// <summary>
+        /// Inserts a new reminder into the database via an API call.
+        /// </summary>
+        /// <param name="reminder">The reminder model to insert.</param>
 
         [HttpPost]
         public async Task<IActionResult> InsertReminder(Reminder_Model reminder)
@@ -42,44 +52,31 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, redirectUrl = Url.Action("Reminders") });
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Reminders")
+                });
             }
             else
             {
                 var errorResponse = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = $"Server error: {errorResponse}" });
+                return Json(new
+                {
+                    success = false,
+                    message = $"Server error: {errorResponse}"
+                });
             }
         }
 
+        #endregion
 
+        #region Section: Update Remidner
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateReminderDetails(Reminder_Model reminder)
-        {
-            var jsonContent = JsonConvert.SerializeObject(reminder);
-            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Reminder/UpdateReminder", stringContent);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return Json(new { success = true, redirectUrl = Url.Action("Reminders") });
-            }
-            else
-            {
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                return Json(new { success = false, message = $"Server error: {errorResponse}" });
-            }
-        }
-
-
-
-
-        public async Task<IActionResult> Reminders()
-        {
-            List<Reminder_Model> reminders = await api_Service.List_Of_Data_Display<Reminder_Model>("Reminder/GetAllReminders");
-            return View(reminders);
-        }
+        /// <summary>
+        /// Fetches and displays a specific reminder by ID for editing.
+        /// </summary>
+        /// <param name="Reminder_ID">The encrypted ID of the reminder.</param>
 
         public async Task<IActionResult> EditReminder(string Reminder_ID)
         {
@@ -91,12 +88,65 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
                 string data = await response.Content.ReadAsStringAsync();
                 reminder = JsonConvert.DeserializeObject<Reminder_Model>(JsonConvert.SerializeObject(JsonConvert.DeserializeObject<dynamic>(data).data, Formatting.Indented));
-               
+
             }
             return View(reminder);
         }
 
+        /// <summary>
+        /// Updates a reminder's details via an API call.
+        /// </summary>
+        /// <param name="reminder">The reminder model to update.</param>
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateReminderDetails(Reminder_Model reminder)
+        {
+            var jsonContent = JsonConvert.SerializeObject(reminder);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Reminder/UpdateReminder", stringContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Reminders")
+                });
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                return Json(new
+                {
+                    success = false,
+                    message = $"Server error: {errorResponse}"
+                });
+            }
+        }
+
+        #endregion
+
+        #region Section: Reminders
+
+        /// <summary>
+        /// Displays all reminders via an API call.
+        /// </summary>
+
+        public async Task<IActionResult> Reminders()
+        {
+            List<Reminder_Model> reminders = await api_Service.List_Of_Data_Display<Reminder_Model>("Reminder/GetAllReminders");
+            return View(reminders);
+        }
+
+        #endregion
+
+        #region Section: Get Reminder By ID
+
+        /// <summary>
+        /// Fetches a specific reminder by ID via an API call.
+        /// </summary>
+        /// <param name="Reminder_ID">The encrypted ID of the reminder.</param>
         public async Task<IActionResult> GetReminderByID(string Reminder_ID)
         {
             Reminder_Model reminder = new Reminder_Model();
@@ -115,6 +165,14 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             }
         }
 
+        #endregion
+
+        #region Section: Delete Reminder
+
+        /// <summary>
+        /// Deletes a specific reminder by ID via an API call.
+        /// </summary>
+        /// <param name="Reminder_ID">The encrypted ID of the reminder to delete.</param>
 
         [HttpPost]
         public IActionResult DeleteReminder(string Reminder_ID)
@@ -122,12 +180,23 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Reminder/DeleteReminder?Reminder_ID={UrlEncryptor.Decrypt(Reminder_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Reminders") });
+                return Json(new
+                {
+                    success = true,
+                    message = "Delete Successfully!",
+                    redirectUrl = Url.Action("Reminders")
+                });
             }
             else
             {
-                return Json(new { success = false, message = "Error. Please try again." });
+                return Json(new
+                {
+                    success = false,
+                    message = "Error. Please try again."
+                });
             }
         }
+
+        #endregion
     }
 }

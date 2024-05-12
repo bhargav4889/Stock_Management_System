@@ -54,13 +54,13 @@
             return false;
         } else {
             // Confirmation before adding customer
-            confirmAddCustomer('/Reminder/InsertReminder');
+            confirmAddReminder('/Reminder/InsertReminder');
             return false; // Prevent form submission
         }
     }
 
     // Function to confirm the addition of a customer
-    function confirmAddCustomer(redirectUrl) {
+    function confirmAddReminder(redirectUrl) {
         Swal.fire({
             title: 'Confirm Add Reminder',
             text: 'Are you sure you want to add this reminder?',

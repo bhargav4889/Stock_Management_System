@@ -92,14 +92,14 @@ document.getElementById("productprice").addEventListener("input", CalculateMetho
 
 
 function CheckData() {
-    var grainname = document.getElementById("selectgrain").value;
-    var customerName = document.getElementById("Customer").value;
-    var weight = document.getElementById("weight").value;
-    var productprice = document.getElementById("productprice").value;
-    var totalprice = document.getElementById("totalprice").value;
-    var vehicletype = document.getElementById("selectvehicletype").value;
-    var vehicleno = document.getElementById("vehicleno").value;
-    var drivername = document.getElementById("drivername").value;
+    var grainname = document.getElementById("selectgrain").value.trim();
+    var customerName = document.getElementById("Customer").value.trim();
+    var weight = document.getElementById("weight").value.trim();
+    var productprice = document.getElementById("productprice").value.trim();
+    var totalprice = document.getElementById("totalprice").value.trim();
+    var vehicletype = document.getElementById("selectvehicletype").value.trim();
+    var vehicleno = document.getElementById("vehicleno").value.trim();
+    var drivername = document.getElementById("drivername").value.trim();
 
     var missingFields = [];
 
@@ -127,7 +127,7 @@ function CheckData() {
             showMethod: 'fadeIn',
             hideMethod: 'fadeOut'
         });
-        return false;
+        return false; // Ensure this return prevents further code execution in this branch
     } else {
         // Use SweetAlert2 to confirm with the user before submission
         confirmInvoiceCreation("/Invoice/UpdatePurchaseInvoiceDetails", customerName);

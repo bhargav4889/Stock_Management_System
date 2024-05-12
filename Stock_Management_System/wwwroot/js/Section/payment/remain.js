@@ -94,6 +94,44 @@ function showToastNotification(formId) {
 
     return false; // Prevent immediate form submission
 }
+
+function confirmRemainDeletion(deleteUrl) {
+    Swal.fire({
+        title: 'Are You Sure You Want To Delete?',
+        text: "This will delete the payment information and Status Wil be Reset !!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: deleteUrl,
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        sessionStorage.setItem('DeleteStatus', response.message);
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        Swal.fire('Failed!', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    toastr.error("Somthing Went Wrong !!");
+                }
+            });
+        }
+    });
+}
+
+$(function () {
+    var deleteStatus = sessionStorage.getItem('DeleteStatus');
+    if (deleteStatus) {
+        toastr.success(deleteStatus);
+        sessionStorage.removeItem('DeleteStatus');
+    }
+});
 document.addEventListener("DOMContentLoaded", function () {
     // Function to check and disable/enable the buttons and update their titles
     function updateButtonState() {

@@ -27,6 +27,7 @@
         display: flex;
         justify-content: space-between;
         padding: 20px;
+        overflow-x: auto;
     }
 
     .table-section {
@@ -52,6 +53,7 @@
         margin-right: 5px;
     }
 </style>
+
 
 <script>
     function toggleMainAccountNo() {
@@ -172,13 +174,13 @@
                 }
                 <tr>
                     <th>Is Full Amount Payment Received?</th>
-                    <td>@(Model.IsFullPaymentReceive ? "No" : "Yes")</td>
+                    <td>@(Model.IsFullPaymentReceive)</td>
                 </tr>
                 @{
-                    string IsSucess = Convert.ToString(Model.IsFullPaymentReceive ? "No" : "Yes");
+                    string IsSucess = Convert.ToString(Model.IsFullPaymentReceive);
                 }
 
-                @if (IsSucess == "No")
+                @if (IsSucess == "NO")
                 {
                     <tr>
                         <th>Remain Payment Date</th>

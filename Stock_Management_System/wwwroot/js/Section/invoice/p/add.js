@@ -134,6 +134,9 @@ function CheckData() {
     }
 }
 
+
+
+
 function confirmInvoiceCreation(redirectUrl, customerName) {
     Swal.fire({
         title: 'Confirm Invoice Creation',

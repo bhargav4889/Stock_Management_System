@@ -27,15 +27,12 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         public Api_Service api_Service = new Api_Service();
 
-
         public SaleController(IConfiguration configuration)
         {
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
         }
-
-
 
         #region Section: Dropdown Function
 
@@ -76,21 +73,205 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             }
         }
 
-       
-
-
         #endregion
 
+        #region Section: Add Sale
+
+        /// <summary>
+        /// Displays the view to add a new sale.
+        /// </summary>
         public async Task<IActionResult> AddSale()
         {
-          
 
             await PopulateDropdownLists();
 
             return View();
         }
 
+        /// <summary>
+        /// Inserts a new sale into the system along with customer details.
+        /// </summary>
+        /// <param name="model">Combined model of sale and customer data.</param>
+        public async Task<IActionResult> InsertSale(Sale_Customer_Combied_Model model)
+        {
+            // Check if the customer is new; if so, add them
+            if (model.customer.CustomerId == 0)
+            {
+                // Add the new customer and directly use the returned model
+                Customer_Model customerInfo = await CreateCustomer(model.customer);
+                if (customerInfo == null || customerInfo.CustomerId == 0)
+                {
+                    return BadRequest("Failed to create a new customer.");
+                }
+                model.customer = customerInfo; // Update the model with the new customer info
+            }
+            else
+            {
+                // Fetch existing customer details if not adding new customer
+                model.customer = await GetCustomerProfile(model.customer.CustomerId, model.customer.CustomerType);
+                if (model.customer == null)
+                {
+                    return NotFound("Customer not found.");
+                }
+            }
 
+            // Prepare the data object for posting sale details
+            var dataObject = new
+            {
+                sale = model.sale,
+                customer = model.customer // Use the updated/existing customer details
+            };
+
+            // Serialize the data object to JSON
+            var jsonContent = JsonConvert.SerializeObject(dataObject);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            // Post the model to the "Sales/AddSale" endpoint
+            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Sale/AddSale", stringContent);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Sales")
+                });
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = false,
+                    redirectUrl = Url.Action("AddSale")
+                });
+            }
+        }
+
+
+        #endregion
+
+        #region Section: Update Sale
+
+        /// <summary>
+        /// Displays the view for editing a sale and its associated customer.
+        /// </summary>
+        /// <param name="Sale_ID">Encrypted ID of the sale.</param>
+        /// <param name="Customer_ID">Encrypted ID of the customer associated with the sale.</param>
+
+        public async Task<IActionResult> EditSale(string Sale_ID, string Customer_ID)
+        {
+
+            await PopulateDropdownLists();
+
+            Sale_Customer_Combied_Model sale_Customer_Combied_Model = new Sale_Customer_Combied_Model();
+
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Sale/GetSaleAndCustomerDetails/{UrlEncryptor.Decrypt(Sale_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
+
+            if (response.IsSuccessStatusCode)
+            {
+
+                string data = await response.Content.ReadAsStringAsync();
+
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                };
+                
+
+                dynamic jsonObject = JsonConvert.DeserializeObject(data,settings);
+                var dataObject = jsonObject.data;
+                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+                sale_Customer_Combied_Model = JsonConvert.DeserializeObject<Sale_Customer_Combied_Model>(extractedDataJson);
+
+            }
+
+            return View(sale_Customer_Combied_Model);
+
+        }
+
+        /// <summary>
+        /// Updates the details of an existing sale and customer in the system.
+        /// </summary>
+        /// <param name="model">Combined model of sale and customer data.</param>
+        public async Task<IActionResult> UpdateSaleDetails(Sale_Customer_Combied_Model model)
+        {
+            // Check if the customer is new; if so, add them
+            if (model.customer.CustomerId == 0)
+            {
+                // Add the new customer and directly use the returned model
+                Customer_Model customerInfo = await CreateCustomer(model.customer);
+                if (customerInfo == null || customerInfo.CustomerId == 0)
+                {
+                    return BadRequest("Failed to create a new customer.");
+                }
+                model.customer = customerInfo; // Update the model with the new customer info
+            }
+            else
+            {
+                // Fetch existing customer details if not adding new customer
+                model.customer = await GetCustomerProfile(model.customer.CustomerId, model.customer.CustomerType);
+                if (model.customer == null)
+                {
+                    return NotFound("Customer not found.");
+                }
+            }
+
+            // Prepare the data object for posting sale details
+            var dataObject = new
+            {
+                sale = model.sale,
+                customer = model.customer // Use the updated/existing customer details
+            };
+
+            // Serialize the data object to JSON
+            var jsonContent = JsonConvert.SerializeObject(dataObject);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            // Post the model to the "Sales/AddSale" endpoint
+            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Sale/UpdateSale", stringContent);
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new
+                {
+                    success = true,
+                    redirectUrl = Url.Action("Sales")
+                });
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = false,
+                    redirectUrl = Url.Action("AddSale")
+                });
+            }
+
+        }
+
+        #endregion
+
+        #region Section: Sales
+
+        /// <summary>
+        /// Displays the list of all sales.
+        /// </summary>
+
+        public async Task<IActionResult> Sales()
+        {
+            await PopulateDropdownLists();
+
+            List<Show_Sale> sales = await api_Service.List_Of_Data_Display<Show_Sale>("Sale/GetAllSales");
+            return View(sales);
+        }
+
+        #endregion
+
+        #region Section: Get Customer Data
+
+        /// <summary>
+        /// Asynchronously retrieves a list of customer models based on the provided customer name.
+        /// </summary>
+        /// <param name="CustomerName">The name of the customer to search for.</param>
+        /// <returns>A JsonResult containing a list of Customer_Model objects matching the provided name.</returns>
 
         public async Task<JsonResult> GetSellerCustomerData(string CustomerName)
         {
@@ -98,6 +279,11 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             return Json(customerModels);
         }
 
+        /// <summary>
+        /// Fetches a list of customers from the server based on the provided customer name.
+        /// </summary>
+        /// <param name="CustomerName">The customer name to search for in the database.</param>
+        /// <returns>A list of Customer_Model objects that match the given customer name.</returns>
         private async Task<List<Customer_Model>> FetchSellerCustomerByName(string CustomerName)
         {
             List<Customer_Model> customer_Models = new List<Customer_Model>();
@@ -116,55 +302,12 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             return customer_Models;
         }
 
-
-
-
-        #region Insert Sale If Customer Check not Exitst and then Insert Also Customer 
-
-
-        public async Task<IActionResult> InsertSale(Sale_Customer_Combied_Model model)
-        {
-            // Check if the customer is new; if so, add them
-            if (model.customer.CustomerId == 0)
-            {
-                // Add the new customer and directly use the returned model
-                Customer_Model customerInfo = await CreateCustomer(model.customer);
-                if (customerInfo == null || customerInfo.CustomerId == 0)
-                {
-                    return BadRequest("Failed to create a new customer.");
-                }
-                model.customer = customerInfo; // Update the model with the new customer info
-            }
-
-            // Prepare the data object for posting sale details
-            var dataObject = new
-            {
-                sale = model.sale,
-                customer = model.customer // Use the updated or existing customer details
-            };
-
-            // Serialize the anonymous object to JSON
-            var jsonContent = JsonConvert.SerializeObject(dataObject);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            // Post the model to the "Sales/Insert_Sale" endpoint
-            HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Sale/AddSale", content);
-            if (response.IsSuccessStatusCode)
-            {
-                // Return a JSON response to redirect the client to another action
-                return Json(new { success = true, redirectUrl = Url.Action("Sales") });
-            }
-            else
-            {
-                // Read and handle failures, possibly returning an error status or message
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return StatusCode((int)response.StatusCode, responseContent);
-            }
-        }
-
-
-
-
+        /// <summary>
+        /// Retrieves a customer profile from the server based on customer ID and type.
+        /// </summary>
+        /// <param name="Customer_ID">The ID of the customer to be fetched.</param>
+        /// <param name="Customer_Type">The type of customer to be fetched (e.g., regular, VIP).</param>
+        /// <returns>A Customer_Model object if the customer is found; otherwise, returns null.</returns>
         private async Task<Customer_Model> GetCustomerProfile(int Customer_ID, string Customer_Type)
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetCustomerByIDAndType/{Customer_ID}&{Customer_Type}");
@@ -178,11 +321,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             return null;
         }
 
-
-
-
         #endregion
-
 
         #region Section: Create New Customer
 
@@ -215,15 +354,12 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         #endregion
 
-        public async Task<IActionResult> Sales()
-        {
-            await PopulateDropdownLists();
+        #region Section: Delete Sale
 
-            List<Show_Sale> sales = await api_Service.List_Of_Data_Display<Show_Sale>("Sale/GetAllSales");
-            return View(sales);
-        }
-
-
+        /// <summary>
+        /// Deletes a sale based on its ID.
+        /// </summary>
+        /// <param name="Sale_ID">Encrypted ID of the sale to be deleted.</param>
 
         [HttpPost]
         public IActionResult DeleteSale(string Sale_ID)
@@ -231,55 +367,31 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Sale/DeleteSale?Sale_ID={UrlEncryptor.Decrypt(Sale_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
-                return Json(new { success = true, message = "Delete Successfully!", redirectUrl = Url.Action("Sales") });
-            }
-            else
-            {
-                return Json(new { success = false, message = "Error. Please try again." });
-            }
-        }
-
-
-        public async Task<IActionResult> UpdateSaleDetails(Sale_Customer_Combied_Model model)
-        {
-            // Check if the customer exists; if not, add them
-            Customer_Model customerInfo = await GetCustomerProfile(model.customer.CustomerId, model.customer.CustomerType);
-            if (customerInfo == null)
-            {
-                // Add the new customer and directly use the returned model
-                customerInfo = await CreateCustomer(model.customer);
-                if (customerInfo == null || customerInfo.CustomerId == 0)
+                return Json(new
                 {
-                    return BadRequest("Failed to create a new customer.");
-                }
-            }
-
-            // Prepare the data object for posting sale details
-            var dataObject = new
-            {
-                sale = model.sale,
-                customer = customerInfo // Use the updated or existing customer details
-            };
-
-            // Serialize the anonymous object to JSON
-            var jsonContent = JsonConvert.SerializeObject(dataObject);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            // Post the model to the "Sales/Insert_Sale" endpoint
-            HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Sale/UpdateSale", content);
-            if (response.IsSuccessStatusCode)
-            {
-                // Return a JSON response to redirect the client to another action
-                return Json(new { success = true, redirectUrl = Url.Action("Sales") });
+                    success = true,
+                    message = "Delete Successfully!",
+                    redirectUrl = Url.Action("Sales")
+                });
             }
             else
             {
-                // Read and handle failures, possibly returning an error status or message
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return StatusCode((int)response.StatusCode, responseContent);
+                return Json(new
+                {
+                    success = false,
+                    message = "Error. Please try again."
+                });
             }
-
         }
+
+        #endregion
+
+        #region Section: Sale Details View By Sale ID
+
+        /// <summary>
+        /// Displays the details of a specific sale.
+        /// </summary>
+        /// <param name="Sale_ID">Encrypted ID of the sale.</param>
 
         public async Task<IActionResult> SaleDetailsView(string Sale_ID)
         {
@@ -288,53 +400,21 @@ namespace Stock_Management_System.Areas.Sales.Controllers
                 return RedirectToAction("Sales");
             }
 
-
             Show_Sale show_Sale = new Show_Sale();
-
 
             show_Sale = await api_Service.Model_Of_Data_Display<Show_Sale>("Sale/GetSaleByID", Convert.ToInt32(UrlEncryptor.Decrypt(Sale_ID)));
 
             return View(show_Sale);
         }
 
+        #endregion
 
+        #region Section: Download Statement PDF & EXCEL
 
-        public async Task<IActionResult> EditSale(string Sale_ID, string Customer_ID)
-        {
+        /// <summary>
+        /// Downloads the sales statement as a PDF.
+        /// </summary>
 
-            await PopulateDropdownLists();
-
-           
-
-            Sale_Customer_Combied_Model sale_Customer_Combied_Model = new Sale_Customer_Combied_Model();
-
-            
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Sale/GetSaleAndCustomerDetails/{UrlEncryptor.Decrypt(Sale_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
-
-
-            if (response.IsSuccessStatusCode)
-            {
-
-                string data = await response.Content.ReadAsStringAsync();
-                dynamic jsonObject = JsonConvert.DeserializeObject(data);
-                var dataObject = jsonObject.data;
-                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                sale_Customer_Combied_Model = JsonConvert.DeserializeObject<Sale_Customer_Combied_Model>(extractedDataJson);
-
-
-
-            }
-
-            return View(sale_Customer_Combied_Model);
-
-
-
-
-
-
-        }
-
-        #region Method : Download Statement PDF & EXCEL 
         public async Task<IActionResult> SalesStatementPDF()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesStatementPDF");
@@ -355,7 +435,9 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Downloads the sales statement as an Excel file.
+        /// </summary>
         public async Task<IActionResult> SalesStatementEXCEL()
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesStatementEXCEL");
@@ -378,6 +460,12 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         #endregion
 
+        #region Section: Sale Information By ID
+
+        /// <summary>
+        /// Fetches and displays specific sale information based on the sale ID.
+        /// </summary>
+        /// <param name="Sale_ID">Encrypted ID of the sale.</param>
 
         public async Task<IActionResult> GetSaleInfo(string Sale_ID)
         {
@@ -396,5 +484,6 @@ namespace Stock_Management_System.Areas.Sales.Controllers
             }
         }
 
+        #endregion
     }
 }

@@ -42,7 +42,7 @@ $(function () {
         if (selectedGrain) {
             table.column(2).search(selectedGrainText, false, false);
         }
-
+        
 
 
         // Redraw table to apply all filters
@@ -76,6 +76,44 @@ $(function () {
             }
         });
     });
+});
+
+function confirmDeletion(deleteUrl) {
+    Swal.fire({
+        title: 'Are You Sure You Want To Delete?',
+        text: "This will delete the payment information as well as related stock details!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: deleteUrl,
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        sessionStorage.setItem('DeleteStatus', response.message);
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        Swal.fire('Failed!', response.message, 'error');
+                    }
+                },
+                error: function () {
+                    toastr.error("Somthing Went Wrong !!");
+                }
+            });
+        }
+    });
+}
+
+$(function () {
+    var deleteStatus = sessionStorage.getItem('DeleteStatus');
+    if (deleteStatus) {
+        toastr.success(deleteStatus);
+        sessionStorage.removeItem('DeleteStatus');
+    }
 });
 
 function showToastNotification(formId) {
@@ -133,3 +171,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Optionally, add event listeners or other mechanisms to invoke updateButtonState if the table is dynamically updated.
 });
+

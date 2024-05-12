@@ -46,6 +46,7 @@
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Insert_Purchase_Stock.ProductId"></span>
                     </div>
                 </div>
+                <input type="hidden" id="CustomerId" asp-for="Customers.CustomerId" />
                 <!-- Customer Name -->
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
@@ -54,10 +55,10 @@
                         </label>
                         <input type="text" class="form-control" id="Customer" placeholder="Customer Name" asp-for="Customers.CustomerName" oninput="this.value = this.value.toUpperCase()">
                         <span class="text-danger" style="color: red; font-size:11px; font-weight:bold;" asp-validation-for="Customers.CustomerName"></span>
-                        <span id="newCustomerMessage" style="color:green">* New Customer</span>
+                        <span id="newCustomerMessage" value="NewCustomer" style="color:green">* New Customer</span>
                     </div>
                 </div>
-                <input type="hidden" id="CustomerId" asp-for="Customers.CustomerId" />
+             
                 <div id="newcustomertype" class="col-lg-3 col-sm-6 col-12" style="display: none;">
                     <div class="form-group">
                         <label>
@@ -209,9 +210,5 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @section Scripts {
-
-
-
-    <script src="/js/bundle/stock/add-bundle.js"></script>
-
+    <script src="/js/bundle/stock/add-bundle.js"></script>"
 }
