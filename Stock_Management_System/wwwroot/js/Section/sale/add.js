@@ -254,25 +254,30 @@ $(function () {
     }); 
 
 
-    function DateDefaultValue() {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var yyyy = today.getFullYear();
-        today = yyyy + '-' + mm + '-' + dd;
-        document.getElementById('datepicker').value = today;
-    }
 
-    window.onload = function () {
-        DateDefaultValue();
-
-    };
+  
 
 
 
 
 }); // Correctly closed $(document).ready function
 
+function setDateDefaultValue() {
+    var today = new Date();
+    var day = String(today.getDate()).padStart(2, '0');
+    var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    var year = today.getFullYear();
+    var formattedDate = year + '-' + month + '-' + day;
+    // Ensure the datepicker element exists and then set its value
+    var datePicker = document.getElementById('datepicker');
+    if (datePicker) {
+        datePicker.value = formattedDate;
+    }
+}
+// Run the function after the page has loaded to ensure the element is available
+document.addEventListener('DOMContentLoaded', function () {
+    setDateDefaultValue();
+});
 
 
 
@@ -347,7 +352,7 @@ function CheckData() {
     }
 
     // If all checks pass, optionally confirm before proceeding
-    confirmAddition("/Sale/InsertSale", customerName);
+    confirmSaleAddition("/Sale/InsertSale", customerName);
     return false; // Prevent form submission
 }
 
@@ -356,7 +361,7 @@ function CheckData() {
 
 
 
-function confirmAddition(addUrl, customerName) {
+function confirmSaleAddition(addUrl, customerName) {
     Swal.fire({
         title: 'Are You Sure You Want To Complete This Sale?',
         text: `${customerName}'s sale completion?`,
@@ -415,18 +420,22 @@ $(function () {
         templateSelection: formatBankOption
     });
 
-    $('button[type="reset"]').click(function () {
-        setTimeout(function () {
-            $('#bankSelect').val("").trigger('change');
-        }, 1);
-        setTimeout(function () {
-            $('#selectgrain').val("").trigger('change');
-        }, 1);
-        setTimeout(function () {
-            $('#selectpaymentmethod').val("").trigger('change');
-        }, 1);
-        setTimeout(function () {
-            $('#isFullAmountReceive').val("").trigger('change');
-        }, 1);
-    });
+
+
+
 }); 
+function confirmSaleDataReset() {
+    Swal.fire({
+        title: 'Are you sure Want Reset All values ?',
+        text: "You won't be able to revert this!",
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, clear it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.reload();
+        }
+    });
+}

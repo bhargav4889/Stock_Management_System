@@ -119,7 +119,6 @@ function showToastNotification(formId) {
     return false; // Prevent immediate form submission
 }
 
-
 document.addEventListener("DOMContentLoaded", function () {
     // Function to check and disable/enable the buttons and update their titles
     function updateButtonState() {
@@ -159,3 +158,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Optionally, add event listeners or other mechanisms to invoke updateButtonState if the table is dynamically updated.
 });
+

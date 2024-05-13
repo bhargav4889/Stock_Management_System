@@ -350,7 +350,7 @@ function CheckData() {
     }
 
     // If all checks pass, optionally confirm before proceeding
-    confirmSaleUpdation("/Sale/UpdateSaleDetails", customerName);
+    confirmSaleUpdate("/Sale/UpdateSaleDetails", customerName);
     return false; // Prevent form submission
 }
 
@@ -369,7 +369,7 @@ if ($('#selectremainpaymentmethod').val() == 'BANK') {
     $('#RemainbankSelection').show();
 }
 
-function confirmSaleUpdation(addUrl, customerName) {
+function confirmSaleUpdate(addUrl, customerName) {
     Swal.fire({
         title: 'Are You Sure You Want To Complete This Sale?',
         text: `${customerName}'s sale completion?`,

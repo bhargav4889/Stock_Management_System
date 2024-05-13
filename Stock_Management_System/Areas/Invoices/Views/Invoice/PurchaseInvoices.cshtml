@@ -32,39 +32,33 @@
                     <div class="search-input">
                         <a class="btn btn-searchset"><img src="~/img/icons/search-white.svg" alt="img"></a>
                     </div>
-                </div>
+                </div> 
                 <div class="wordset">
                     <ul>
                         <li>
                             <form id="pdfExportForm" asp-action="GeneratePurchaseInvoicesPDFStatement" asp-controller="Invoice">
-
-
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
+                                <button id="pdfExportButton" type="submit" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
-
-
                             </form>
+
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="GeneratePurchaseInvoicesEXCELStatement" asp-controller="Invoice" >
-
+                            <form id="excelExportForm" asp-action="GeneratePurchaseInvoicesEXCELStatement" asp-controller="Invoice">
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>
-
                             </form>
                         </li>
                         <li>
                             <form>
-
                                 <button type="button" onclick="window.print();" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
                                     <img src="~/img/icons/printer.svg" alt="img">
                                 </button>
-
                             </form>
                         </li>
+
 
                     </ul>
                 </div>

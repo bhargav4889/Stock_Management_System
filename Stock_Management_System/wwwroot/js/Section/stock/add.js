@@ -132,7 +132,7 @@ function CheckData() {
         return false; // Prevent form submission
     } else {
         // Use SweetAlert2 to confirm with the user before submission
-        confirmInvoiceCreation("/Stock/InsertStockAndCustomerDetails", customerName);
+        confirmStockAddition("/Stock/InsertStockAndCustomerDetails", customerName);
         return false; // Prevent form submission until confirmation and AJAX call are completed
     }
 }
@@ -140,8 +140,7 @@ function CheckData() {
 
 
 function confirmStockAddition(addUrl, customerName) {
-    console.log("Requesting URL: " + addUrl);  // This will log the full URL used in the AJAX request
-
+ 
     Swal.fire({
         title: 'Are You Sure You Want To Add This Stock?',
         text: `${customerName}'s Stock Add?`,
@@ -152,7 +151,7 @@ function confirmStockAddition(addUrl, customerName) {
         confirmButtonText: 'Yes, add it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            console.log("Confirmed URL: " + addUrl);  // This will log the URL upon user confirmation
+      
             $.ajax({
                 url: addUrl, // Make sure addUrl is correctly defined
                 type: 'POST',
@@ -161,6 +160,10 @@ function confirmStockAddition(addUrl, customerName) {
                     console.log("Success, redirecting to: " + response.redirectUrl);  // This will log the redirect URL on successful AJAX response
                     sessionStorage.setItem('AddStatus', 'Stock added successfully!');
                     window.location.href = response.redirectUrl; // Use the redirect URL from the response
+                    // Reset the form here
+                    $("#AddStockForm")[0].reset();                        ;
+                    toggleNewCustomerFields(false); // Resetting any dynamic UI changes related to the form.
+                    
                 },
                 error: function () {
                     console.error("Error in AJAX request to: " + addUrl);  // This will log errors with more detail
@@ -178,15 +181,25 @@ function formatVehicleNo(input) {
     let formattedInput = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     // Ensure the input does not exceed the expected length
     formattedInput = formattedInput.substr(0, 14);
-    // Insert hyphens at specific positions
-    formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+
+    // Determine the appropriate format based on the number of letters after the first four characters
+    if (/^[A-Z]{2}\d{2}[A-Z]{1}\d{4}$/.test(formattedInput)) {
+        // Format: GJ-12-A-1234
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{1})(\d{4})/, '$1-$2-$3-$4');
+    } else if (/^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/.test(formattedInput)) {
+        // Format: GJ-12-AB-1234
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+    }
+
     // Update the input field with the formatted value
     input.value = formattedInput;
+
     // Validate the input format
-    const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{2})-(\d{4})$/;
+    const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{1,2})-(\d{4})$/;
     const errorMsg = document.getElementById('error-msg');
-    errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the format: GJ-12-AB-1234';
+    errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the formats: GJ-12-A-1234 or GJ-12-AB-1234';
 }
+
 
 $(document).ready(function () {
     var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
@@ -261,6 +274,26 @@ $(function () {
         sessionStorage.removeItem('ErrorMsg');
     }
 });
+
+
+function confirmStockDataReset() {
+    Swal.fire({
+        title: 'Are you sure Want Reset All values ?',
+        text: "You won't be able to revert this!",
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, clear it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.reload();
+        }
+    });
+}
+
+
+
 
 
 

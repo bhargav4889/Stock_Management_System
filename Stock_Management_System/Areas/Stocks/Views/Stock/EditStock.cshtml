@@ -56,7 +56,7 @@
 
                     </div>
                 </div>
-               
+
 
 
                 <!-- Customer Name -->
@@ -186,7 +186,7 @@
                     </div>
                 </div>
 
-              
+
 
                 <!-- Vehicle No. -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -215,9 +215,7 @@
                         <button type="submit" class="btn btn-success me-2" onclick="confirmStockUpdation('@Url.Action("UpdateStockAndCustomerDetails", "Stock")', '@Model.Customers.CustomerName')">
                             <i class="fas fa-file"></i>  Update Stock
                         </button>
-                        <button type="submit" asp-action="Manage_Stocks" asp-controller="Stock" class="btn btn-info">
-                            <i class="fas fa-arrow-left"></i> Back to Stocks
-                        </button>
+
                     </div>
                 </div>
 
@@ -240,11 +238,11 @@
 
 
 
-@section Scripts{
+@section Scripts {
 
 
     <script src="/js/bundle/stock/edit-bundle.js"></script>
-  
+
 }
 
 

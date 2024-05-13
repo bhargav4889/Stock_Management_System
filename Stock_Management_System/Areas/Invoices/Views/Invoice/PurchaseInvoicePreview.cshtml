@@ -9,9 +9,14 @@
             <h6>Preview Invoices</h6>
         </div>
         <div class="row">
+            <div class="col-auto">
+                <button onclick="history.back()" class="btn btn-primary">
+                    <i class="fa fa-arrow-left"></i> Back
+                </button>
+            </div>
             <div class="col">
                 <div class="page-btn">
-                    <a role="button" asp-action="Create_Sell_Invoice" asp-controller="Invoice" class="btn btn-added">
+                    <a role="button" asp-action="CreatePurchaseInvoice" asp-controller="Invoice" class="btn btn-added">
                         <img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Invoice
                     </a>
                 </div>

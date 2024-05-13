@@ -29,13 +29,13 @@ function CheckData() {
         return false;
     } else {
         // Use SweetAlert2 to confirm with the user before submission
-        confirmAddCustomer('/Account/UpdateCustomerDetails', customerName);
+        confirmUpdateCustomer('/Account/UpdateCustomerDetails', customerName);
         return false; // Prevent form submission until confirmation and AJAX call are completed
     }
 }
 
 
-function confirmAddCustomer(redirectUrl, customerName) {
+function confirmUpdateCustomer(redirectUrl, customerName) {
     Swal.fire({
         title: 'Confirm Update Customer',
         text: `Are you sure you want to Update info ${customerName} Customer ?`,

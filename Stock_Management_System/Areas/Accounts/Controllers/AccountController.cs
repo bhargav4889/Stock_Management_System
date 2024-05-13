@@ -235,7 +235,9 @@ namespace Stock_Management_System.Areas.Accounts.Controllers
         public async Task<IActionResult> Customers()
         {
 
-            List<Customer_Model> customers = await api_Service.List_Of_Data_Display<Customer_Model>("Customers/GetAllCustomers");
+            List<Customer_Model> customers = new List<Customer_Model>();
+
+            customers = await api_Service.List_Of_Data_Display<Customer_Model>("Customers/GetAllCustomers");
 
             return View(customers);
         }

@@ -128,7 +128,7 @@ function showToastNotification(formId) {
     return false; // Prevent immediate form submission
 }
 
-    document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
     // Function to check and disable/enable the buttons and update their titles
     function updateButtonState() {
         var dataRows = document.querySelectorAll("#data tbody tr");
@@ -142,8 +142,6 @@ function showToastNotification(formId) {
                 button.disabled = true;
                 button.style.opacity = 0.5;
                 button.style.cursor = "not-allowed";
-                // Updating title to indicate no data available
-                button.title = "No Data Available";
             });
         } else {
             // Enable all buttons and reset styles and titles
@@ -155,7 +153,7 @@ function showToastNotification(formId) {
                 if (button === pdfButton) {
                     button.title = "Download PDF";
                 } else if (button === excelButton) {
-                    button.title = "Export Excel";
+                    button.title = "Download Excel";
                 } else if (button === printButton) {
                     button.title = "Print";
                 }
@@ -163,16 +161,9 @@ function showToastNotification(formId) {
         }
     }
 
-    // Run this function on page load
-    updateButtonState();
+    updateButtonState(); // Run this function on page load
 
-    // Check for data changes periodically every 500 ms
-    setInterval(updateButtonState, 500);
-
-    // Optionally, if there are specific events known to change the data, bind those events to updateButtonState
-    // For example, if data is added through an AJAX call:
-    // document.querySelector("#addDataButton").addEventListener("click", function() {
-    //     // Simulate data change
-    //     updateButtonState();
-    // });
+    // Optionally, add event listeners or other mechanisms to invoke updateButtonState if the table is dynamically updated.
 });
+
+

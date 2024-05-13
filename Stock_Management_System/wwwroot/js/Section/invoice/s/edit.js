@@ -186,13 +186,13 @@ function CheckData() {
     }
 
     // Use SweetAlert2 to confirm with the user before submission
-    confirmInvoiceUpdation("/Invoice/UpdateSaleInvoiceDetails", partyName);
+    confirmSaleInvoiceUpdation("/Invoice/UpdateSaleInvoiceDetails", partyName);
     return false; // Prevent form submission until confirmation and AJAX call are completed
 }
 
 
 
-function confirmInvoiceUpdation(redirectUrl, partyName) {
+function confirmSaleInvoiceUpdation(redirectUrl, partyName) {
     Swal.fire({
         title: 'Confirm Invoice Update',
         text: `Update an invoice for ${partyName}?`,
@@ -262,18 +262,23 @@ $(document).ready(function () {
 function formatVehicleNo(input) {
     // Remove non-alphanumeric characters and convert to uppercase
     let formattedInput = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
     // Ensure the input does not exceed the expected length
     formattedInput = formattedInput.substr(0, 14);
 
-    // Insert hyphens at specific positions
-    formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+    // Determine the appropriate format based on the number of letters after the first four characters
+    if (/^[A-Z]{2}\d{2}[A-Z]{1}\d{4}$/.test(formattedInput)) {
+        // Format: GJ-12-A-1234
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{1})(\d{4})/, '$1-$2-$3-$4');
+    } else if (/^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/.test(formattedInput)) {
+        // Format: GJ-12-AB-1234
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+    }
 
     // Update the input field with the formatted value
     input.value = formattedInput;
 
     // Validate the input format
-    const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{2})-(\d{4})$/;
+    const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{1,2})-(\d{4})$/;
     const errorMsg = document.getElementById('error-msg');
-    errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the format: GJ-12-AB-1234';
+    errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the formats: GJ-12-A-1234 or GJ-12-AB-1234';
 }

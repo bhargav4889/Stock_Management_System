@@ -162,7 +162,7 @@
 
                         <th class="text-center">Date</th>
                         <th class="text-center">Name</th>
-                     
+
                         <th class="text-center">Product</th>
                         <th class="text-center">Bag</th>
                         <th class="text-center">Bag Per KG</th>
@@ -189,7 +189,7 @@
                                         @((DateTime.TryParse(item.PurchaseStockDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
                                     </td>
                                     <td class="text-center">@item.CustomerName</td>
-                                   
+
                                     <td class="text-center">@item.ProductName</td>
                                     <td class="text-center">@((item.Bags == 0) ? "--" : item.Bags.ToString())</td>
                                     <td class="text-center">@((item.BagPerKg == 0) ? "--" : item.BagPerKg.ToString())</td>
@@ -223,12 +223,15 @@
                                                    href="@Url.Action("StockDetailsView", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseStockId)) })"
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Stock Info</a>
                                             </li>
+                                            @if (item.PaymentStatus != "REMAIN" && item.PaymentStatus != "PAID")
+                                            {
+                                                <li>
+                                                    <a role="link"
+                                                       href="@Url.Action("EditStock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseStockId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
+                                                       onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Stock</a>
+                                                </li>
+                                            }
 
-                                            <li>
-                                                <a role="link"
-                                                   href="@Url.Action("EditStock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseStockId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
-                                                   onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Stock</a>
-                                            </li>
                                             <li>
                                                 <a role="button" onclick="confirmDeletion('@Url.Action("DeleteStock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.PurchaseStockId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
                                                     <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock

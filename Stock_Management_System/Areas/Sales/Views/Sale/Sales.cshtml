@@ -51,7 +51,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                            <form asp-action="SalesStatementPDF" asp-controller="Sale">
+                            <form id="pdfExportForm" asp-action="SalesStatementPDF" asp-controller="Sale">
                                 <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
@@ -61,7 +61,7 @@
                         </li>
 
                         <li>
-                            <form asp-action="SalesStatementEXCEL" asp-controller="Sale">
+                            <form id="excelExportForm" asp-action="SalesStatementEXCEL" asp-controller="Sale">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
                                     <img src="~/img/icons/excel.svg" alt="img">

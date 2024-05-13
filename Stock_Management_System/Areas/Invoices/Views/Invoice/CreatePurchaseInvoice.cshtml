@@ -15,14 +15,7 @@
         <div class="card-body">
             <form id="PurchaseInvoiceForm" class="row g-3" asp-action="Insert_Purchase_Invoice_Details" asp-controller="Invoice" onsubmit="return CheckData()" method="post">
 
-                @*  <!-- Date -->
-                <div class="col-12 col-md-3 mb-3">
-                <div class="form-floating">
-                <input type="date" class="form-control" id="datepicker" asp-for="PurchaseInvoiceDate">
-                <label for="datepicker" class="text-truncate"><span style="color: black;">*</span> Select a Date</label>
-
-                </div>
-                </div>*@
+               
 
                 <div class="col-lg-3 col-sm-6 col-12">
                     <div class="form-group">
@@ -174,7 +167,7 @@
                             <i class="fas fa-file-invoice"></i>
                             Create Invoice
                         </button>
-                        <button type="reset" class="btn btn-danger">
+                        <button type="reset" onclick="confirmPurchaseInvoiceDataReset()" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Clear All
                         </button>
                     </div>

@@ -1,3 +1,6 @@
+
+
+
 $(function () {
     $('#selectgrain').select2({
         minimumResultsForSearch: Infinity // Disables the search box
@@ -15,6 +18,24 @@ $(function () {
     });
 });
 
+function setDateDefaultValue() {
+    var today = new Date();
+    var day = String(today.getDate()).padStart(2, '0');
+    var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    var year = today.getFullYear();
+    var formattedDate = year + '-' + month + '-' + day;
+    // Ensure the datepicker element exists and then set its value
+    var datePicker = document.getElementById('datepicker');
+    if (datePicker) {
+        datePicker.value = formattedDate;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    setDateDefaultValue();
+});
+
+
 $(function () {
     $('#selectvehicletype').select2({
         minimumResultsForSearch: Infinity // Disables the search box
@@ -31,6 +52,8 @@ $(function () {
         // Logging the selected text for verification
     });
 });
+
+
 
 function CalculateMethod() {
     var bags = document.getElementById('bags').value.trim();
@@ -129,7 +152,7 @@ function CheckData() {
         return false;
     } else {
         // Use SweetAlert2 to confirm with the user before submission
-        confirmInvoiceCreation("/Invoice/InsertPurchaseInvoice", customerName);
+        confirmPurchaseInvoiceCreation("/Invoice/InsertPurchaseInvoice", customerName);
         return false; // Prevent form submission until confirmation and AJAX call are completed
     }
 }
@@ -137,7 +160,7 @@ function CheckData() {
 
 
 
-function confirmInvoiceCreation(redirectUrl, customerName) {
+function confirmPurchaseInvoiceCreation(redirectUrl, customerName) {
     Swal.fire({
         title: 'Confirm Invoice Creation',
         text: `Create an invoice for ${customerName}?`,
@@ -180,18 +203,42 @@ function confirmInvoiceCreation(redirectUrl, customerName) {
 function formatVehicleNo(input) {
     // Remove non-alphanumeric characters and convert to uppercase
     let formattedInput = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
     // Ensure the input does not exceed the expected length
     formattedInput = formattedInput.substr(0, 14);
 
-    // Insert hyphens at specific positions
-    formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+    // Determine the appropriate format based on the number of letters after the first four characters
+    if (/^[A-Z]{2}\d{2}[A-Z]{1}\d{4}$/.test(formattedInput)) {
+        // Format: GJ-12-A-1234
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{1})(\d{4})/, '$1-$2-$3-$4');
+    } else if (/^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/.test(formattedInput)) {
+        // Format: GJ-12-AB-1234
+        formattedInput = formattedInput.replace(/(\w{2})(\d{2})(\w{2})(\d{4})/, '$1-$2-$3-$4');
+    }
 
     // Update the input field with the formatted value
     input.value = formattedInput;
 
     // Validate the input format
-    const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{2})-(\d{4})$/;
+    const regex = /^([A-Z]{2})-(\d{2})-([A-Z]{1,2})-(\d{4})$/;
     const errorMsg = document.getElementById('error-msg');
-    errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the format: GJ-12-AB-1234';
+    errorMsg.textContent = regex.test(formattedInput) ? '' : 'Invalid format. Please follow the formats: GJ-12-A-1234 or GJ-12-AB-1234';
 }
+
+function confirmPurchaseInvoiceDataReset() {
+    Swal.fire({
+        title: 'Are you sure Want Reset All values ?',
+        text: "You won't be able to revert this!",
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, clear it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.reload();
+        }
+    });
+}
+
+
+
