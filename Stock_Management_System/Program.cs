@@ -108,8 +108,11 @@ builder.Services.AddWebOptimizer(pipeline =>
     pipeline.AddJavaScriptBundle("/js/bundle/reminder/edit-bundle.js", "/js/Section/reminder/edit.js");
     pipeline.AddJavaScriptBundle("/js/bundle/reminder/reminders-bundle.js", "/js/Section/reminder/reminders.js");
 
+    // auth
 
-
+    pipeline.AddJavaScriptBundle("/js/bundle/auth/reset.js", "/js/Section/auth/reset.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/auth/login.js", "/js/Section/auth/login.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/auth/change.js", "/js/Section/auth/change.js");
 
 });
 

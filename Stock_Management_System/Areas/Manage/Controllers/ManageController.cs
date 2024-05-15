@@ -63,7 +63,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
             _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Features/PendingCustomersPaymentSortList");
 
-            _All_Models.All_Counts_Model = await api_Service.Model_Of_Data_Display<AllCountsModel>("Counts");
+            
 
             _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/GetRecentActions");
 
@@ -73,19 +73,16 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-
                 string data = await response.Content.ReadAsStringAsync();
                 dynamic jsonObject = JsonConvert.DeserializeObject(data);
                 var dataObject = jsonObject.data;
-                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                _All_Models.All_Counts_Model = JsonConvert.DeserializeObject<AllCountsModel>(extractedDataJson);
-
+                _All_Models.All_Counts_Model = JsonConvert.DeserializeObject<AllCountsModel>(JsonConvert.SerializeObject(dataObject));
             }
             else
             {
-
                 return default;
             }
+
 
             return View(_All_Models);
         }

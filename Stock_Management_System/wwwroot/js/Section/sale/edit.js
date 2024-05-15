@@ -144,16 +144,16 @@ $(function () {
         calculateDeductedAmount();
     });
 });
-
+$('#selectpaymentmethod').change(function () {
+    if ($(this).val() === 'BANK') {
+        $('#bankSelection').show();
+    } else {
+        $('#bankSelection').hide();
+    }
+});
 
 $(function () {
-    $('#selectpaymentmethod').change(function () {
-        if ($(this).val() === 'BANK') {
-            $('#bankSelection').show();
-        } else {
-            $('#bankSelection').hide();
-        }
-    });
+
 
     $(function () {
         $('#isFullAmountReceive').change(function () {
@@ -173,14 +173,7 @@ $(function () {
         });
 
         // Handle changes in the remain payment method to potentially show bank selection
-        $('#selectremainpaymentmethod').change(function () {
-            var paymentMethod = $(this).val();
-            if (paymentMethod === "BANK") {
-                $('#RemainbankSelection').show();
-            } else {
-                $('#RemainbankSelection').hide();
-            }
-        });
+
 
         // Initialize hidden state based on initial page load values
         $('#isFullAmountReceive').trigger('change');
@@ -357,17 +350,7 @@ function CheckData() {
 
 
 
-$('#selectremainpaymentmethod').change(function () {
-    if ($(this).val() === 'BANK') {
-        $('#RemainbankSelection').show();
-    } else {
-        $('#RemainbankSelection').hide();
-    }
-});
 
-if ($('#selectremainpaymentmethod').val() == 'BANK') {
-    $('#RemainbankSelection').show();
-}
 
 function confirmSaleUpdate(addUrl, customerName) {
     Swal.fire({
@@ -428,18 +411,5 @@ $(function () {
         templateSelection: formatBankOption
     });
 
-    $('button[type="reset"]').click(function () {
-        setTimeout(function () {
-            $('#bankSelect').val("").trigger('change');
-        }, 1);
-        setTimeout(function () {
-            $('#selectgrain').val("").trigger('change');
-        }, 1);
-        setTimeout(function () {
-            $('#selectpaymentmethod').val("").trigger('change');
-        }, 1);
-        setTimeout(function () {
-            $('#isFullAmountReceive').val("").trigger('change');
-        }, 1);
-    });
+   
 }); 

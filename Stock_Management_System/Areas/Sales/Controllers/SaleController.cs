@@ -265,49 +265,11 @@ namespace Stock_Management_System.Areas.Sales.Controllers
 
         #endregion
 
-        #region Section: Get Customer Data
+        #region Section: Get Customer Details From AutoComplete
 
         /// <summary>
-        /// Asynchronously retrieves a list of customer models based on the provided customer name.
+        /// Retrieves customer data by name for autocomplete feature.
         /// </summary>
-        /// <param name="CustomerName">The name of the customer to search for.</param>
-        /// <returns>A JsonResult containing a list of Customer_Model objects matching the provided name.</returns>
-
-        public async Task<JsonResult> GetSellerCustomerData(string CustomerName)
-        {
-            List<Customer_Model> customerModels = await FetchSellerCustomerByName(CustomerName);
-            return Json(customerModels);
-        }
-
-        /// <summary>
-        /// Fetches a list of customers from the server based on the provided customer name.
-        /// </summary>
-        /// <param name="CustomerName">The customer name to search for in the database.</param>
-        /// <returns>A list of Customer_Model objects that match the given customer name.</returns>
-        private async Task<List<Customer_Model>> FetchSellerCustomerByName(string CustomerName)
-        {
-            List<Customer_Model> customer_Models = new List<Customer_Model>();
-
-            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/IsSellerCustomerExist/{CustomerName}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                string data = await response.Content.ReadAsStringAsync();
-                dynamic jsonObject = JsonConvert.DeserializeObject(data);
-                var dataObject = jsonObject.data;
-                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                customer_Models = JsonConvert.DeserializeObject<List<Customer_Model>>(extractedDataJson);
-            }
-
-            return customer_Models;
-        }
-
-        /// <summary>
-        /// Retrieves a customer profile from the server based on customer ID and type.
-        /// </summary>
-        /// <param name="Customer_ID">The ID of the customer to be fetched.</param>
-        /// <param name="Customer_Type">The type of customer to be fetched (e.g., regular, VIP).</param>
-        /// <returns>A Customer_Model object if the customer is found; otherwise, returns null.</returns>
         private async Task<Customer_Model> GetCustomerProfile(int Customer_ID, string Customer_Type)
         {
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetCustomerByIDAndType/{Customer_ID}&{Customer_Type}");
@@ -319,6 +281,40 @@ namespace Stock_Management_System.Areas.Sales.Controllers
                 return customerInfo;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Asynchronously gets a list of customer models matching a specified name, intended for use with an autocomplete feature.
+        /// </summary>
+        /// <param name="CustomerName">The name of the customer to search for.</param>
+        /// <returns>A JsonResult containing a list of matching customer models.</returns>
+        public async Task<JsonResult> GetSellerCustomerData(string CustomerName)
+        {
+            List<Customer_Model> customerModels = await FetchSellerCustomerByName(CustomerName);
+            return Json(customerModels);
+        }
+
+        /// <summary>
+        /// Asynchronously fetches customer models by name from a remote API, intended to check if the buyer customer exists in the system.
+        /// </summary>
+        /// <param name="CustomerName">The name of the customer to be fetched.</param>
+        /// <returns>A list of customer models that match the provided name.</returns>
+        private async Task<List<Customer_Model>> FetchSellerCustomerByName(string CustomerName)
+        {
+            List<Customer_Model> customer_Models = new List<Customer_Model>();
+
+            HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers//{CustomerName}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string data = await response.Content.ReadAsStringAsync();
+                dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                var dataObject = jsonObject.data;
+                var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+                customer_Models = JsonConvert.DeserializeObject<List<Customer_Model>>(extractedDataJson);
+            }
+
+            return customer_Models;
         }
 
         #endregion

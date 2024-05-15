@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Bibliography;
 using DocumentFormat.OpenXml.Vml;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
@@ -17,6 +18,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 {
     [Area("Manage")]
     [Route("~/[controller]/[action]")]
+    
     public class PaymentController : Controller
     {
         public IConfiguration Configuration;
@@ -150,6 +152,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         /// Retrieves and displays a list of pending payments.
         /// </summary>
         /// <returns>A view showing pending payments.</returns>
+      
         public async Task<IActionResult> PendingPayments()
         {
             await PopulateDropdownLists();

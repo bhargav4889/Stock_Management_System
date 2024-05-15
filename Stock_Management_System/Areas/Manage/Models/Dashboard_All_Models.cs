@@ -36,16 +36,16 @@ namespace Stock_Management_System.Areas.Manage.Models
         [JsonProperty("amountOfPurchasedStock")]
         public decimal AmountOfPurchasedStock { get; set; }
 
-        [JsonProperty("totalPurchaseInvoices")]
+        [JsonProperty("totalPurchaseInvoice")]
         public int TotalPurchaseInvoice { get; set; }
 
-        [JsonProperty("amountOfPurchaseInvoices")]
+        [JsonProperty("amountOfPurchaseInvoice")]
         public decimal AmountOfPurchaseInvoice { get; set; }
 
-        [JsonProperty("totalSalesInvoices")]
+        [JsonProperty("totalSalesInvoice")]
         public int TotalSalesInvoice { get; set; }
 
-        [JsonProperty("amountOfSalesInvoices")]
+        [JsonProperty("amountOfSalesInvoice")]
         public decimal AmountOfSalesInvoice { get; set; }
 
         [JsonProperty("totalPayments")]
@@ -68,6 +68,9 @@ namespace Stock_Management_System.Areas.Manage.Models
 
         [JsonProperty("amountOfPendingPayments")]
         public decimal AmountOfPendingPayments { get; set; }
+
+        [JsonProperty("amountOfSaleStock")]
+        public decimal AmountOfSaleStock { get; set; }
     }
 
 

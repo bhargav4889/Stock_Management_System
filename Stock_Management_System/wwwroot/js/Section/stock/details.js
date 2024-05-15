@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    var downloadButton = document.getElementById('downloadImage');
+    var downloadButton = document.getElementById('downloadsStockDetailsImage');
     var customerNameElement = document.getElementById('customerName');
     var productNameElement = document.getElementById('productName');
     var purchaseDateElement = document.getElementById('purchaseStockDate');

@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\section\sale\edit.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\section\sale\edit.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.2" />
     <PackageReference Include="itext" Version="8.0.2" />
     <PackageReference Include="itext7" Version="8.0.2" />
@@ -24,6 +32,11 @@
 
   <ItemGroup>
     <Folder Include="Areas\Information\Data\" />
+    <Folder Include="wwwroot\js\Section\auth\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\section\sale\edit.js" />
   </ItemGroup>
 
 </Project>
