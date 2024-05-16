@@ -30,7 +30,7 @@
             <h6>Manage Sales </h6>
         </div>
         <div class="page-btn">
-            <a role="button" asp-action="CreateSale" asp-controller="Sales" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Sale</a>
+            <a role="button" asp-action="AddSale" asp-controller="Sale" class="btn btn-added"><img src="~/img/icons/plus.svg" alt="img" class="me-1">Create Sale</a>
         </div>
     </div>
 
@@ -109,7 +109,7 @@
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label for="ProductType"><span style="color: black;">*</span> Select Product</label>
-                                <select class="select form-control" id="graintype" asp-items="@(ViewBag.Products)">
+                                <select class="select form-control" id="graintype" asp-items="@(ViewBag.ProductsInEnglish)">
                                     <option value="" selected disabled>-- Select Product --</option>
                                 </select>
                             </div>
@@ -135,13 +135,7 @@
 
 
 
-                        <!-- Search By Tolat -->
-                        <div class="col-sm-2">
-                            <div class="form-group">
-                                <label for="TolatName"><span style="color: black;">*</span> Search By Tolat</label>
-                                <input type="text" class="form-control" placeholder="Enter Name Of Tolat.." oninput="this.value = this.value.toUpperCase()" id="searchTolatName">
-                            </div>
-                        </div>
+                      
 
                         <!-- Search Button -->
                         <div class="col-sm-1">
@@ -186,7 +180,7 @@
                                 <tr>
 
                                     <td class="text-center">
-                                        @((DateTime.TryParse(item.Create_Sales.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                        @item.Create_Sales.ToString("yyyy-MM-dd")
                                     </td>
                                     <td class="text-center">@item.CustomerName</td>
                                     

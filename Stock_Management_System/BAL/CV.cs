@@ -38,7 +38,7 @@ namespace Stock_Management_System.BAL
 
         public string? JWT_Token()
         {
-            Console.WriteLine("Token", _httpContextAccessor.HttpContext?.Session.GetString("JWT_Token"));
+
             return _httpContextAccessor.HttpContext?.Session.GetString("JWT_Token");
         }
     }

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Stock_Management_System.UrlEncryption;
 using Stock_Management_System.BAL;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
 
 namespace Stock_Management_System.API_Services
 {
@@ -11,22 +12,26 @@ namespace Stock_Management_System.API_Services
         Uri baseaddress = new Uri("https://localhost:7024/api");
 
         private readonly HttpClient _Client;
-        private readonly CV _cv;
+
+        private readonly HttpContextAccessor _HttpContextAccessor;
+       
 
 
         public Api_Service()
         {
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
-            _cv = new CV();
+            _HttpContextAccessor = new HttpContextAccessor();
+            
         }
 
+        
 
 
         // Common Function Of List Of Data Display
 
         #region Common Function Of List Of Data Display
-        
+
         public async Task<List<T>> List_Of_Data_Display<T>(string requestUri, int reuqestId = 0)
         {
 
@@ -35,7 +40,9 @@ namespace Stock_Management_System.API_Services
             {
                 if (reuqestId == 0)
                 {
-                
+
+
+                    _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
                     HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}");
 
@@ -58,6 +65,9 @@ namespace Stock_Management_System.API_Services
                 }
                 else
                 {
+
+                    _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
                     HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}/{reuqestId}");
 
 
@@ -93,65 +103,57 @@ namespace Stock_Management_System.API_Services
         {
 
 
-            try
+            if (requestedId == 0)
             {
 
-                if (requestedId == 0)
+                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
+                HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}");
+
+
+                if (response.IsSuccessStatusCode)
                 {
 
-                    HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}");
+                    string data = await response.Content.ReadAsStringAsync();
+                    // Directly deserialize the JSON string into type T.
+                    T model = JsonConvert.DeserializeObject<T>(data);
+                    return model;
 
 
-                    if (response.IsSuccessStatusCode)
-                    {
-
-                        string data = await response.Content.ReadAsStringAsync();
-                        // Directly deserialize the JSON string into type T.
-                        T model = JsonConvert.DeserializeObject<T>(data);
-                        return model;
-
-
-                    }
-                    else
-                    {
-
-                        return default;
-                    }
                 }
                 else
                 {
-                    HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}/{requestedId}");
+
+                    return default;
+                }
+            }
+            else
+            {
+                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
+                HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/{requestUri}/{requestedId}");
 
 
-                    if (response.IsSuccessStatusCode)
-                    {
+                if (response.IsSuccessStatusCode)
+                {
 
-                        string data = await response.Content.ReadAsStringAsync();
-                        dynamic jsonObject = JsonConvert.DeserializeObject(data);
-                        var dataObject = jsonObject.data;
-                        var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
-                        var models = JsonConvert.DeserializeObject<T>(extractedDataJson);
-                        return models;
+                    string data = await response.Content.ReadAsStringAsync();
+                    dynamic jsonObject = JsonConvert.DeserializeObject(data);
+                    var dataObject = jsonObject.data;
+                    var extractedDataJson = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+                    var models = JsonConvert.DeserializeObject<T>(extractedDataJson);
+                    return models;
 
-
-                    }
-                    else
-                    {
-
-                        return default;
-                    }
 
                 }
+                else
+                {
 
-
-
-
+                    return default;
+                }
 
             }
-            catch
-            {
-                throw new Exception();
-            }
+
         }
 
 

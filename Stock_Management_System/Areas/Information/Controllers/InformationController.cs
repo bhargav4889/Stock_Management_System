@@ -4,6 +4,7 @@ using Stock_Management_System.API_Services;
 using Stock_Management_System.Areas.Accounts.Models;
 using Stock_Management_System.Areas.Information.Models;
 using Stock_Management_System.Areas.Manage.Models;
+using Stock_Management_System.BAL;
 using Stock_Management_System.UrlEncryption;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
 {
     [Area("Information")]
     [Route("~/[controller]/[action]")]
+    [CheckAccess]
     public class InformationController : Controller
     {
         public IConfiguration Configuration;
@@ -21,6 +23,8 @@ namespace Stock_Management_System.Areas.Information.Controllers
 
         public Api_Service api_Service = new Api_Service();
 
+        public HttpContextAccessor _HttpContextAccessor;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InformationController"/> class.
         /// </summary>
@@ -30,6 +34,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _HttpContextAccessor = new HttpContextAccessor();
         }
 
         #region Section: Dropdown Fucntion
@@ -78,6 +83,8 @@ namespace Stock_Management_System.Areas.Information.Controllers
             var jsonContent = JsonConvert.SerializeObject(information_Model);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Information/AddBankInformation", stringContent);
 
             if (response.IsSuccessStatusCode)
@@ -114,6 +121,9 @@ namespace Stock_Management_System.Areas.Information.Controllers
             await Dropdown_For_Bank_Names();
 
             Information_Model information_Model = new Information_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/InformationByID/{UrlEncryptor.Decrypt(Information_ID)}");
 
             if (response.IsSuccessStatusCode)
@@ -138,6 +148,8 @@ namespace Stock_Management_System.Areas.Information.Controllers
 
             var jsonContent = JsonConvert.SerializeObject(information_Model);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Information/UpdateBankInformation", stringContent);
 
@@ -173,6 +185,8 @@ namespace Stock_Management_System.Areas.Information.Controllers
         [HttpPost]
         public IActionResult DeleteBankInformation(string Information_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Information/DeleteInformation?Information_ID={UrlEncryptor.Decrypt(Information_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -218,6 +232,9 @@ namespace Stock_Management_System.Areas.Information.Controllers
         public async Task<IActionResult> GetInformationByID(string Information_ID)
         {
             Information_Model information_Model = new Information_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Information/InformationByID/{UrlEncryptor.Decrypt(Information_ID)}");
 
             if (response.IsSuccessStatusCode)

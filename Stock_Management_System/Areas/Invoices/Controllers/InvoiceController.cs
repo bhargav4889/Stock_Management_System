@@ -15,12 +15,14 @@ using Stock_Management_System.All_DropDowns;
 using Font = iTextSharp.text.Font;
 using System.Net.Http.Json;
 using System.Net.Http;
+using Stock_Management_System.BAL;
 
 namespace Stock_Management_System.Areas.Invoices.Controllers
 {
 
     [Area("Invoices")]
     [Route("~/[controller]/[action]")]
+    [CheckAccess]
     public class InvoiceController : Controller
     {
 
@@ -33,6 +35,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
         public readonly HttpClient _Client;
 
         private readonly Api_Service api_Service = new Api_Service();
+
+        public HttpContextAccessor _HttpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvoiceController"/> class.
@@ -47,6 +51,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _HttpContextAccessor = new HttpContextAccessor();
         }
 
         #endregion
@@ -87,6 +92,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
         {
             var jsonContent = JsonConvert.SerializeObject(purchase_InvoiceModel);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Invoices/AddPurchaseInvoice", stringContent);
 
@@ -129,6 +136,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public IActionResult DeletePurchaseInvoice(string Invoice_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Invoices/DeletePurchaseInvoice?Purchase_Invoice_ID={UrlEncryptor.Decrypt(Invoice_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -170,6 +179,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
             var jsonContent = JsonConvert.SerializeObject(purchase_Invoice_Details);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Invoices/UpdatePurchaseInvoice", stringContent);
 
@@ -271,6 +282,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
         {
 
             Purchase_Invoice_Model purchase_Invoices = new Purchase_Invoice_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Invoices/GetPurchaseInvoiceByID/{Invoice_ID}").Result;
 
@@ -695,6 +708,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GeneratePurchaseInvoicesPDFStatement()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseInvoiceStatementPDF");
 
             if (response.IsSuccessStatusCode)
@@ -716,6 +731,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GeneratePurchaseInvoicesEXCELStatement()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseInvoiceStatementEXCEL");
 
             if (response.IsSuccessStatusCode)
@@ -763,6 +780,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
         {
             var jsonContent = JsonConvert.SerializeObject(sales_Invoice);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Invoices/AddSaleInvoice", stringContent);
 
@@ -820,6 +839,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public IActionResult DeleteSaleInvoice(string Invoice_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Invoices/DeleteSaleInvoice?Sale_Invoice_ID={UrlEncryptor.Decrypt(Invoice_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -860,6 +881,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
             var jsonContent = JsonConvert.SerializeObject(sales_Invoice_Model);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Invoices/UpdateSaleInvoice", stringContent);
 
@@ -969,6 +992,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
             }
 
             Sales_Invoice_Model sales_Invoice_Model = new Sales_Invoice_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Invoices/GetSaleInvoiceByID/{Invoice_ID}").Result;
 
@@ -1587,6 +1612,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GenerateSaleInvoicesPDFStatement()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesInvoiceStatementPDF");
 
             if (response.IsSuccessStatusCode)
@@ -1608,6 +1635,8 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public async Task<IActionResult> GenerateSaleInvoicesEXCELStatement()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/SalesInvoiceStatementEXCEL");
 
             if (response.IsSuccessStatusCode)

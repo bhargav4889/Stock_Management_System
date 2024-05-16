@@ -68,7 +68,7 @@ builder.Services.AddWebOptimizer(pipeline =>
 
     pipeline.AddJavaScriptBundle("/js/bundle/invoice/p/add-bundle.js", "/js/Section/invoice/p/add.js");
     pipeline.AddJavaScriptBundle("/js/bundle/invoice/p/edit-bundle.js", "/js/Section/invoice/p/edit.js");
-    pipeline.AddJavaScriptBundle("/js/bundle/invoice/p/sales-bundle.js", "/js/Section/invoice/p/purchases.js");
+    pipeline.AddJavaScriptBundle("/js/bundle/invoice/p/purchases-bundle.js", "/js/Section/invoice/p/purchases.js");
     pipeline.AddJavaScriptBundle("/js/bundle/invoice/p/preview-bundle.js", "/js/Section/invoice/p/preview.js");
     pipeline.AddJavaScriptBundle("/js/bundle/invoice/p/details-bundle.js", "/js/Section/invoice/p/details.js");
 

@@ -1,11 +1,5 @@
 $(function () {
     var table = $('#data').DataTable();
-
-    function parseDate(str) {
-        var parts = str.split('-');
-        return new Date(2000 + parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-    }
-
     function applySearches() {
         var Name = $("#searchName").val();
         var VehicleName = $("#vehicletype").val();
@@ -14,7 +8,7 @@ $(function () {
         var selectedGrain = $("#graintype").val();
         var selectedGrainText = $("#graintype option:selected").text();
         var startdate = $('#startdate').val();
-        var enddate = $('#datepickerend').val(); // Ensure this matches your HTML
+        var enddate = $('#datepickerend').val();
 
         // Clear existing searches
         table.columns().search('');
@@ -35,24 +29,16 @@ $(function () {
         // Setup date filtering
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             var dateColumn = data[0]; // Assuming the date is in the first column
-            var date = parseDate(dateColumn); // Parse the DD-MM-YY format
+            var date = parseDate(dateColumn); // Parse the date
 
-            var start = startdate ? parseDate(startdate.split('-').reverse().join('-')) : null;
-            var end = enddate ? parseDate(enddate.split('-').reverse().join('-')) : new Date();
+            var startDate = startdate ? new Date(startdate) : null;
+            var endDate = enddate ? new Date(enddate) : new Date();
 
-            if (enddate && !startdate) {
-                start = new Date(end.getFullYear(), end.getMonth(), 1); // Set to the first of the month
+            if (!startDate && !endDate) {
+                return true; 
             }
 
-            if (startdate && !enddate) {
-                end = new Date(); // Set to current date
-            }
-
-            if (!startdate && !enddate) {
-                return true; // No filtering on dates
-            }
-
-            return (start ? date >= start : true) && (end ? date <= end : true);
+            return (!startDate || date >= startDate) && (!endDate || date <= endDate);
         });
 
         // Perform a single draw after all search criteria have been applied
@@ -63,11 +49,26 @@ $(function () {
         $("#searchName, #searchTolatName").val('');
         $('#graintype').val('').trigger('change');
         $('#vehicletype').val('').trigger('change');
+
+        // Reset date pickers
+        $('#startdate').val('');
+        $('#datepickerend').val('');
     }
+
 
     $('#searchButton').on('click', function () {
         applySearches();
+      
     });
+
+    function parseDate(dateString) {
+        var parts = dateString.split('-');
+        var year = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10); // Months are 1-based
+        var day = parseInt(parts[2], 10);
+
+        return new Date(year, month - 1, day); // Months are 0-based in JavaScript Date objects
+    }
 });
 
 function confirmPurchaseInvoiceDeletion(deleteUrl, customerName) {

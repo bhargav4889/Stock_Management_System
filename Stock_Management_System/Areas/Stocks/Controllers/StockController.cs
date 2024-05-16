@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
 using System.Data;
 using Stock_Management_System.Areas.Stocks.Models;
 using iTextSharp.text.pdf;
@@ -15,12 +14,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Customers_Model = Stock_Management_System.Areas.Accounts.Models.Customer_Model;
 using Stock_Management_System.Areas.Accounts.Models;
 using Stock_Management_System.Services;
+using Stock_Management_System.BAL;
 
 namespace Stock_Management_System.Areas.Stocks.Controllers
 {
 
     [Area("Stocks")]
     [Route("~/[controller]/[action]")]
+    [CheckAccess]
     public class StockController : Controller
     {
 
@@ -33,6 +34,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         public readonly HttpClient _Client;
 
         private readonly Api_Service api_Service = new Api_Service();
+
+        public HttpContextAccessor _HttpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StockController"/> class.
@@ -47,6 +50,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
 
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _HttpContextAccessor = new HttpContextAccessor();
+
         }
 
         #endregion
@@ -114,6 +119,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             var jsonContent = JsonConvert.SerializeObject(dataObject);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             // Send the PUT request to the "Stock/Update_Purchase_Stock" endpoint
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Stock/AddPurchaseStockWithCustomerDetails", stringContent);
 
@@ -142,6 +149,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             await PopulateDropdownLists();
 
             Customers_Stock_Combined_Model customers_Stock_Combined_Model = new Customers_Stock_Combined_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Stock/GetPurchaseStockAndCustomerDetails/{UrlEncryptor.Decrypt(TN_ID)}&{UrlEncryptor.Decrypt(Customer_ID)}");
 
@@ -186,6 +195,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
             var jsonContent = JsonConvert.SerializeObject(dataObject);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             // Send the PUT request to the "Stock/Update_Purchase_Stock" endpoint
             HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Stock/UpdatePurchaseStock", stringContent);
 
@@ -212,6 +223,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// </summary>
         private async Task<Customer_Model> GetCustomerProfile(int Customer_ID, string Customer_Type)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/GetCustomerByIDAndType/{Customer_ID}&{Customer_Type}");
             if (response.IsSuccessStatusCode)
             {
@@ -242,6 +255,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         private async Task<List<Customer_Model>> FetchBuyerCustomerByName(string CustomerName)
         {
             List<Customer_Model> customer_Models = new List<Customer_Model>();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Customers/IsBuyerCustomerExist/{CustomerName}");
 
@@ -282,6 +297,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <returns>A Customer_Model if the customer exists; otherwise, null.</returns>
         private Customer_Model FindCustomer(int Customer_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.GetAsync($"{_Client.BaseAddress}/Customers/Get_Customer/{Customer_ID}").Result;
             Customer_Model Customer_Info = new Customer_Model();
 
@@ -314,6 +331,9 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         {
             var jsonContent = JsonConvert.SerializeObject(customerModel);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Customers/AddCustomer", content);
 
             if (response.IsSuccessStatusCode)
@@ -343,6 +363,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         [HttpPost]
         public IActionResult DeleteStock(string TN_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Stock/RemovePurchaseStock?TN_ID={UrlEncryptor.Decrypt(TN_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -394,6 +416,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <returns>An IActionResult containing the PDF file or an error message.</returns>
         public async Task<IActionResult> GenerateStocksPDFStatement()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseStocksStatementPDF");
 
             if (response.IsSuccessStatusCode)
@@ -415,6 +439,8 @@ namespace Stock_Management_System.Areas.Stocks.Controllers
         /// <returns>An IActionResult containing the Excel file or an error message.</returns>
         public async Task<IActionResult> GenerateStocksExcelStatement()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PurchaseStocksStatementEXCEL");
 
             if (response.IsSuccessStatusCode)

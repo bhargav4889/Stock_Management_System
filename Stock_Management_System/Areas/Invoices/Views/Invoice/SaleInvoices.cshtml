@@ -162,7 +162,7 @@
                                 <tr>
 
                                     <td class="text-center">
-                                        @((DateTime.TryParse(item.SalesInvoiceDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                     @item.SalesInvoiceDate.ToString("yyyy-MM-dd")
                                     </td>
                                     <td class="text-center">
                                         @(string.IsNullOrWhiteSpace(Convert.ToString(item.BrokerName)) ? "--" : item.BrokerName)
@@ -226,7 +226,7 @@
 
 
 
-    <script src="/js/Section/invoice/s/sales.js"></script>
+    <script src=/js/bundle/invoice/s/sales-bundle.js></script>
 
 
 } 

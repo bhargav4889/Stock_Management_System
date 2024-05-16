@@ -70,13 +70,13 @@
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
                     <label><span style="color:red;">*</span> Total Amount (₹)</label>
-                    <input type="text" disabled name="Total_Amount" asp-for=Total_Amount name="Total_Amount" value="@Model.Total_Amount">
+                    <input type="text" disabled id="totalAmount" name="Total_Amount" asp-for=Total_Amount name="Total_Amount" value="@Model.Total_Amount">
                 </div>
             </div>
             <div class="col-lg-4 col-sm-12">
                 <div class="form-group">
                     <label><span style="color:red;">*</span> Paid Amount (₹)</label>
-                    <input type="text" disabled name="Paid_Amount" asp-for=Paid_Amount name="Paid_Amount" value="@Model.Paid_Amount">
+                    <input type="text" disabled name="Paid_Amount" id="paidAmount" asp-for=Paid_Amount name="Paid_Amount" value="@Model.Paid_Amount">
                 </div>
             </div>
             <div class="col-lg-4 col-sm-12">

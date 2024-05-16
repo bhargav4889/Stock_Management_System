@@ -9,6 +9,7 @@ using Stock_Management_System.API_Services;
 using Stock_Management_System.Areas.Accounts.Models;
 using Stock_Management_System.Areas.Manage.Models;
 using Stock_Management_System.Areas.Stocks.Models;
+using Stock_Management_System.BAL;
 using Stock_Management_System.UrlEncryption;
 using System.Net;
 using System.Text;
@@ -18,13 +19,14 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 {
     [Area("Manage")]
     [Route("~/[controller]/[action]")]
-    
+    [CheckAccess]
     public class PaymentController : Controller
     {
         public IConfiguration Configuration;
         Uri baseaddress = new Uri("https://localhost:7024/api");
         public readonly HttpClient _Client;
         public Api_Service api_Service = new Api_Service();
+        public HttpContextAccessor _HttpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PaymentController"/> class with specified configuration.
@@ -36,6 +38,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _HttpContextAccessor = new HttpContextAccessor();
         }
 
         #region Section: Dropdown Function
@@ -209,6 +212,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public async Task<ActionResult> GetPaymentInfoByCustomerStockID(string Customer_ID, string Stock_ID)
         {
             Payment_All_Models.Payment_Model payment_Model = new Payment_All_Models.Payment_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/GetPaymentInfoByStockCustomerID/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
@@ -239,6 +245,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public async Task<IActionResult> GetRemainPaymentInfo(string Customer_ID, string Stock_ID)
         {
             Remain_Payment_Model remain_Payment_Model = new Remain_Payment_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/RemainGetPaymentInfoByCustomerFKAndStockIdAndPaymentID/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
@@ -268,6 +277,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public async Task<ActionResult> GetPaymentInfo(string Customer_ID, string Stock_ID)
         {
             Payment_All_Models.Show_Payment_Info show_Payment_Info = new Payment_All_Models.Show_Payment_Info();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Payment/GetFullPaymentInfo/{UrlEncryptor.Decrypt(Customer_ID)}&{UrlEncryptor.Decrypt(Stock_ID)}");
 
             if (response.IsSuccessStatusCode)
@@ -292,6 +304,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         /// <returns>A PDF file if successful; otherwise, an error message.</returns>
         public async Task<IActionResult> PendingPaymentsPDF()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PendingPaymentsPDF");
 
@@ -317,6 +330,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         /// <returns>An Excel file if successful; otherwise, an error message.</returns>
         public async Task<IActionResult> PendingPaymentsEXCEL()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PendingPaymentsEXCEL");
 
             if (response.IsSuccessStatusCode)
@@ -346,6 +361,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         public async Task<IActionResult> RemainPaymentsPDF()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/RemainPaymentsPDF");
 
@@ -371,6 +387,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         /// <returns>An Excel file if successful; otherwise, an error message.</returns>
         public async Task<IActionResult> RemainPaymentsEXCEL()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/RemainPaymentsEXCEL");
 
             if (response.IsSuccessStatusCode)
@@ -400,6 +418,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         public async Task<IActionResult> PaidPaymentsPDF()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PaidPaymentsPDF");
 
@@ -425,6 +444,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         /// <returns>An Excel file if successful; otherwise, an error message.</returns>
         public async Task<IActionResult> PaidPaymentsEXCEL()
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Download/PaidPaymentsEXCEL");
 
             if (response.IsSuccessStatusCode)
@@ -449,6 +470,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         [HttpPost]
         public IActionResult DeletePaidStatusPayment(string Payment_ID,string Stock_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Payment/DeletePaidStatusPayment?Payment_ID={UrlEncryptor.Decrypt(Payment_ID)}&Stock_ID{UrlEncryptor.Decrypt(Stock_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -473,6 +496,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         [HttpPost]
         public IActionResult DeleteRemainStatusPayment(string Payment_ID, string Stock_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Payment/DeleteRemainStatusPayment?Payment_ID={UrlEncryptor.Decrypt(Payment_ID)}&Stock_ID={UrlEncryptor.Decrypt(Stock_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {
@@ -497,6 +522,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         [HttpPost]
         public IActionResult DeletePendingStatusPayment(string Stock_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Payment/DeletePendingStatusPayment?Stock_ID={UrlEncryptor.Decrypt(Stock_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {

@@ -2,48 +2,54 @@
 $(function () {
     var table = $('#data').DataTable();
 
-
-
     function applySearches() {
-        var Location = $("#searchLocation").val();
-
-        var selectedGrain = $('#graintype').val();
         var startdate = $('#startdate').val();
-        var enddate = $('#enddate').val();
-
-
-
-        var productColumnIndex = 1;
+        var enddate = $('#datepickerend').val();
+        var location = $('#searchLocation').val().toUpperCase();
+        var brandName = $('#BrandName').val();
 
         // Clear existing searches
         table.columns().search('');
 
-        // Apply dropdown search if selected
-        if (selectedGrain) {
-            table.column(productColumnIndex).search(selectedGrain);
-
-        }
-
         // Apply individual column searches from input fields
-        table.column(2).search(Location);
+        table.column(2).search(location);
 
+        table.column(2).search(brandName);
 
+        // Setup date filtering
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            var dateColumn = data[0]; // Assuming the date is in the first column
+            var date = parseDate(dateColumn); // Parse the date
 
+            var startDate = startdate ? new Date(startdate) : null;
+            var endDate = enddate ? new Date(enddate) : new Date();
 
+            return (!startDate || date >= startDate) && (!endDate || date <= endDate);
+        });
 
         // Perform a single draw after all search criteria have been applied
+        // Perform a single draw after all search criteria have been applied
         table.draw();
+        $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
 
         // Reset the input values after search
-        $("#searchLocation").val('');
-        $('#graintype').val('').trigger('change'); // For Select2
-
+        $('#startdate, #datepickerend, #searchLocation').val('');
     }
 
     $('#searchButton').on('click', function () {
         applySearches();
     });
+
+    function parseDate(dateString) {
+        var parts = dateString.split('-');
+        var year = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10); // Months are 1-based
+        var day = parseInt(parts[2], 10);
+
+        return new Date(year, month - 1, day); // Months are 0-based in JavaScript Date objects
+    }
 });
+
 
 //pending
 

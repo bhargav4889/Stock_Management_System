@@ -18,8 +18,12 @@
                 </div>
                 <div class="profile-top">
                     <div class="profile-content">
-                        <div class="profile-contentimg">
-                            <img src="~/img/customer/customer5.jpg" alt="img" id="blah">
+                        <div class="profile-contentimg" style="width: 130px; height: 130px;">
+                            <!-- Circular Avatar -->
+                            <div class="avatar rounded-circle" style="width:150px; height:100%;  max-width: 150px; max-height: 150px; background-color: #004A7F; display: flex; justify-content: center; align-items: center;">
+                                <!-- Display user initials -->
+                                <span class="avatar-text" style="color: white; font-size: 24px; font-weight: bold;">@cv.Username()?.Substring(0, 1).ToUpper()</span>
+                            </div>
                            
                         </div>
                         <div class="profile-contentname">
@@ -61,7 +65,7 @@
                         </div>
                     </div>
                 </div> *@
-               <h6>Last Login Time: @cv.JWT_Token()</h6>
+             
 
             </div>
         </div>

@@ -25,7 +25,7 @@ $(document).ready(function () {
             toastr.error('Passwords do not match.', {
                 closeButton: true,
                 progressBar: true,
-                positionClass: 'toast-bottom-right',
+                positionClass: 'toast-top-right',
                 preventDuplicates: true,
                 timeOut: '5000'
             });

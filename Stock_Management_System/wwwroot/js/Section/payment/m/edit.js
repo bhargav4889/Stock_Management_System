@@ -5,17 +5,19 @@ $(document).ready(function () {
     });
 
     $('#payingAmount').on('input', function () {
-        var totalRemain = parseFloat($('#currentRemainAmount').val()) || 0;
-        var paying = parseFloat($(this).val()) || 0;
+        var totalAmount = parseFloat($('#totalAmount').val()) || 0;
+        var paidAmount = parseFloat($('#paidAmount').val()) || 0;
+        var currentRemaining = totalAmount - paidAmount;
+        var payingAmount = parseFloat($(this).val()) || 0;
 
-        // Check if the paying amount is more than the current remain amount
-        if (paying > totalRemain) {
-            $(this).val(totalRemain); // Set value to max allowable if it's over
-            paying = totalRemain;
+        // Check if the paying amount is more than the current remaining amount
+        if (payingAmount > currentRemaining) {
+            $(this).val(currentRemaining.toFixed(2)); // Set value to max allowable if it's over
+            payingAmount = currentRemaining;
         }
 
         // Calculate and display the new remaining amount
-        var newRemaining = totalRemain - paying;
+        var newRemaining = currentRemaining - payingAmount;
         $('#currentRemainAmount').val(newRemaining.toFixed(2));
     });
 

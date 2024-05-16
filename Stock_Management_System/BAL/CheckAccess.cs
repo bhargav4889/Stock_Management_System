@@ -11,11 +11,11 @@ namespace Stock_Management_System.BAL
 
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
-            if (filterContext.HttpContext.Session.GetString("AdminID") == null)
+            if (filterContext.HttpContext.Session.GetString("Auth_ID") == null)
             {
 
                 filterContext.HttpContext.Session.Clear();
-                filterContext.Result = new RedirectResult("~/Login/Login_Page");
+                filterContext.Result = new RedirectResult("~/Auth/Login");
             }
         }
 

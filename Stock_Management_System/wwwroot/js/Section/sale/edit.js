@@ -144,16 +144,16 @@ $(function () {
         calculateDeductedAmount();
     });
 });
-$('#selectpaymentmethod').change(function () {
-    if ($(this).val() === 'BANK') {
-        $('#bankSelection').show();
-    } else {
-        $('#bankSelection').hide();
-    }
-});
+
 
 $(function () {
-
+    $('#selectpaymentmethod').change(function () {
+        if ($(this).val() === 'BANK') {
+            $('#bankSelection').show();
+        } else {
+            $('#bankSelection').hide();
+        }
+    });
 
     $(function () {
         $('#isFullAmountReceive').change(function () {
@@ -173,7 +173,14 @@ $(function () {
         });
 
         // Handle changes in the remain payment method to potentially show bank selection
-
+        $('#selectremainpaymentmethod').change(function () {
+            var paymentMethod = $(this).val();
+            if (paymentMethod === "BANK") {
+                $('#RemainbankSelection').show();
+            } else {
+                $('#RemainbankSelection').hide();
+            }
+        });
 
         // Initialize hidden state based on initial page load values
         $('#isFullAmountReceive').trigger('change');
@@ -182,8 +189,10 @@ $(function () {
 
 
 
-    $(function () {
+
+    $(document).ready(function () {
         var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
+
         // Function to show or hide new customer fields and a message.
         function toggleNewCustomerFields(show) {
             $("#newCustomerMessage").toggle(show);
@@ -191,8 +200,10 @@ $(function () {
             $("#newcustomercity").toggle(show);
             $("#newcustomerphoneno").toggle(show);
         }
+
         // Initially hide the new customer message and fields.
         toggleNewCustomerFields(false);
+
         $("#Customer").autocomplete({
             source: function (request, response) {
                 $.ajax({
@@ -216,6 +227,7 @@ $(function () {
             },
             minLength: 1, // Minimum length before searching.
             response: function (event, ui) {
+                // Check if there's an exact match.
                 var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
                 toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
             },
@@ -228,18 +240,20 @@ $(function () {
                 toggleNewCustomerFields(false); // Hide new customer fields as a selection has been made.
             }
         });
+
         // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
         $("#Customer").on('input', function () {
             var enteredValue = $(this).val().trim();
+            isSuggestionSelected = false; // Reset the flag as we are entering new text.
+
             if (!enteredValue) {
                 toggleNewCustomerFields(false);
-                isSuggestionSelected = false;
             } else {
-                isSuggestionSelected = false;
-                // Since we are still typing, check if any item matches exactly from the last search.
+                // Re-trigger the autocomplete search to find any matches and invoke the response event.
                 $("#Customer").autocomplete("search", enteredValue);
             }
         });
+
         // Optionally, reset the form state when the page is refreshed or navigated away.
         $(window).on('beforeunload', function () {
             toggleNewCustomerFields(false);
@@ -247,31 +261,36 @@ $(function () {
     });
 
 
-    function DateDefaultValue() {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var yyyy = today.getFullYear();
-        today = yyyy + '-' + mm + '-' + dd;
-        document.getElementById('datepicker').value = today;
-    }
 
-    window.onload = function () {
-        DateDefaultValue();
-
-    };
 
 
 
 
 }); // Correctly closed $(document).ready function
 
+function setDateDefaultValue() {
+    var today = new Date();
+    var day = String(today.getDate()).padStart(2, '0');
+    var month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    var year = today.getFullYear();
+    var formattedDate = year + '-' + month + '-' + day;
+    // Ensure the datepicker element exists and then set its value
+    var datePicker = document.getElementById('datepicker');
+    if (datePicker) {
+        datePicker.value = formattedDate;
+    }
+}
+// Run the function after the page has loaded to ensure the element is available
+document.addEventListener('DOMContentLoaded', function () {
+    setDateDefaultValue();
+
+});
 
 
 
 
 function CheckData() {
-    var date = document.getElementById("datepicker").value;
+  
     var grainName = document.getElementById("selectgrain").value;
     var customerName = document.getElementById("Customer").value;
     var paymentMethod = document.getElementById("selectpaymentmethod").value;
@@ -280,42 +299,37 @@ function CheckData() {
     var rate = document.getElementById("rate").value;
     var totalPrice = document.getElementById("totalprice").value;
     var fullAmountReceived = document.getElementById("isFullAmountReceive").value;
-    var receiveAmount = document.getElementById('receivedAmount').value;
-    var remainDate = document.getElementById("RemainDate").value;
-    var remainAmount = document.getElementById("RemainAmount").value;
+    var receiveAmount = document.getElementById('ReceivedAmount').value;
+  
+    var remainAmount = document.getElementById("remainAmount").value;
     var remainPaymentMethod = document.getElementById("selectremainpaymentmethod").value;
     var remainBankSelect = document.getElementById("remainbankSelect").value;
 
-
-    var isNewCustomer = document.getElementById("newcustomertype").style.display !== 'none'; // Checks if new customer fields are visible
-
-    var newCustomerType = document.getElementById("cttype").value; // Use .value for input fields
-    var newCustomerCity = document.getElementById("customercity").value; // Use .value for input fields
-    var newCustomerPhoneNo = document.getElementById("contactno").value; // Use .value for input fields
+    var isNewCustomer = document.getElementById("newcustomertype").style.display !== 'none';
+    var newCustomerType = document.getElementById("cttype").value;
+    var newCustomerCity = document.getElementById("customercity").value;
+    var newCustomerPhoneNo = document.getElementById("contactno").value;
 
     var missingFields = [];
 
     // Check for missing input in essential fields
-    if (!date) missingFields.push("Date");
+    
     if (!grainName) missingFields.push("Grain Name");
     if (!customerName) missingFields.push("Customer Name");
     if (!weight) missingFields.push("Weight");
     if (!rate) missingFields.push("Rate");
     if (!totalPrice) missingFields.push("Total Price");
     if (!receiveAmount) missingFields.push("Received Amount");
-    if (!fullAmountReceived) missingFields.push("Select Full Payment Received or Not")
+    if (!fullAmountReceived) missingFields.push("Select Full Payment Received or Not");
     if (paymentMethod === "BANK" && !bankSelect) missingFields.push("Bank Select for Payment");
 
     // Check for additional fields when full amount is not received
     if (fullAmountReceived === "NO") {
-        if (!remainDate) missingFields.push("Remaining Payment Date");
+        
         if (!remainAmount) missingFields.push("Remaining Amount");
         if (!remainPaymentMethod) missingFields.push("Remaining Payment Method");
         if (remainPaymentMethod === "BANK" && !remainBankSelect) missingFields.push("Bank Select for Remaining Payment");
     }
-
-
-
 
     // Check new customer fields only if it's a new customer
     if (isNewCustomer) {
@@ -323,12 +337,15 @@ function CheckData() {
         if (!newCustomerCity) missingFields.push('New Customer City');
         if (!newCustomerPhoneNo) missingFields.push('New Customer Contact No');
     }
+
+
+
     // Display a collective error if any fields are missing
     if (missingFields.length > 0) {
         toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, {
             closeButton: true,
             progressBar: true,
-            positionClass: 'toast-bottom-right',
+            positionClass: 'toast-top-right',
             preventDuplicates: true,
             showDuration: '300',
             hideDuration: '1000',
@@ -343,7 +360,7 @@ function CheckData() {
     }
 
     // If all checks pass, optionally confirm before proceeding
-    confirmSaleUpdate("/Sale/UpdateSaleDetails", customerName);
+    confirmSaleUpdation("/Sale/UpdateSaleDetails", customerName);
     return false; // Prevent form submission
 }
 
@@ -352,10 +369,12 @@ function CheckData() {
 
 
 
-function confirmSaleUpdate(addUrl, customerName) {
+
+
+function confirmSaleUpdation(addUrl, customerName) {
     Swal.fire({
-        title: 'Are You Sure You Want To Complete This Sale?',
-        text: `${customerName}'s sale completion?`,
+        title: 'Are You Sure You Want To Update This Sale?',
+        text: `${customerName}'s sale Update?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -370,6 +389,7 @@ function confirmSaleUpdate(addUrl, customerName) {
                 success: function (response) {
                     sessionStorage.setItem('SaleStatus', 'Sale Add successfully!');
                     window.location.href = response.redirectUrl; // Redirect using the URL from the server response
+                    $("#SaleForm")[0].reset();
                 },
                 error: function () {
                     sessionStorage.setItem('ErrorMsg', 'Something Went Wrong !');
@@ -379,6 +399,7 @@ function confirmSaleUpdate(addUrl, customerName) {
         }
     });
 }
+
 
 
 $(function () {
@@ -411,5 +432,7 @@ $(function () {
         templateSelection: formatBankOption
     });
 
-   
-}); 
+
+
+
+});

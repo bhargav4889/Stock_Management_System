@@ -209,7 +209,7 @@ $(function () {
                 $.ajax({
                     url: "/Sale/GetSellerCustomerData", // Correct URL to your controller action.
                     type: "POST",
-                    dataType: "json",
+   
                     data: {
                         CustomerName: request.term
                     },
@@ -259,9 +259,9 @@ $(function () {
             toggleNewCustomerFields(false);
         });
     });
-    
 
-  
+
+
 
 
 
@@ -283,13 +283,14 @@ function setDateDefaultValue() {
 // Run the function after the page has loaded to ensure the element is available
 document.addEventListener('DOMContentLoaded', function () {
     setDateDefaultValue();
+
 });
 
 
 
 
 function CheckData() {
-    var date = document.getElementById("datepicker").value;
+   
     var grainName = document.getElementById("selectgrain").value;
     var customerName = document.getElementById("Customer").value;
     var paymentMethod = document.getElementById("selectpaymentmethod").value;
@@ -298,35 +299,33 @@ function CheckData() {
     var rate = document.getElementById("rate").value;
     var totalPrice = document.getElementById("totalprice").value;
     var fullAmountReceived = document.getElementById("isFullAmountReceive").value;
-    var receiveAmount = document.getElementById('receivedAmount').value;
-    var remainDate = document.getElementById("RemainDate").value;
-    var remainAmount = document.getElementById("RemainAmount").value;
+    var receiveAmount = document.getElementById('ReceivedAmount').value;
+   
+    var remainAmount = document.getElementById("remainAmount").value;
     var remainPaymentMethod = document.getElementById("selectremainpaymentmethod").value;
     var remainBankSelect = document.getElementById("remainbankSelect").value;
 
-
-    var isNewCustomer = document.getElementById("newcustomertype").style.display !== 'none'; // Checks if new customer fields are visible
-
-    var newCustomerType = document.getElementById("cttype").value; // Use .value for input fields
-    var newCustomerCity = document.getElementById("customercity").value; // Use .value for input fields
-    var newCustomerPhoneNo = document.getElementById("contactno").value; // Use .value for input fields
+    var isNewCustomer = document.getElementById("newcustomertype").style.display !== 'none';
+    var newCustomerType = document.getElementById("cttype").value;
+    var newCustomerCity = document.getElementById("customercity").value;
+    var newCustomerPhoneNo = document.getElementById("contactno").value;
 
     var missingFields = [];
 
     // Check for missing input in essential fields
-    if (!date) missingFields.push("Date");
+   
     if (!grainName) missingFields.push("Grain Name");
     if (!customerName) missingFields.push("Customer Name");
     if (!weight) missingFields.push("Weight");
     if (!rate) missingFields.push("Rate");
     if (!totalPrice) missingFields.push("Total Price");
     if (!receiveAmount) missingFields.push("Received Amount");
-    if (!fullAmountReceived) missingFields.push("Select Full Payment Received or Not")
+    if (!fullAmountReceived) missingFields.push("Select Full Payment Received or Not");
     if (paymentMethod === "BANK" && !bankSelect) missingFields.push("Bank Select for Payment");
 
     // Check for additional fields when full amount is not received
     if (fullAmountReceived === "NO") {
-        if (!remainDate) missingFields.push("Remaining Payment Date");
+        
         if (!remainAmount) missingFields.push("Remaining Amount");
         if (!remainPaymentMethod) missingFields.push("Remaining Payment Method");
         if (remainPaymentMethod === "BANK" && !remainBankSelect) missingFields.push("Bank Select for Remaining Payment");
@@ -338,12 +337,15 @@ function CheckData() {
         if (!newCustomerCity) missingFields.push('New Customer City');
         if (!newCustomerPhoneNo) missingFields.push('New Customer Contact No');
     }
+
+  
+
     // Display a collective error if any fields are missing
     if (missingFields.length > 0) {
         toastr.error(`Please fill out the following required fields: ${missingFields.join(', ')}`, {
             closeButton: true,
             progressBar: true,
-            positionClass: 'toast-bottom-right',
+            positionClass: 'toast-top-right',
             preventDuplicates: true,
             showDuration: '300',
             hideDuration: '1000',
@@ -361,6 +363,8 @@ function CheckData() {
     confirmSaleAddition("/Sale/InsertSale", customerName);
     return false; // Prevent form submission
 }
+
+
 
 
 
@@ -385,6 +389,7 @@ function confirmSaleAddition(addUrl, customerName) {
                 success: function (response) {
                     sessionStorage.setItem('SaleStatus', 'Sale Add successfully!');
                     window.location.href = response.redirectUrl; // Redirect using the URL from the server response
+                    $("#SaleForm")[0].reset();  
                 },
                 error: function () {
                     sessionStorage.setItem('ErrorMsg', 'Something Went Wrong !');
@@ -394,6 +399,7 @@ function confirmSaleAddition(addUrl, customerName) {
         }
     });
 }
+
 
 
 $(function () {
@@ -428,8 +434,8 @@ $(function () {
 
 
 
-
-}); 
+        
+});
 function confirmSaleDataReset() {
     Swal.fire({
         title: 'Are you sure Want Reset All values ?',

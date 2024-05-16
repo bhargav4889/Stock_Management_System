@@ -17,12 +17,12 @@
                 <div class="login-userheading">
                     <h3>Login</h3>
                     <h4>Login to your System</h4>
-                </div>
-                <form asp-action="Login" asp-controller="Auth">
+                </div> 
+                <form id="loginForm" asp-action="Login" asp-controller="Auth" onsubmit="return CheckData()">
                     <div class="form-login">
                         <label><span style="color:red;">*</span> Username</label>
                         <div class="form-addons">
-                            <input type="text" asp-for="Username" placeholder="Enter Username">
+                            <input type="text" asp-for="Username" name="Username" placeholder="Enter Username">
                             <img src="~/img/icons/users1.svg" alt="img">
                             <span style="color:red;" asp-validation-for="Username"></span>
                         </div>
@@ -30,7 +30,7 @@
                     <div class="form-login">
                         <label><span style="color:red;">*</span> Password</label>
                         <div class="pass-group">
-                            <input type="password" class="pass-input" asp-for="Password" placeholder="Enter your password">
+                            <input type="password" class="pass-input" asp-for="Password" name="Password" placeholder="Enter your password">
                             <span class="fas toggle-password fa-eye-slash"></span>
 
                         </div>
@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     <div class="form-login">
-                        <button type="submit" class="btn btn-login">Login</button>
+                        <button id="loginButton" type="submit" class="btn btn-login">Login</button>
                     </div>
                 </form>
 
@@ -51,8 +51,13 @@
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- Toastr CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+        <!-- Toastr JS -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
 
 
+        <script src="/js/bundle/auth/login.js"></script>
+    

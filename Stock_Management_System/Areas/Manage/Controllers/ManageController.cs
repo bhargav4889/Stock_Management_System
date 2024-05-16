@@ -13,7 +13,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
     [Area("Manage")]
     [Route("~/[controller]/[action]")]
-
+    [CheckAccess]
     public class ManageController : Controller
     {
         #region Section :  Configuration
@@ -23,6 +23,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         Uri baseaddress = new Uri("https://localhost:7024/api");
 
         public readonly HttpClient _Client;
+
+        public HttpContextAccessor _HttpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ManageController"/> class with specified configuration.
@@ -35,7 +37,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             Configuration = configuration;
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
-
+            _HttpContextAccessor = new HttpContextAccessor();
         }
 
         #endregion
@@ -63,11 +65,12 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
             _All_Models.Pending_Customers_Payment_Sort_List = await api_Service.List_Of_Data_Display<Pending_Customers_Payment_Sort_List>("Features/PendingCustomersPaymentSortList");
 
-            
-
             _All_Models.recent_Actions_With_Info = await api_Service.List_Of_Data_Display<Recent_Action_Model>("Recent_Actions/GetRecentActions");
 
             _All_Models.upcoming_Reminders = await api_Service.List_Of_Data_Display<Upcoming_Reminders_Model>("Features/UpcomingRemindersList");
+
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Counts");
 

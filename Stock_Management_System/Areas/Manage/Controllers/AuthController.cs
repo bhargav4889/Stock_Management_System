@@ -69,29 +69,29 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                         User_Model user = JsonConvert.DeserializeObject<User_Model>(userData);
 
                         // Set individual session items
-
+                        HttpContext.Session.SetString("Auth_ID", user.UserId.ToString());
                         HttpContext.Session.SetString("Auth_Name", user.Username);
                         HttpContext.Session.SetString("Auth_Email", user.Emailaddress); // Handle possible null values
                         HttpContext.Session.SetString("Auth_Phone", user.Phoneno); // Handle possible null values
                         HttpContext.Session.SetString("Last_Login", DateTime.Now.ToString());
                         HttpContext.Session.SetString("JWT_Token", user.Token);
 
-                        return RedirectToAction("Dashboard", "Manage"); // Redirect to home page or dashboard
+                        return Json(new { success = true, redirectUrl = Url.Action("Dashboard", "Manage") });
                     }
                     else
                     {
-                        TempData["ErrorMsg"] = "User Not Found. Please check username and password.";
-                        return View(model);
+                        return Json(new { success = false, redirectUrl = Url.Action("Login", "Auth"), errorMessage = "Invalid Username and Password !" });
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Server error. Please contact administrator.");
+                    return Json(new { success = false, redirectUrl = Url.Action("Login", "Auth"), errorMessage = " Invalid Username or Password !" });
                 }
             }
 
-            return View(model);
+            return BadRequest(ModelState);
         }
+
 
 
 
@@ -182,7 +182,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 }
             }
 
-            
+
             return RedirectToAction("Login", "Auth");
         }
 
@@ -204,7 +204,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 newPassword = model.Password
             }), Encoding.UTF8, "application/json");
 
-         
+
 
             HttpResponseMessage response = await _Client.PostAsync(url, content);
             if (response.IsSuccessStatusCode)
@@ -214,7 +214,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
                 if (result["success"])
                 {
-                   
+
                     return RedirectToAction("Login", "Auth");
                 }
                 else

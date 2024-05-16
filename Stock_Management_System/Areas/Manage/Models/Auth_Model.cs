@@ -13,7 +13,8 @@ namespace Stock_Management_System.Areas.Manage.Models
             public string? Username { get; set; }
 
             [Required(ErrorMessage = "Please Enter Password")]
-            [MaxLength(15)]
+         
+            [MaxLength(20,ErrorMessage ="Password Must be 10 or Above charcters")]
             public string? Password { get; set; }
 
 
@@ -25,6 +26,8 @@ namespace Stock_Management_System.Areas.Manage.Models
     public class User_Model
     {
         
+        public int UserId { get; set; }
+
         public string Username { get; set; }
 
        

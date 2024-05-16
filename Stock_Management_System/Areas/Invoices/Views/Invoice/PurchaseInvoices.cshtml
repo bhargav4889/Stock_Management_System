@@ -168,7 +168,7 @@
                                 <tr>
 
                                     <td class="text-center">
-                                        @((DateTime.TryParse(item.PurchaseInvoiceDate.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                       @item.PurchaseInvoiceDate.ToString("yyyy-MM-dd")
                                     </td>
                                     <td class="text-center">@item.CustomerName</td>
                                     <td class="text-center">@item.ProductName</td>
@@ -229,7 +229,7 @@
 
 
 
-        <script src="/js/Section/invoice/p/purchases.js"></script>
+        <script src= "/js/bundle/invoice/p/purchases-bundle.js"></script>
 
 
     }

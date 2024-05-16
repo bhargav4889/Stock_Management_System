@@ -94,29 +94,58 @@
                         <div class="col-lg-6 col-sm-12">
                             <div class="row">
 
-                                <!-- Start Date Input -->
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label for="startdate" class="text-truncate"><span style="color: black;">*</span> Start Date</label>
-                                        <input type="date" class="form-control" id="startdate">
+                                @if(Model.Customers.CustomerType == "BUYER")
+                                {
+                                    <!-- Start Date Input -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="startdate" class="text-truncate"><span style="color: black;">*</span> Start Date</label>
+                                            <input type="date" class="form-control" id="startdate">
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- End Date Input -->
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label for="datepickerend" class="text-truncate"><span style="color: black;">*</span> End Date</label>
-                                        <input type="date" class="form-control" id="datepickerend" name="enddate">
+                                    <!-- End Date Input -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="datepickerend" class="text-truncate"><span style="color: black;">*</span> End Date</label>
+                                            <input type="date" class="form-control" id="datepickerend" name="enddate">
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Search By Location Input -->
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <label for="customertype" class="text-truncate"><span style="color: black;">*</span> Search By Location</label>
-                                        <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="searchLocation">
+                                    <!-- Search By Location Input -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="customertype" class="text-truncate"><span style="color: black;">*</span> Search By Location</label>
+                                            <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="searchLocation">
+                                        </div>
                                     </div>
-                                </div>
+                                }
+                                else if(Model.Customers.CustomerType == "SELLER")
+                                {
+                                    <!-- Start Date Input -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="startdate" class="text-truncate"><span style="color: black;">*</span> Start Date</label>
+                                            <input type="date" class="form-control" id="startdate">
+                                        </div>
+                                    </div>
+
+                                    <!-- End Date Input -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="datepickerend" class="text-truncate"><span style="color: black;">*</span> End Date</label>
+                                            <input type="date" class="form-control" id="datepickerend" name="enddate">
+                                        </div>
+                                    </div>
+
+                                    <!-- Search By Brand Input -->
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="customertype" class="text-truncate"><span style="color: black;">*</span> Search By Location</label>
+                                            <input type="text" class="form-control" placeholder="Enter Brand.." oninput="this.value = this.value.toUpperCase()" id="BrandName">
+                                        </div>
+                                    </div>
+                                }
 
 
 
@@ -203,7 +232,7 @@
                                 {
                                     <tr>
 
-                                        <td class="text-center">@(DateTime.TryParse(item.StockDate.ToString(), out var piDate) ? piDate.ToString("dd-MM-yy") : "")</td>
+                                        <td class="text-center">@item.StockDate.ToString("yyyy-MM-dd")</td>
                                         <td class="text-center">@item.ProductName</td>
                                         <td class="text-center">@item.PurchaseStockLocation</td>
                                         <td class="text-center">@(item.Bags == 0 ? "--" :item.Bags)</td>
@@ -306,7 +335,7 @@
                                 {
                                     <tr>
 
-                                        <td class="text-center">@(DateTime.TryParse(item.Create_Sales.ToString(), out var piDate) ? piDate.ToString("dd-MM-yy") : "")</td>
+                                        <td class="text-center">@item.Create_Sales.ToString("yyyy-MM-dd")</td>
                                         <td class="text-center">@item.Product_Name</td>
                                         <td class="text-center">@item.Brand_Name</td>
                                         <td class="text-center">@item.Bags</td>

@@ -6,6 +6,8 @@
     ViewData["Title"] = "Create Reminder";
 }
 @model Stock_Management_System.Areas.Manage.Models.Reminder_Model;
+@using Stock_Management_System.BAL; 
+@inject CV cv;
 <div class="content">
     <div class="page-header">
         <div class="page-title">
@@ -67,9 +69,9 @@
 
 
                 
-                <input type="text" value="bhargavkachhela1@gmail.com" name="SentEmailAddress" asp-for="SentEmailAddress" />
+                <input type="hidden" value="@cv.Email()" name="SentEmailAddress" asp-for="SentEmailAddress" />
 
-                <input type="text" value="9664633122" name="SentPhoneNo" asp-for="SentPhoneNo" />
+                <input type="hidden" value="@cv.ContactNo()" name="SentPhoneNo" asp-for="SentPhoneNo" />
 
                 <div class="row justify-content-center">
                     <div class="col-auto text-center mb-3" style="margin-top:20px;">

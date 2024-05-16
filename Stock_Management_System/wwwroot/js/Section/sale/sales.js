@@ -1,57 +1,76 @@
 
 $(function () {
-    var table = $('#data').DataTable();
+    $(function () {
+        var table = $('#data').DataTable();
 
-    function applySearches() {
-        var Name = $("#searchName").val();
-        var VehicleName = $("#vehicletype").val();
-        var selectedVehicle = $("#vehicletype option:selected").text();
-        var TolatName = $("#searchTolatName").val();
-        var selectedGrain = $("#graintype").val();
-        var selectedGrainText = $("#graintype option:selected").text();
-        var startdate = $('#startdate').val();
-        var enddate = $('#enddate').val();
+        function applySearches() {
+            var Name = $("#searchName").val();
+            var VehicleName = $("#vehicletype").val();
+            var selectedVehicle = $("#vehicletype option:selected").text();
+           
+            var selectedGrain = $("#graintype").val();
+            var selectedGrainText = $("#graintype option:selected").text();
+            var startdate = $('#startdate').val();
+            var enddate = $('#datepickerend').val();
 
+            var productColumnIndex = 3;
+            var VehicleColumnIndex = 10;
 
+            // Clear existing searches
+            table.columns().search('');
 
+            // Apply dropdown search if selected
+            if (selectedGrain) {
+                table.column(productColumnIndex).search(selectedGrainText);
+            }
 
-        var productColumnIndex = 3;
-        var VehicleColumnIndex = 10;
+            if (VehicleName) {
+                table.column(VehicleColumnIndex).search(selectedVehicle);
+            }
 
-        // Clear existing searches
-        table.columns().search('');
+            // Apply individual column searches from input fields
+            table.column(1).search(Name);
+           
 
-        // Apply dropdown search if selected
-        if (selectedGrain) {
-            table.column(productColumnIndex).search(selectedGrainText);
+            // Setup date filtering
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var start = startdate ? parseDate(startdate) : null;
+                var end = enddate ? parseDate(enddate) : new Date();
 
+                var dateString = data[0]; // Assuming the date is in the first column
+                var date = parseDate(dateString); // Parse date in format dd-MM-yyyy
+
+                return (!start || date >= start) && (!end || date <= end);
+            });
+
+            // Perform a single draw after all search criteria have been applied
+            table.draw();
+
+            // Remove the date filter after drawing
+            $.fn.dataTable.ext.search.pop();
+
+            // Reset the input values after search
+            $("#searchName").val('');
+            $('#graintype').val('').trigger('change');
+            $('#vehicletype').val('').trigger('change');
+            $('#startdate').val('');
+            $('#datepickerend').val('');
         }
 
-        if (VehicleName) {
-            table.column(VehicleColumnIndex).search(selectedVehicle).draw();
+        $('#searchButton').on('click', function () {
+            applySearches();
+        });
+
+        function parseDate(dateString) {
+            var parts = dateString.split('-');
+            var year = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10); // Months are 1-based
+            var day = parseInt(parts[2], 10);
+
+            return new Date(year, month - 1, day); // Months are 0-based in JavaScript Date objects
         }
-
-        // Apply individual column searches from input fields
-        table.column(1).search(Name);
-
-        table.column(9).search(TolatName);
-
-
-
-
-        // Perform a single draw after all search criteria have been applied
-        table.draw();
-
-        // Reset the input values after search
-        $("#searchName, #searchTolatName").val('');
-        $('#graintype').val('').trigger('change');
-        $('#vehicletype').val('').trigger('change');
-
-    }
-
-    $('#searchButton').on('click', function () {
-        applySearches();
     });
+
 });
 
 $(function () {

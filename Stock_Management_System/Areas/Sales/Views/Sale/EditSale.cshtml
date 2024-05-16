@@ -241,7 +241,7 @@
                 <div class="col-lg-3 col-sm-12">
                     <div class="form-group">
                         <label><span style="color: red;">*</span> Full Payment Amount Receive?</label>
-                        <select class="select" id="isFullAmountReceive" asp-for=sale.IsFullPaymentReceive>
+                        <select class="select" id="isFullAmountReceive"  asp-for=sale.IsFullPaymentReceive>
                             <option value="" selected disabled>-- Options --</option>
                             <option value="YES">YES</option>
                             <option value="NO">NO</option>
@@ -294,7 +294,7 @@
                             <option selected disabled value="">-- Select Bank --</option>
                             @foreach (var bank in ViewBag.OurBanks as List<Stock_Management_System.Areas.Manage.Models.Our_Banks_Dropdown>)
                             {
-                                <option value="@bank.BankId" data-icon="@bank.BankIcon" data-info-id="@bank.InformationId">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
+                                <option value="@bank.InformationId" data-icon="@bank.BankIcon">XXXXX@(bank.AccountNo.Substring(bank.AccountNo.Length - 4))</option>
                             }
                         </select>
                         <input type="hidden" asp-for="sale.Remain_Infromation_ID" id="remainInformationId" />

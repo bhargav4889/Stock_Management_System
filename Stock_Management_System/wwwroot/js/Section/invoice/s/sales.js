@@ -1,7 +1,6 @@
 
 $(document).ready(function () {
     var table = $('#data').DataTable();
-
     function applySearches() {
         var BrokerName = $("#searchBrokerName").val();
         var PartyName = $("#searchPartyName").val();
@@ -9,19 +8,16 @@ $(document).ready(function () {
         var selectedGrain = $("#graintype").val();
         var selectedGrainText = $("#graintype option:selected").text(); // Get the selected option text
         var startdate = $('#startdate').val();
-        var enddate = $('#enddate').val();
+        var enddate = $('#datepickerend').val();
 
-        console.log(selectedGrain);
-
-        var productColumnIndex = 3;
-
-        // Clear existing searches
+        // Clear existing searches and date filters
         table.columns().search('');
+     
 
         // Apply dropdown search if selected
         if (selectedGrain) {
+            var productColumnIndex = 3; // Adjust according to your table structure
             table.column(productColumnIndex).search(selectedGrainText);
-
         }
 
         // Apply individual column searches from input fields
@@ -29,20 +25,48 @@ $(document).ready(function () {
         table.column(2).search(PartyName);
         table.column(4).search(Brand);
 
+        // Setup date filtering
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            var dateColumn = data[0]; // Assuming the date is in the first column
+            var date = parseDate(dateColumn); // Parse the date
 
+            var startDate = startdate ? new Date(startdate) : null;
+            var endDate = enddate ? new Date(enddate) : new Date();
+
+            if (!startDate && !endDate) {
+                return true; // No filtering on dates
+            }
+
+            return (!startDate || date >= startDate) && (!endDate || date <= endDate);
+        });
 
         // Perform a single draw after all search criteria have been applied
         table.draw();
-
-        // Reset the input values after search
-        $("#searchBrokerName, #searchPartyName , #searchBrandName").val('');
-        $('#graintype').val('').trigger('change');
-
+        $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
     }
+
+    // Reset input values after search
+    $("#searchBrokerName, #searchPartyName, #searchBrandName").val('');
+    $('#graintype').val('').trigger('change');
+
+
+    // Reset date pickers
+    $('#startdate').val('');
+    $('#datepickerend').val('');
+
 
     $('#searchButton').on('click', function () {
         applySearches();
     });
+
+    function parseDate(dateString) {
+        var parts = dateString.split('-');
+        var year = parseInt(parts[0], 10);
+        var month = parseInt(parts[1], 10); // Months are 1-based
+        var day = parseInt(parts[2], 10);
+
+        return new Date(year, month - 1, day); // Months are 0-based in JavaScript Date objects
+    }
 });
 
 function confirmPurchaseInvoiceDeletion(deleteUrl, customerName) {

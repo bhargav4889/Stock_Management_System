@@ -1,6 +1,15 @@
 ﻿@using Stock_Management_System.BAL;
 
 @inject CV cv
+
+@functions {
+    public string GetColorFromUsername(string username)
+    {
+        Random random = new Random(username.GetHashCode());
+        var color = String.Format("#{0:X6}", random.Next(0x1000000)); // Generates a random color
+        return color;
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <meta name="description" content="POS - Bootstrap Admin Template">
     <meta name="keywords" content="admin, estimates, bootstrap, business, corporate, creative, management, minimal, modern,  html5, responsive">
- 
+
     <meta name="robots" content="noindex, nofollow">
     <title>@ViewData["Title"]</title>
 
@@ -102,23 +111,19 @@
                     <!-- Profile Menu or Icon -->
                     <li class="nav-item dropdown has-arrow main-drop">
                         <a href="~/profile-menu" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
-                            <div class="avatar avatar-lg">
-                                <img class="avatar-img rounded-circle" alt="User Image" src="~/img/profile.png">
+                            <div class="avatar avatar-lg" style="width: 35px; height: 35px;">
+                                <!-- Set width and height to match the original image size -->
+                                <!-- Replace img with div -->
+                                <div class="avatar-img rounded-circle avatar-letter" style="background-color: @GetColorFromUsername(cv.Username())">
+                                    @cv.Username()?.Substring(0, 1).ToUpper()
+                                </div>
                             </div>
                             <span style="color:black; font-style:initial; font-weight:bolder">Hi, @cv.Username()</span>
                         </a>
                         <div class="dropdown-menu menu-drop-user">
                             <div class="profilename">
-                                <div class="profileset">
-                                    <span class="user-img">
-                                        <img src="~/img/profile.png" alt="">
-                                        <span class="status online"></span>
-                                    </span>
-                                    <div class="profilesets">
-                                        <h6>Bhargav</h6>
-                                        <h5>Admin</h5>
-                                    </div>
-                                </div>
+                               
+
                                 <hr class="m-0">
                                 <a class="dropdown-item" asp-action="Profile" asp-controller="Manage">
                                     <i class="me-2" data-feather="user"></i> My Profile
@@ -294,7 +299,7 @@
 
     <script src="~/js/moment.min.js"></script>
 
-   
+
 
     <script src="~/js/bootstrap-datetimepicker.min.js"></script>
     <script src="/_framework/aspnetcore-browser-refresh.js"></script>

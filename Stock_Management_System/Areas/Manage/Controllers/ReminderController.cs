@@ -4,6 +4,7 @@ using Stock_Management_System.API_Services;
 using Stock_Management_System.Areas.Accounts.Models;
 using Stock_Management_System.Areas.Information.Models;
 using Stock_Management_System.Areas.Manage.Models;
+using Stock_Management_System.BAL;
 using Stock_Management_System.UrlEncryption;
 using System.Text;
 using static Stock_Management_System.Areas.Manage.Models.Payment_All_Models;
@@ -12,6 +13,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 {
     [Area("Manage")]
     [Route("~/[controller]/[action]")]
+    [CheckAccess]
     public class ReminderController : Controller
     {
         Uri baseaddress = new Uri("https://localhost:7024/api");
@@ -20,10 +22,13 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
         private readonly Api_Service api_Service = new Api_Service();
 
+        public HttpContextAccessor _HttpContextAccessor;
+
         public ReminderController()
         {
             _Client = new HttpClient();
             _Client.BaseAddress = baseaddress;
+            _HttpContextAccessor = new HttpContextAccessor();
         }
 
         #region Section: Create Reminder
@@ -47,6 +52,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         {
             var jsonContent = JsonConvert.SerializeObject(reminder);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Reminder/AddReminder", stringContent);
 
@@ -81,6 +88,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public async Task<IActionResult> EditReminder(string Reminder_ID)
         {
             Reminder_Model reminder = new Reminder_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Reminder/GetReminderByID/{UrlEncryptor.Decrypt(Reminder_ID)}");
 
             if (response.IsSuccessStatusCode)
@@ -103,6 +113,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         {
             var jsonContent = JsonConvert.SerializeObject(reminder);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
 
             HttpResponseMessage response = await _Client.PutAsync($"{_Client.BaseAddress}/Reminder/UpdateReminder", stringContent);
 
@@ -150,6 +162,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public async Task<IActionResult> GetReminderByID(string Reminder_ID)
         {
             Reminder_Model reminder = new Reminder_Model();
+
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = await _Client.GetAsync($"{_Client.BaseAddress}/Reminder/GetReminderByID/{UrlEncryptor.Decrypt(Reminder_ID)}");
 
             if (response.IsSuccessStatusCode)
@@ -177,6 +192,8 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         [HttpPost]
         public IActionResult DeleteReminder(string Reminder_ID)
         {
+            _Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
             HttpResponseMessage response = _Client.DeleteAsync($"{_Client.BaseAddress}/Reminder/DeleteReminder?Reminder_ID={UrlEncryptor.Decrypt(Reminder_ID)}").Result;
             if (response.IsSuccessStatusCode)
             {

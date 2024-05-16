@@ -105,7 +105,7 @@
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label for="customername"><span style="color: black;">*</span> Search By Location</label>
-                                <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="location">
+                                <input type="text" class="form-control" placeholder="Enter Location.." oninput="this.value = this.value.toUpperCase()" id="searchLocation">
                             </div>
                         </div>
 
@@ -137,10 +137,10 @@
                         <th class="text-center">Payment Date</th>
                         <th class="text-center">Name</th>
                         <th class="text-center">Product</th>
-                        <th class="text-center">Total Amount</th>
-                        <th class="text-center">Total Paid</th>
-                        <th class="text-center">Total Remain</th>
-                        <th class="text-center">Payment-Method</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Paid</th>
+                        <th class="text-center">Remain</th>
+                        <th class="text-center">Method</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Pay</th>
                         <th class="text-center">Delete</th>
@@ -155,7 +155,7 @@
                                 <tr>
 
                                     <td class="text-center">
-                                        @((DateTime.TryParse(item.Payment_Date.ToString(), out DateTime piDate) ? piDate : (DateTime?)null)?.ToString("dd-MM-yy"))
+                                        @item.Payment_Date.ToString("yyyy-MM-dd")
                                     </td>
                                     <td class="text-center">@item.Customer_Name</td>
                                     <td class="text-center">@item.Product_Name</td>

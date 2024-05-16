@@ -206,6 +206,7 @@ function confirmSaleInvoiceCreation(redirectUrl, partyName) {
                     if (response.success) {
                         sessionStorage.setItem('InvoiceStatus', 'Invoice created successfully!');
                         window.location.href = response.redirectUrl; // Use the redirect URL from the response
+                        $("#SaleInvoiceForm")[0].reset();  
                     } else {
                         toastr.error('Failed to create invoice: ' + response.message);
                     }

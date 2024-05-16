@@ -15,7 +15,7 @@ namespace Stock_Management_System.Controllers
             _logger = logger;
         }
 
-       /* [CheckAccess]*/
+        [CheckAccess]
         public IActionResult Index()
         {
             return View();

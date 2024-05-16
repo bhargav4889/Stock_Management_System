@@ -1,62 +1,66 @@
 
-$(function () {
+function applySearches() {
+
+
     var table = $('#data').DataTable();
-
-    // Extend DataTable search to include date range filtering
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-        var startDateInput = $("#startdate").val();
-        var endDateInput = $("#datepickerend").val();
-
-        // If only the end date is specified, set the start date to the first day of the current month
-        var startDate = startDateInput ? moment(startDateInput, "YYYY-MM-DD") : (endDateInput ? moment().startOf('month') : moment().startOf('month'));
-        // If only the start date is specified, set the end date to today's date
-        var endDate = endDateInput ? moment(endDateInput, "YYYY-MM-DD").endOf('day') : (startDateInput ? moment() : moment().endOf('day'));
-
-        var dateColumn = data[0]; // Adjust if date is in another column
-        var date = moment(dateColumn, "DD-MM-YY");
-
-        if (!date.isValid() || !startDate.isValid() || !endDate.isValid()) {
-            console.error("Invalid date encountered");
-            return false;
-        }
-
-        return date.isSameOrAfter(startDate) && date.isSameOrBefore(endDate);
-    });
-
-    // Function to apply all search filters and reset date inputs after search
-    function applySearches() {
-        var Name = $("#searchName").val();
-
-        var location = $("#location").val();
-        var selectedGrain = $("#graintype").val();
-        var selectedGrainText = $("#graintype option:selected").text();
-
-        // Clear existing searches
-        table.search('').columns().search('');
-
-        // Apply text input searches
-        table.column(1).search(Name, true, false);
-        table.column(3).search(location, true, false);
-
-        // Apply dropdown searches
-        if (selectedGrain) {
-            table.column(2).search(selectedGrainText, false, false);
-        }
+    var location = $("#searchLocation").val();
+    var startdate = $('#startdate').val();
+    var selectedGrain = $("#producttype").val();
+    var selectedGrainText = $("#producttype option:selected").text(); // Get the selected option text
+    var enddate = $('#enddate').val();
 
 
 
-        // Redraw table to apply all filters
-        table.draw();
+    // Clear existing searches
+    table.columns().search('');
 
-        // Reset start and end date values after search
-        $("#startdate, #datepickerend").val('');
+
+    // Apply individual column searches from input fields
+    table.column(3).search(location);
+
+    if (selectedGrain) {
+        table.column(2).search(selectedGrainText);
     }
 
-    // Bind the search function to the search button click event
-    $('#searchButton').on('click', function () {
-        applySearches();
+    // Setup date filtering
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        var start = startdate ? parseDate(startdate) : null;
+        var end = enddate ? parseDate(enddate) : new Date();
+
+        var dateString = data[0]; // Assuming the date is in the first column
+        var date = parseDate(dateString); // Parse date in format dd/MM/yyyy
+
+        return (!start || date >= start) && (!end || date <= end);
     });
+
+    // Perform a single draw after all search criteria have been applied
+    table.draw();
+
+    // Remove the date filter after drawing
+    $.fn.dataTable.ext.search.pop();
+
+    $('#producttype').val('').trigger('change');
+    $('#searchLocation').val('');
+
+
+    $('#startdate').val('');
+    $('#enddate').val('');
+}
+
+$('#searchButton').on('click', function () {
+    applySearches();
+
 });
+
+function parseDate(dateString) {
+    var parts = dateString.split('-');
+    var year = parseInt(parts[0], 10);
+    var month = parseInt(parts[1], 10); // Months are 1-based
+    var day = parseInt(parts[2], 10);
+
+    return new Date(year, month - 1, day); // Months are 0-based in JavaScript Date objects
+}
+
 
 $(function () {
     // Attach event to document, delegate to .loadPaymentInfoBtn
