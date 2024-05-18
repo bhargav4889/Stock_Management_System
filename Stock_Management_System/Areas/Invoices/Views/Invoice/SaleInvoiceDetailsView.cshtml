@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Globalization
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Sale Invoice Details";
 
@@ -120,12 +121,12 @@
 
             <tr>
                 <th>CGST(%) Tax Price(₹)</th>
-                <td>@(Model?.TotalCGSTPrice != null ? Model.TotalCGSTPrice.Value.ToString("C") : "--")</td>
+                <td>@(Model?.TotalCGSTPrice != null ? Model.TotalCGSTPrice.Value.ToString("C", new CultureInfo("hi-IN")) : "--")</td>
             </tr>
 
             <tr>
                 <th>SGST(%) Tax Price(₹)</th>
-                <td>@(Model?.TotalSGSTPrice != null ? Model.TotalSGSTPrice.Value.ToString("C") : "--")</td>
+                <td>@(Model?.TotalSGSTPrice != null ? Model.TotalSGSTPrice.Value.ToString("C", new CultureInfo("hi-IN")) : "--")</td>
             </tr>
 
 
@@ -133,18 +134,18 @@
 
             <tr>
                 <th>Product Price(₹)</th>
-                <td>@Model?.ProductPrice.ToString("C")</td>
+                <td>@Model?.ProductPrice.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
 
             <tr>
                 <th>Without GST Tax Price(₹)</th>
-                <td>@(Model?.WithoutGSTPrice != null ? Model.WithoutGSTPrice.Value.ToString("C") : "--")</td>
+                <td>@(Model?.WithoutGSTPrice != null ? Model.WithoutGSTPrice.Value.ToString("C", new CultureInfo("hi-IN")) : "--")</td>
             </tr>
 
 
             <tr>
                 <th>Total Price(₹)</th>
-                <td>@Model?.TotalPrice.ToString("C")</td>
+                <td>@Model?.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
             <tr>
                 <th>Vehicle Type</th>

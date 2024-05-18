@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Globalization
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Sale Details";
 }
@@ -85,14 +86,14 @@
             </tr>
             <tr>
                 <th>Rate(₹)</th>
-                <td>@Model.Rate.ToString("C")</td>
+                <td>@Model.Rate.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
             
             @if(Model.CGST != 0 || Model.CGST != null)
             {
                 <tr>
                     <th>CGST (@Model.CGST%)</th>
-                    <td>@Model.TotalCGSTPrice?.ToString("C")</td>
+                    <td>@Model.TotalCGSTPrice?.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
             }
 
@@ -100,25 +101,25 @@
             {
                 <tr>
                     <th>SGST (@Model.SGST%)</th>
-                    <td>@Model.TotalSGSTPrice?.ToString("C")</td>
+                    <td>@Model.TotalSGSTPrice?.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
 
                 <tr>
                     <th>Without GST Price(₹)</th>
-                    <td>@Model.WithoutGSTPrice?.ToString("C")</td>
+                    <td>@Model.WithoutGSTPrice?.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
             }
             <tr>
                 <th>Total Amount(₹)</th>
-                <td>@Model.Total_Price.ToString("C")</td>
+                <td>@Model.Total_Price.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
             <tr>
                 <th>Received Amount(₹)</th>
-                <td>@Model.Receive_Amount.ToString("C")</td>
+                <td>@Model.Receive_Amount.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
             <tr>
                 <th>Discount (₹)</th>
-                <td>@Model.Discount?.ToString("C")</td>
+                <td>@Model.Discount?.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
             <tr>
                 <th>Receive Payment Method</th>
@@ -127,7 +128,7 @@
 
             @if (Model.Receive_Information_ID != null)
             {
-                string baseAddress = "https://localhost:7024/";
+                string baseAddress = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
                 string Icon = Model.Bank_Icon;
                 string BankIcon = baseAddress + Icon;
 
@@ -145,7 +146,7 @@
 
             <tr>
                 <th>Deducted Amount(₹)</th>
-                <td>@Model.Deducted_Amount.Value.ToString("C")</td>
+                <td>@Model.Deducted_Amount.Value.ToString("C", new CultureInfo("hi-IN"))</td>
             </tr>
 
             <tr>
@@ -163,7 +164,7 @@
                 </tr>
                 <tr>
                     <th>Remain Amount(₹)</th>
-                    <td>@Model.Receive_Remain_Amount?.ToString("C")</td>
+                    <td>@Model.Receive_Remain_Amount?.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
                 <tr>
                     <th>Remain Payment Method</th>
@@ -172,7 +173,7 @@
 
                 @if (Model.Remain_Receive_Information_ID != 0)
                 {
-                    string baseAddress = "https://localhost:7024/";
+                    string baseAddress = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
                     string Icon = Model.Remain_Bank_Icon;
                     string BankIcon = baseAddress + Icon;
 

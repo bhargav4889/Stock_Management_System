@@ -40,7 +40,7 @@ function requestPasswordReset() {
                 data: { email: email },
                 success: function (response) {
                     if (response.success) {
-                        sessionStorage.setItem('ResetStatus', 'Password reset link sent successfully!');
+                        sessionStorage.setItem('resetStatus', 'Password reset link sent successfully!');
                         window.location.href = response.redirectUrl;
                     } else {
                         toastr.error('Email is not registered.', {

@@ -17,7 +17,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
     {
         public IConfiguration Configuration;
 
-        Uri baseaddress = new Uri("https://localhost:7024/api");
+        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/api");
 
         public readonly HttpClient _Client;
 
@@ -46,7 +46,7 @@ namespace Stock_Management_System.Areas.Information.Controllers
             List<Bank_Model> bank_Models = await api_Service.List_Of_Data_Display<Bank_Model>("Bank/GetBanksList");
             if (bank_Models != null)
             {
-                string baseUrl = "https://localhost:7024/";
+                string baseUrl = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
                 foreach (var bank in bank_Models)
                 {
                     if (!string.IsNullOrEmpty(bank.BankIcon))

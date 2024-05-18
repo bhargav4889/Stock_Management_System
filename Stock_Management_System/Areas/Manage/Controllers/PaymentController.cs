@@ -23,7 +23,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
     public class PaymentController : Controller
     {
         public IConfiguration Configuration;
-        Uri baseaddress = new Uri("https://localhost:7024/api");
+        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/api");
         public readonly HttpClient _Client;
         public Api_Service api_Service = new Api_Service();
         public HttpContextAccessor _HttpContextAccessor;
@@ -65,7 +65,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             if (bank_Models != null)
             {
                 // Base URL where the images are hosted, ensure this matches the actual location
-                string baseUrl = "https://localhost:7024/";
+                string baseUrl = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
 
                 // Append the base URL to each bank's icon path
                 foreach (var bank in bank_Models)

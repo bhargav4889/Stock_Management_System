@@ -9,7 +9,7 @@ namespace Stock_Management_System.API_Services
 {
     public class Api_Service
     {
-        Uri baseaddress = new Uri("https://localhost:7024/api");
+        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/api");
 
         private readonly HttpClient _Client;
 

@@ -1,4 +1,5 @@
 ﻿@using Stock_Management_System.UrlEncryption
+@using System.Globalization
 @{
     Layout = null;
 }
@@ -12,7 +13,7 @@
 @model Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Show_Payment_Info;
 
 @{
-    string BaseAddress = "https://localhost:7024/";
+    string BaseAddress = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
 
     string Icon = Model.BankIcon;
     string RemainIcon = Model.RemainBankIcon;
@@ -115,11 +116,11 @@
                 </tr>
                 <tr>
                     <th>Total Amount</th>
-                    <td>@Model.TotalPrice.ToString("C")</td>
+                    <td>@Model.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
                 <tr>
                     <th>Paid Amount</th>
-                    <td>@Model.AmountPaid.ToString("C")</td>
+                    <td>@Model.AmountPaid.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
                 <tr>
                     <th>Payment Method</th>
@@ -167,7 +168,7 @@
                     </tr>
                     <tr>
                         <th>Remain Amount</th>
-                        <td>@Model.RemainPaymentAmount.ToString("C")</td>
+                        <td>@Model.RemainPaymentAmount.ToString("C", new CultureInfo("hi-IN"))</td>
                     </tr>
                     <tr>
                         <th>Payment Method</th>
@@ -234,11 +235,11 @@ else
                 </tr>
                 <tr>
                     <th>Total Amount</th>
-                    <td>@Model.TotalPrice.ToString("C")</td>
+                    <td>@Model.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
                 <tr>
                     <th>Paid Amount</th>
-                    <td>@Model.AmountPaid.ToString("C")</td>
+                    <td>@Model.AmountPaid.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
                 <tr>
                     <th>Payment Method</th>

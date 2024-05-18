@@ -6,6 +6,7 @@
 @model IEnumerable<Stock_Management_System.Areas.Stocks.Models.Purchase_Stock>
 @using Stock_Management_System.UrlEncryption;
 @using System.Text;
+@using System.Globalization
 
 @section Scripts
 {
@@ -194,8 +195,8 @@
                                     <td class="text-center">@((item.Bags == 0) ? "--" : item.Bags.ToString())</td>
                                     <td class="text-center">@((item.BagPerKg == 0) ? "--" : item.BagPerKg.ToString())</td>
                                     <td class="text-center">@item.TotalWeight</td>
-                                    <td class="text-center">@item.ProductPrice.ToString("C")</td>
-                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
+                                    <td class="text-center">@item.ProductPrice.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@item.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
                                     <td class="text-center">@item.TolatName</td>
                                     <td class="text-center">@item.VehicleName</td>
                                     @{

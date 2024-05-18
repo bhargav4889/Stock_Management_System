@@ -6,7 +6,9 @@
     ViewData["Title"] = "Pending Payments";
 }
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 @model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Pending_Customers_Payments>
+
 @section Scripts{
 
     <script src="/js/bundle/payment/pending-bundle.js"></script>
@@ -157,7 +159,7 @@
                                     <td class="text-center">@item.CustomerName</td>
                                     <td class="text-center">@item.ProductName</td>
                                     <td class="text-center">@item.Location</td>
-                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
+                                    <td class="text-center">@item.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
 
                                     <td class="text-center"><span class="badges bg-lightred">@item.Payment_Status</span></td>
 

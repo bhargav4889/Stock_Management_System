@@ -6,6 +6,7 @@
 @model IEnumerable<Stock_Management_System.Areas.Sales.Models.Show_Sale>
 @using Stock_Management_System.UrlEncryption;
 @using System.Text;
+@using System.Globalization
 
 @section Scripts
 {
@@ -189,8 +190,8 @@
                                     <td class="text-center">@item.Bags</td>
                                     <td class="text-center">@item.BagPerKg</td>
                                     <td class="text-center">@item.Total_Weight</td>
-                                    <td class="text-center">@item.Rate.ToString("C")</td>
-                                    <td class="text-center">@item.Total_Price.ToString("C")</td>
+                                    <td class="text-center">@item.Rate.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@item.Total_Price.ToString("C", new CultureInfo("hi-IN"))</td>
                                  
 
 
@@ -205,11 +206,7 @@
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Sale Info</a>
                                             </li>
 
-                                            <li>
-                                                <a role="link"
-                                                   href="@Url.Action("EditSale", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(item.CustomerId)) })"
-                                                   onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Sale</a>
-                                            </li>
+                                        
                                             <li>
                                                 <a role="button" onclick="confirmDeletion('@Url.Action("DeleteSale", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
                                                     <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale

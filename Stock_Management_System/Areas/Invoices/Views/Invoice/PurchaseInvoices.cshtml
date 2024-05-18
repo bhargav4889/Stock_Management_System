@@ -1,5 +1,6 @@
 ﻿@using System.Data;
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Purchase Invoices";
@@ -175,8 +176,8 @@
                                     <td class="text-center">@(item.Bags.HasValue ? item.Bags.Value.ToString() : "--")</td>
                                     <td class="text-center">@(item.BagPerKg.HasValue ? item.BagPerKg.Value.ToString() : "--")</td>
                                     <td class="text-center">@item.TotalWeight</td>
-                                    <td class="text-center">@item.ProductPrice.ToString("C")</td>
-                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
+                                    <td class="text-center">@item.ProductPrice.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@item.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
                                     <td class="text-center">@(string.IsNullOrEmpty(item.TolatName) ? "--" : @item.TolatName)</td>
                                     <td class="text-center">@item.VehicleName</td>
 

@@ -30,7 +30,7 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
 
         public IConfiguration Configuration;
 
-        Uri baseaddress = new Uri("https://localhost:7024/api");
+        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/api");
 
         public readonly HttpClient _Client;
 
@@ -350,10 +350,10 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
                         BaseFont boldfont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
                         iTextSharp.text.Font bfont = new iTextSharp.text.Font(boldfont, 18);
 
-                        BaseFont inrfont = BaseFont.CreateFont("https://localhost:7024/Fonts/Rupee.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
+                        BaseFont inrfont = BaseFont.CreateFont("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Fonts/Rupee.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
                         iTextSharp.text.Font ifont = new iTextSharp.text.Font(inrfont, 18);
 
-                        BaseFont gujaratifont = BaseFont.CreateFont("https://localhost:7024/Fonts/NotoSansGujarati.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
+                        BaseFont gujaratifont = BaseFont.CreateFont("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Fonts/NotoSansGujarati.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
                         iTextSharp.text.Font font = new iTextSharp.text.Font(gujaratifont, 18);
                         font.Color = new BaseColor(Color.Red);
 
@@ -371,9 +371,9 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
                         contentByte.SetTextMatrix(460, 790); // X, Y position
                         contentByte.ShowText("Mo: +91 94277 23092");
 
-                        iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance("https://localhost:7024/Images/Logo.png");
+                        iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Logo.png");
 
-                        iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("https://localhost:7024/Images/Backimg.png");
+                        iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Backimg.png");
 
                         image.ScaleToFit(60, 60); // Adjust width and height
 
@@ -1046,10 +1046,10 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
                         BaseFont boldfont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.WINANSI, BaseFont.EMBEDDED);
                         iTextSharp.text.Font bfont = new iTextSharp.text.Font(boldfont, 18);
 
-                        BaseFont inrfont = BaseFont.CreateFont("https://localhost:7024/Fonts/Rupee.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
+                        BaseFont inrfont = BaseFont.CreateFont("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Fonts/Rupee.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
                         iTextSharp.text.Font ifont = new iTextSharp.text.Font(inrfont, 18);
 
-                        BaseFont gujaratifont = BaseFont.CreateFont("https://localhost:7024/Fonts/NotoSansGujarati.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
+                        BaseFont gujaratifont = BaseFont.CreateFont("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Fonts/NotoSansGujarati.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED, true);
                         iTextSharp.text.Font font = new iTextSharp.text.Font(gujaratifont, 18);
                         font.Color = new BaseColor(Color.Red);
 
@@ -1075,9 +1075,9 @@ namespace Stock_Management_System.Areas.Invoices.Controllers
                         contentByte.SetTextMatrix(70, 810); // X, Y position
                         contentByte.ShowText("24CSDPK5665E1ZS");
 
-                        iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance("https://localhost:7024/Images/Logo.png");
+                        iTextSharp.text.Image image = iTextSharp.text.Image.GetInstance("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Logo.png");
 
-                        iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("https://localhost:7024/Images/Backimg.png");
+                        iTextSharp.text.Image backimage = iTextSharp.text.Image.GetInstance("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Backimg.png");
 
                         image.ScaleToFit(60, 60); // Adjust width and height
 

@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
               
 
                 watermark.crossOrigin = "Anonymous";
-                watermark.src = 'https://localhost:7024/Images/Backimg.png';
+                watermark.src = 'https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Backimg.png';
 
                 watermark.onload = () => {
                     const x = 720;

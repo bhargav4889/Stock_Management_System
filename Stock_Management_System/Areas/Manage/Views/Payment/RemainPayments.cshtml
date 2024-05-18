@@ -6,6 +6,7 @@
     ViewData["Title"] = "Remain Payments";
 }
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 @model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Remain_Payment_Model>
 @section Scripts {
 
@@ -159,9 +160,9 @@
                                     </td>
                                     <td class="text-center">@item.Customer_Name</td>
                                     <td class="text-center">@item.Product_Name</td>
-                                    <td class="text-center">@item.Total_Amount.ToString("C")</td>
-                                    <td class="text-center">@item.Paid_Amount.ToString("C")</td>
-                                    <td class="text-center">@((item.Total_Amount - item.Paid_Amount).ToString("C"))</td> <!-- Display the difference formatted as currency -->
+                                    <td class="text-center">@item.Total_Amount.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@item.Paid_Amount.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@((item.Total_Amount - item.Paid_Amount).ToString("C", new CultureInfo("hi-IN")))</td> <!-- Display the difference formatted as currency -->
                                     <td class="text-center">@item.First_Payment_Method</td>
 
                                     <td class="text-center"><span class="badges bg-lightyellow">@item.Remain_Payment_Status</span></td>

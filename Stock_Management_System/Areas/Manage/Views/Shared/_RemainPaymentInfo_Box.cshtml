@@ -102,7 +102,7 @@
                         <select class="select" asp-for=Bank_Id id="PreviousbankSelect" name="Bank_Id">
 
                             @{
-                                var baseAddress = "https://localhost:7024/";
+                                var baseAddress = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
                                 var Bank_Icon = baseAddress + Model.Bank_Icon;
                             }
                             <option name="Bank_Name" disabled selected  value="@Model.Bank_Id" data-icon="@Bank_Icon">@Model.Bank_Name</option>

@@ -20,7 +20,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         // IConfiguration instance to access configuration settings
         public IConfiguration Configuration;
 
-        Uri baseaddress = new Uri("https://localhost:7024/api");
+        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/");
 
         private readonly HttpClient _Client;
 
@@ -54,7 +54,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         {
             if (ModelState.IsValid)
             {
-                string url = $"https://localhost:7024/Auth/Login";
+                string url = $"https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Auth/Login";
                 StringContent content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = await _Client.PostAsync(url, content);
@@ -93,13 +93,6 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         }
 
 
-
-
-
-
-
-
-
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
@@ -127,7 +120,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             }
 
             // Construct the full URL including the email as a query parameter
-            var url = $"https://localhost:7024/Auth/request-reset?email={Uri.EscapeDataString(email)}";
+            var url = $"https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Auth/request-reset?email={Uri.EscapeDataString(email)}";
 
             HttpResponseMessage response = await _Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -167,7 +160,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public async Task<IActionResult> ChangePassword(string token, string email)
         {
             // Call your API or service to validate the token
-            string url = $"https://localhost:7024/Auth/validate-token?email={email}&token={token}";
+            string url = $"https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Auth/validate-token?email={email}&token={token}";
 
             HttpResponseMessage response = await _Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -196,7 +189,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 return View(model);
             }
 
-            string url = "https://localhost:7024/Auth/reset-password";
+            string url = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Auth/reset-password";
             StringContent content = new StringContent(JsonConvert.SerializeObject(new
             {
                 email = model.Email,

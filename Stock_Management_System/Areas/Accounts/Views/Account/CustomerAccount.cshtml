@@ -1,5 +1,6 @@
 ﻿@using Stock_Management_System.Areas.Manage.Models
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Account Details";
@@ -147,14 +148,6 @@
                                     </div>
                                 }
 
-
-
-
-
-
-
-
-
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-12 d-flex align-items-end">
@@ -238,8 +231,8 @@
                                         <td class="text-center">@(item.Bags == 0 ? "--" :item.Bags)</td>
                                         <td class="text-center">@(item.BagPerKg == 0 ? "--" : item.BagPerKg)</td>
                                         <td class="text-center">@item.TotalWeight</td>
-                                        <td class="text-center">@item.ProductPrice.ToString("C")</td>
-                                        <td class="text-center">@item.TotalPrice.ToString("C")</td>
+                                        <td class="text-center">@item.ProductPrice.ToString("C", new CultureInfo("hi-IN"))</td>
+                                        <td class="text-center">@item.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
                                         <td class="text-center">@item.VehicleNo</td>
                                         @{
                                             if (item.PaymentStatus == "PAID")
@@ -282,9 +275,17 @@
                                                 </li>
                                                 <li>
                                                     <a role="button" onclick="confirmDeletion('@Url.Action("DeleteStock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)) })', '@Html.Encode(Model.Customers.CustomerName)')" class="dropdown-item delete-stock">
-                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock Entry
+                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Stock 
                                                     </a>
                                                 </li>
+                                                @if(item.PaymentStatus == "PENDING")
+                                                {
+                                                    <li>
+                                                        <a role="link"
+                                                           href="@Url.Action("EditStock", "Stock", new { TN_ID = UrlEncryptor.Encrypt(Convert.ToString(item.StockId)), Customer_ID = UrlEncryptor.Encrypt(Convert.ToString(Model.Customers.CustomerId)) })"
+                                                           onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/edit.svg" class="me-2" alt="img">Update Details</a>
+                                                    </li>
+                                                }
 
                                             </ul>
                                         </td>
@@ -341,8 +342,8 @@
                                         <td class="text-center">@item.Bags</td>
                                         <td class="text-center">@item.BagPerKg</td>
                                         <td class="text-center">@item.Total_Weight</td>
-                                        <td class="text-center">@item.Rate.ToString("C")</td>
-                                        <td class="text-center">@item.Total_Price.ToString("C")</td>
+                                        <td class="text-center">@item.Rate.ToString("C", new CultureInfo("hi-IN"))</td>
+                                        <td class="text-center">@item.Total_Price.ToString("C", new CultureInfo("hi-IN"))</td>
 
                                         <td class="text-center">
                                             <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
@@ -357,7 +358,7 @@
                                                 </li>
                                                 <li>
                                                     <a role="button" onclick="confirmDeletion('@Url.Action("Delete_Sale", "Sales", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
-                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale Entry
+                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale 
                                                     </a>
                                                 </li>
 

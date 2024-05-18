@@ -3,6 +3,7 @@
 }
 @model Stock_Management_System.Areas.Manage.Models.Dashboard_All_Models;
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 
 
 <div class="content">
@@ -15,8 +16,8 @@
                 </div>
                 <div class="dash-widgetcontent">
                     <h5>
-                        ₹<span class="counters">
-                            @Model.All_Counts_Model.AmountOfPurchaseInvoice.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        <span class="counters">
+                            @Model.All_Counts_Model.AmountOfPurchaseInvoice.ToString("C", new CultureInfo("hi-IN"))
                         </span>
                     </h5>
                     <h6> Purchase Invoice</h6>
@@ -30,8 +31,8 @@
                 </div>
                 <div class="dash-widgetcontent">
                     <h5>
-                        ₹<span class="counters">
-                            @Model.All_Counts_Model.AmountOfSalesInvoice.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        <span class="counters">
+                            @Model.All_Counts_Model.AmountOfSalesInvoice.ToString("C", new CultureInfo("hi-IN"))
 
                         </span>
                     </h5>
@@ -45,7 +46,7 @@
                     <span><img src="~/img/icons/dash3.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>₹<span class="counters"> @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))</span></h5>
+                    <h5><span class="counters"> @Model.All_Counts_Model.AmountOfPurchasedStock.ToString("C", new CultureInfo("hi-IN"))</span></h5>
                     <h6>Purchase Stock </h6>
                 </div>
             </div>
@@ -56,7 +57,7 @@
                     <span><img src="~/img/icons/dash4.svg" alt="img"></span>
                 </div>
                 <div class="dash-widgetcontent">
-                    <h5>₹<span class="counters"> @Model.All_Counts_Model.AmountOfSaleStock.ToString("N2", new System.Globalization.CultureInfo("en-IN"))</span></h5>
+                    <h5><span class="counters"> @Model.All_Counts_Model.AmountOfSaleStock.ToString("C", new CultureInfo("hi-IN"))</span></h5>
                     <h6>Sales Stock </h6>
                 </div>
             </div>
@@ -68,8 +69,8 @@
                 </div>
                 <div class="dash-widgetcontent">
                     <h5>
-                        ₹<span class="counters">
-                            @Model.All_Counts_Model.AmountOfPendingPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        <span class="counters">
+                            @Model.All_Counts_Model.AmountOfPendingPayments.ToString("C", new CultureInfo("hi-IN"))
                         </span>
                     </h5>
                     <h6>Total Pending Payments</h6>
@@ -83,8 +84,8 @@
                 </div>
                 <div class="dash-widgetcontent">
                     <h5>
-                        ₹<span class="counters">
-                            @Model.All_Counts_Model.AmountOfPaidPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        <span class="counters">
+                            @Model.All_Counts_Model.AmountOfPaidPayments.ToString("C", new CultureInfo("hi-IN"))
                         </span>
                     </h5>
                     <h6>Total Paid Payments</h6>
@@ -99,8 +100,8 @@
                 </div>
                 <div class="dash-widgetcontent">
                     <h5>
-                        ₹<span class="counters">
-                            @Model.All_Counts_Model.AmountOfRemainingPayments.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                        <span class="counters">
+                            @Model.All_Counts_Model.AmountOfRemainingPayments.ToString("C", new CultureInfo("hi-IN"))
                         </span>
                     </h5>
                     <h6>Total Remain Payments</h6>
@@ -130,8 +131,9 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalBags.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                @Model.All_Counts_Model.TotalBags.ToString("N2")
                                 ;
+                                
                             }
                         }
                     </h4>
@@ -150,8 +152,9 @@
                     <h4>
                         @{
                             {
-                                @Model.All_Counts_Model.TotalWeight.ToString("N2", new System.Globalization.CultureInfo("en-IN"))
+                                @Model.All_Counts_Model.TotalWeight.ToString("N2")
                                 ;
+                                
                             }
                         }
                     </h4>
@@ -453,7 +456,7 @@
                                         <td>@customers_Payment_Sort_List.StockDate.ToString("dd/MM/yy")</td>
                                         <td>@customers_Payment_Sort_List.CustomerName</td>
                                         <td>@customers_Payment_Sort_List.ProductName</td>
-                                        <td>@customers_Payment_Sort_List.TotalPrice</td>
+                                        <td>@customers_Payment_Sort_List.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
                                     </tr>
 
                                 }
@@ -545,16 +548,3 @@
 
 
 
-<script>
-    function submitForm(clickedRow) {
-        // Find the form related to the clicked row. This example assumes the form is a sibling or child of the clicked row.
-        // You might need to adjust the selector based on your actual HTML structure.
-        var form = clickedRow.querySelector("form");
-        if (form) {
-            form.submit(); // Submit the found form
-        } else {
-            console.error("Form not found");
-        }
-    }
-
-</script>

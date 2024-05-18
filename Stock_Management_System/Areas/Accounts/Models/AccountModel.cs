@@ -19,6 +19,7 @@ namespace Stock_Management_System.Areas.Accounts.Models
         public string CustomerType { get; set; }
 
         [Required(ErrorMessage ="Please Enter Contact No")]
+        [MaxLength(10,ErrorMessage ="Number Must 10 Digits")]
         public string? CustomerContact { get; set; }
 
         [Required(ErrorMessage ="Please Enter Address")]

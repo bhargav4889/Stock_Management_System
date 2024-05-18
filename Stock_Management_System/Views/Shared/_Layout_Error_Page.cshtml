@@ -23,9 +23,25 @@
 		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
 
+
+	<script src="~/js/checknetwork.js">
+	</script>
+
 </head>
 
 <body>
+
+	<div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; top: 10px; right: 10px; z-index: 1080;">
+		<div id="no-internet-toast" class="toast bg-danger text-white" style="min-width: 250px;">
+			<div class="toast-header">
+				<strong class="me-auto">Network Status</strong>
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				No Internet Connection
+			</div>
+		</div>
+	</div>
 
 	@RenderBody()
 

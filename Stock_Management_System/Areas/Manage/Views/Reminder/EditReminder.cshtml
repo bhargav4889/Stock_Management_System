@@ -5,6 +5,8 @@
     Layout = "_Layout";
     ViewData["Title"] = "Update Reminder";
 }
+@using Stock_Management_System.BAL;
+@inject CV cv
 @model Stock_Management_System.Areas.Manage.Models.Reminder_Model;
 <div class="content">
     <div class="page-header">
@@ -19,14 +21,6 @@
 
                 <input type="hidden" asp-for="ReminderId" value="@Model.ReminderId" />
 
-                @*  <!-- Date -->
-                <div class="col-12 col-md-3 mb-3">
-                <div class="form-floating">
-                <input type="date" class="form-control" id="datepicker" asp-for="PurchaseInvoiceDate">
-                <label for="datepicker" class="text-truncate"><span style="color: black;">*</span> Select a Date</label>
-
-                </div>
-                </div>*@
 
                 <!-- Date -->
                 <div class="col-lg-3 col-sm-6 col-12">
@@ -76,9 +70,9 @@
 
 
 
-                <input type="text" value="bhargavkachhela1@gmail.com" name="SentEmailAddress" asp-for="SentEmailAddress" />
+                <input type="hidden" value="@cv.Email()" name="SentEmailAddress" asp-for="SentEmailAddress" />
 
-                <input type="text" value="9664633122" name="SentPhoneNo" asp-for="SentPhoneNo" />
+                <input type="hidden" value="@cv.ContactNo()" name="SentPhoneNo" asp-for="SentPhoneNo" />
 
                 <div class="row justify-content-center">
                     <div class="col-auto text-center mb-3" style="margin-top:20px;">

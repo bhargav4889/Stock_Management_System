@@ -2,6 +2,15 @@
 @{
     ViewData["Title"] = "Profile";
 }
+
+@functions {
+    public string GetColorFromUsername(string username)
+    {
+        Random random = new Random(username.GetHashCode());
+        var color = String.Format("#{0:X6}", random.Next(0x1000000)); // Generates a random color
+        return color;
+    }
+}
 @inject CV cv
 <div class="content">
     <div class="page-header">
@@ -14,27 +23,24 @@
     <div class="card">
         <div class="card-body">
             <div class="profile-set">
-                <div class="profile-head">
-                </div>
+                
                 <div class="profile-top">
                     <div class="profile-content">
-                        <div class="profile-contentimg" style="width: 130px; height: 130px;">
-                            <!-- Circular Avatar -->
-                            <div class="avatar rounded-circle" style="width:150px; height:100%;  max-width: 150px; max-height: 150px; background-color: #004A7F; display: flex; justify-content: center; align-items: center;">
-                                <!-- Display user initials -->
-                                <span class="avatar-text" style="color: white; font-size: 24px; font-weight: bold;">@cv.Username()?.Substring(0, 1).ToUpper()</span>
-                            </div>
-                           
+
+                        <!-- Circular Avatar -->
+                        <div class="avatar rounded-circle" style="width: 75px; height: 75px; background-color: @GetColorFromUsername(cv.Username()); display: flex; justify-content: center; align-items: center; border-radius: 50%;">
+                            <!-- Display user initials -->
+                            <span class="avatar-text" style="color: white; font-size: 20px; font-weight: bold;">@cv.Username()?.Substring(0, 1).ToUpper()</span>
                         </div>
+
+
+
                         <div class="profile-contentname">
                             <h2>Hello,@cv.Username()</h2>
-                            <h4>Check Yoor Personal Info.</h4>
+                            <h4>Check Your Personal Info.</h4>
                         </div>
                     </div>
-                   @* <div class="ms-auto">
-                        <a href="javascript:void(0);" class="btn btn-submit me-2">Save</a>
-                        <a href="javascript:void(0);" class="btn btn-cancel">Cancel</a>
-                    </div>*@
+
                 </div>
             </div>
             <div class="row">
@@ -47,25 +53,17 @@
                 <div class="col-lg-6 col-sm-12">
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="text" disabled placeholder="@cv.Email()">
+                        <input type="text" style="font-weight:bold; color:black" disabled placeholder="@cv.Email()">
                     </div>
                 </div>
                 <div class="col-lg-6 col-sm-12">
                     <div class="form-group">
                         <label>Phone</label>
-                        <input type="text" disabled placeholder="@cv.ContactNo()">
+                        <input type="text" style="font-weight:bold; color:black" disabled placeholder="@cv.ContactNo()">
                     </div>
                 </div>
-                @* <div class="col-lg-6 col-sm-12">
-                    <div class="form-group">
-                        <label>Password</label>
-                        <div class="pass-group">
-                            <input type="password" disabled value="@CV.Password()" class=" pass-input">
-                            <span class="fas toggle-password fa-eye-slash"></span>
-                        </div>
-                    </div>
-                </div> *@
-             
+
+
 
             </div>
         </div>

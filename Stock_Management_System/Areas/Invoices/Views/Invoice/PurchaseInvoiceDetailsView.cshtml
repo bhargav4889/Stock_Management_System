@@ -4,6 +4,7 @@
 
 }
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 @model Stock_Management_System.Areas.Invoices.Models.InvoiceModel.Purchase_Invoice_Model;
 
 <link rel="stylesheet" href="~/css/detailsviewtablestyle.css">
@@ -76,11 +77,11 @@
             </tr>
             <tr>
                 <th>Product Price(₹)</th>
-                <td>@Model?.ProductPrice.ToString("C")</td>
+                <td>@Model?.ProductPrice.ToString("C", new CultureInfo("hi-IN")))</td>
             </tr>
             <tr>
                 <th>Total Price(₹)</th>
-                <td>@Model?.TotalPrice.ToString("C")</td>
+                <td>@Model?.TotalPrice.ToString("C", new CultureInfo("hi-IN")))</td>
             </tr>
             <tr>
                 <th>Vehicle Type</th>

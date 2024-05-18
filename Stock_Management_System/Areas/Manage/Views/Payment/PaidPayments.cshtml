@@ -6,6 +6,7 @@
     ViewData["Title"] = "Paid Payments";
 }
 @using Stock_Management_System.UrlEncryption;
+@using System.Globalization
 @model IEnumerable<Stock_Management_System.Areas.Manage.Models.Payment_All_Models.Show_Payment_Info>
 @section Scripts {
     <script src="/js/bundle/payment/paid-bundle.js"></script>
@@ -157,9 +158,9 @@
                                     </td>
                                     <td class="text-center">@item.CustomerName</td>
                                     <td class="text-center">@item.ProductName</td>
-                                    <td class="text-center">@item.TotalPrice.ToString("C")</td>
-                                    <td class="text-center">@item.AmountPaid.ToString("C")</td>
-                                    <td class="text-center">@item.RemainPaymentAmount.ToString("C")</td>
+                                    <td class="text-center">@item.TotalPrice.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@item.AmountPaid.ToString("C", new CultureInfo("hi-IN"))</td>
+                                    <td class="text-center">@item.RemainPaymentAmount.ToString("C", new CultureInfo("hi-IN"))</td>
 
 
                                     <td class="text-center"><span class="badges bg-lightgreen">@item.Payment_Status</span></td>
@@ -183,21 +184,21 @@
                     }
                 </tbody>
             </table>
-
-
-        </div>
-
-
-        <!-- Modal Shell -->
-        <div class="modal fade" id="payment" tabindex="-1" aria-labelledby="paymentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <!-- Dynamic Content Will Be Loaded Here -->
-                </div>
-            </div>
         </div>
 
     </div>
+
+
+    <!-- Modal Shell -->
+    <div class="modal fade" id="payment" tabindex="-1" aria-labelledby="paymentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Dynamic Content Will Be Loaded Here -->
+            </div>
+        </div>
+    </div>
+
+</div>
 
 
 
