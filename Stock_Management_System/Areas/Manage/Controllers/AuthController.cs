@@ -186,7 +186,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return Json(new { success = false, message = "Invalid Data." });
             }
 
             string url = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Auth/reset-password";
@@ -196,9 +196,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
                 token = model.Token,
                 newPassword = model.Password
             }), Encoding.UTF8, "application/json");
-
-
-
+                
             HttpResponseMessage response = await _Client.PostAsync(url, content);
             if (response.IsSuccessStatusCode)
             {
@@ -207,20 +205,17 @@ namespace Stock_Management_System.Areas.Manage.Controllers
 
                 if (result["success"])
                 {
-
-                    return RedirectToAction("Login", "Auth");
+                    return Json(new { success = true, message = "Your password has been updated successfully.", redirectUrl = Url.Action("Login", "Auth") });
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Failed to reset password: " + result["message"]);
+                    return Json(new { success = false, message = "Failed to reset password: " + result["message"] });
                 }
             }
             else
             {
-                ModelState.AddModelError("", "Error contacting the server.");
+                return Json(new { success = false, message = "Error contacting the server." });
             }
-
-            return View(model);
         }
 
 

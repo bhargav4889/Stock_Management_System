@@ -133,7 +133,7 @@
                             {
                                 @Model.All_Counts_Model.TotalBags.ToString("N2")
                                 ;
-                                
+
                             }
                         }
                     </h4>
@@ -154,7 +154,7 @@
                             {
                                 @Model.All_Counts_Model.TotalWeight.ToString("N2")
                                 ;
-                                
+
                             }
                         }
                     </h4>
@@ -506,7 +506,10 @@
                         <ul class="list-group list-group-flush">
                             @foreach (var reminder in Model.upcoming_Reminders)
                             {
-                                TimeSpan timeLeft = reminder.ReminderDateTime - DateTime.Now;
+                                // Convert current time to Indian Standard Time
+                                var currentDateTimeIST = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+
+                                TimeSpan timeLeft = reminder.ReminderDateTime - currentDateTimeIST;
                                 string timeUntilReminder = timeLeft.TotalMinutes < 0
                                 ? "Expired"
                                 : $"{(int)timeLeft.TotalHours} hours and {timeLeft.Minutes} minutes left";
@@ -524,6 +527,7 @@
                                     </span>
                                 </a>
                             }
+
                         </ul>
                     </div>
                 }

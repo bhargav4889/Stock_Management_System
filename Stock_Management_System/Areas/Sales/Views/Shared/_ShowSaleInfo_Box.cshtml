@@ -1,4 +1,5 @@
 ﻿@using Stock_Management_System.UrlEncryption
+@using System.Globalization
 @{
     Layout = null;
 }
@@ -8,7 +9,7 @@
 @model Stock_Management_System.Areas.Sales.Models.Show_Sale;
 
 @{
-    string BaseAddress = "https://localhost:7024/";
+    string BaseAddress = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
 
     string Icon = Model.Bank_Icon;
     string RemainIcon = Model.Remain_Bank_Icon;
@@ -126,12 +127,12 @@
                 </tr>
                 <tr>
                     <th>Rate(₹)</th>
-                    <td>@Model.Rate.ToString("C")</td>
+                    <td>@Model.Rate.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
 
                 <tr>
                     <th>Total Price(₹)</th>
-                    <td>@Model.Total_Price.ToString("C")</td>
+                    <td>@Model.Total_Price.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
 
                 <tr>
@@ -140,12 +141,12 @@
                 </tr>
                 <tr>
                     <th>Received Amount(₹)</th>
-                    <td>@Model.Receive_Amount.ToString("C")</td>
+                    <td>@Model.Receive_Amount.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
 
                 <tr>
                     <th>Discount (₹)</th>
-                    <td>@Model.Discount?.ToString("C")</td>
+                    <td>@Model.Discount?.ToString("C", new CultureInfo("hi-IN"))</td>
                 </tr>
                 <tr>
                     <th>Receive Payment Method</th>
@@ -188,7 +189,7 @@
                     </tr>
                     <tr>
                         <th>Received Remain Amount(₹)</th>
-                        <td>@Model.Receive_Remain_Amount?.ToString("C")</td>
+                        <td>@Model.Receive_Remain_Amount?.ToString("C", new CultureInfo("hi-IN"))</td>
                     </tr>
                     @if(Model.Remain_Receive_Information_ID != 0)
                     {

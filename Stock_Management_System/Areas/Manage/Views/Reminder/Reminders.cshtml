@@ -53,26 +53,27 @@
                         @{
                             if (Model != null)
                             {
+                                // Get Indian Standard Time zone
+                                TimeZoneInfo indianTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
 
                                 foreach (var row in Model)
                                 {
                                     <tr>
                                         @{
-                                            DateTime ReminderdateTime = row.ReminderDateTime;
+                                            DateTime ReminderdateTime = TimeZoneInfo.ConvertTimeFromUtc(row.ReminderDateTime, indianTimeZone);
                                             bool isExpired = DateTime.Now > ReminderdateTime;
                                         }
 
-                                        <td class="text-center">@row.ReminderDateTime.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                        <td class="text-center">@ReminderdateTime.ToString("dd/MM/yyyy hh:mm tt")</td>
                                         <td class="text-center">@row.ReminderType</td>
 
-                                        
                                         @if (isExpired)
                                         {
-                                        <td class="text-center"><span class="badges bg-lightred">Expired</span></td>
+                                            <td class="text-center"><span class="badges bg-lightred">Expired</span></td>
                                         }
                                         else
                                         {
-                                        <td class="text-center"><span class="badges bg-lightgreen">Upcoming</span></td>
+                                            <td class="text-center"><span class="badges bg-lightgreen">Upcoming</span></td>
                                         }
 
                                         <td class="text-center">
@@ -100,19 +101,17 @@
                                                 }
 
                                                 <li class="dropdown-item">
-                                                    <a role="button" onclick="confirmDeletion('@Url.Action("DeleteReminder", "Reminder", new { Reminder_ID = UrlEncryptor.Encrypt(Convert.ToString(row.ReminderId)) })', '@Html.Encode(row.ReminderDateTime.ToString("dd/MM/yyyy hh:mm tt"))')">
+                                                    <a role="button" onclick="confirmDeletion('@Url.Action("DeleteReminder", "Reminder", new { Reminder_ID = UrlEncryptor.Encrypt(Convert.ToString(row.ReminderId)) })', '@Html.Encode(ReminderdateTime.ToString("dd/MM/yyyy hh:mm tt"))')">
                                                         <img src="~/img/icons/delete1.svg" class="me-2" alt="Delete"> Delete Reminder
                                                     </a>
                                                 </li>
-
-
                                             </ul>
                                         </td>
                                     </tr>
-
                                 }
                             }
                         }
+
                     </tbody>
                 </table>
             </div>

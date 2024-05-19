@@ -48,14 +48,14 @@ $(document).ready(function () {
                     data: $('#resetPasswordForm').serialize(),
                     success: function (response) {
                         if (response.success) {
-                            toastr.success('Your password has been updated.', {
+                            toastr.success(response.message, {
                                 closeButton: true,
                                 progressBar: true,
                                 positionClass: 'toast-bottom-right',
                                 preventDuplicates: true,
                                 timeOut: '5000'
                             });
-                            window.location.href = '/Auth/Login'; // Redirect after success
+                            window.location.href = response.redirectUrl; // Redirect to the provided URL
                         } else {
                             toastr.error(response.message, {
                                 closeButton: true,
@@ -76,6 +76,7 @@ $(document).ready(function () {
                         });
                     }
                 });
+
             }
         });
     });
