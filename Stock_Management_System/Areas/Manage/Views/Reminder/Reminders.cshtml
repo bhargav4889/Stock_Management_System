@@ -51,66 +51,68 @@
                     </thead>
                     <tbody>
                         @{
-                            if (Model != null)
+                            // Get Indian Standard Time zone
+                            TimeZoneInfo indianTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+                            DateTime nowInIndianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, indianTimeZone);
+                        }
+
+                        @if (Model != null)
+                        {
+                            foreach (var row in Model)
                             {
-                                // Get Indian Standard Time zone
-                                TimeZoneInfo indianTimeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+                                <tr>
+                                    @{
+                                        DateTime reminderDateTime = row.ReminderDateTime;
+                                        bool isExpired = nowInIndianTime > reminderDateTime;
+                                    }
 
-                                foreach (var row in Model)
-                                {
-                                    <tr>
-                                        @{
-                                            DateTime ReminderdateTime = TimeZoneInfo.ConvertTimeFromUtc(row.ReminderDateTime, indianTimeZone);
-                                            bool isExpired = DateTime.Now > ReminderdateTime;
-                                        }
+                                    <td class="text-center">@reminderDateTime.ToString("dd/MM/yyyy hh:mm tt")</td>
+                                    <td class="text-center">@row.ReminderType</td>
 
-                                        <td class="text-center">@ReminderdateTime.ToString("dd/MM/yyyy hh:mm tt")</td>
-                                        <td class="text-center">@row.ReminderType</td>
+                                    @if (isExpired)
+                                    {
+                                        <td class="text-center"><span class="badges bg-lightred">Expired</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-center"><span class="badges bg-lightgreen">Upcoming</span></td>
+                                    }
 
-                                        @if (isExpired)
-                                        {
-                                            <td class="text-center"><span class="badges bg-lightred">Expired</span></td>
-                                        }
-                                        else
-                                        {
-                                            <td class="text-center"><span class="badges bg-lightgreen">Upcoming</span></td>
-                                        }
+                                    <td class="text-center">
+                                        <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                        </a>
+                                        <ul class="dropdown-menu text-center">
+                                            <!-- Show Information -->
+                                            <li>
+                                                <a role="link"
+                                                   data-reminder-id="@UrlEncryptor.Encrypt(row.ReminderId.ToString())"
+                                                   onclick="event.preventDefault();" class="loadSaveInfo dropdown-item">
+                                                    <img src="~/img/icons/eye1.svg" class="me-2" alt="img">Show Info
+                                                </a>
+                                            </li>
 
-                                        <td class="text-center">
-                                            <a class="action-set" href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
-                                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-                                            </a>
-                                            <ul class="dropdown-menu text-center">
-                                                <!-- Show Information -->
-                                                <li>
-                                                    <a role="link"
-                                                       data-reminder-id="@UrlEncryptor.Encrypt(row.ReminderId.ToString())"
-                                                       onclick="event.preventDefault();" class="loadSaveInfo dropdown-item">
-                                                        <img src="~/img/icons/eye1.svg" class="me-2" alt="img">Show Info
-                                                    </a>
-                                                </li>
-
-                                                @if (!isExpired)
-                                                {
-                                                    <!-- Edit Reminder -->
-                                                    <li class="dropdown-item">
-                                                        <a role="link" href="@Url.Action("EditReminder", "Reminder", new { Reminder_ID = UrlEncryptor.Encrypt(Convert.ToString(row.ReminderId)) })" onclick="event.preventDefault(); window.location.href = this.href;">
-                                                            <img src="~/img/icons/edit.svg" class="me-2" alt="Edit"> Edit Reminder
-                                                        </a>
-                                                    </li>
-                                                }
-
+                                            @if (!isExpired)
+                                            {
+                                                <!-- Edit Reminder -->
                                                 <li class="dropdown-item">
-                                                    <a role="button" onclick="confirmDeletion('@Url.Action("DeleteReminder", "Reminder", new { Reminder_ID = UrlEncryptor.Encrypt(Convert.ToString(row.ReminderId)) })', '@Html.Encode(ReminderdateTime.ToString("dd/MM/yyyy hh:mm tt"))')">
-                                                        <img src="~/img/icons/delete1.svg" class="me-2" alt="Delete"> Delete Reminder
+                                                    <a role="link" href="@Url.Action("EditReminder", "Reminder", new { Reminder_ID = UrlEncryptor.Encrypt(Convert.ToString(row.ReminderId)) })" onclick="event.preventDefault(); window.location.href = this.href;">
+                                                        <img src="~/img/icons/edit.svg" class="me-2" alt="Edit"> Edit Reminder
                                                     </a>
                                                 </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                }
+                                            }
+
+                                            <li class="dropdown-item">
+                                                <a role="button" onclick="confirmDeletion('@Url.Action("DeleteReminder", "Reminder", new { Reminder_ID = UrlEncryptor.Encrypt(Convert.ToString(row.ReminderId)) })', '@Html.Encode(reminderDateTime.ToString("dd/MM/yyyy hh:mm tt"))')">
+                                                    <img src="~/img/icons/delete1.svg" class="me-2" alt="Delete"> Delete Reminder
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
                             }
                         }
+
 
                     </tbody>
                 </table>
