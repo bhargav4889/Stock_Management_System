@@ -221,7 +221,7 @@
                 <div class="col-lg-3 col-sm-6 col-12" id="containerNumberField" style="display: none;">
                     <div class="form-group">
                         <label for="containerNumber"><span style="color: red;">*</span> Container Number</label>
-                        <input type="text" class="form-control" placeholder="Container Number" id="containerNumber" asp-for="ContainerNo">
+                        <input type="text" class="form-control" placeholder="Container Number" id="containerNumber" oninput="this.value = this.value.toUpperCase()"> asp-for="ContainerNo">
 
                         <span class="text-danger" style="color: red; font-size: 11px; font-weight: bold;" asp-validation-for="ContainerNo"></span>
                     </div>

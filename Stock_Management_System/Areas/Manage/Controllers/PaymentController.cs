@@ -12,6 +12,7 @@ using Stock_Management_System.Areas.Stocks.Models;
 using Stock_Management_System.BAL;
 using Stock_Management_System.UrlEncryption;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using static Stock_Management_System.Areas.Manage.Models.Payment_All_Models;
 
@@ -96,6 +97,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             {
                 var jsonContent = JsonConvert.SerializeObject(payment_Model);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
                 HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Payment/AddPayment", stringContent);
 
                 if (response.IsSuccessStatusCode)
@@ -130,6 +134,9 @@ namespace Stock_Management_System.Areas.Manage.Controllers
             {
                 var jsonContent = JsonConvert.SerializeObject(remain_Payment_Model);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                _Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _HttpContextAccessor.HttpContext.Session.GetString("JWT_Token"));
+
                 HttpResponseMessage response = await _Client.PostAsync($"{_Client.BaseAddress}/Payment/AddRemainPayment", stringContent);
 
                 if (response.IsSuccessStatusCode)

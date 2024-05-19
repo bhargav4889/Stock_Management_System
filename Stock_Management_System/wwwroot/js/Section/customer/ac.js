@@ -5,16 +5,20 @@ $(function () {
     function applySearches() {
         var startdate = $('#startdate').val();
         var enddate = $('#datepickerend').val();
-        var location = $('#searchLocation').val().toUpperCase();
-        var brandName = $('#BrandName').val();
+        var location = $('#searchLocation').val() ? $('#searchLocation').val() : '';
+        var brandName = $('#BrandName').val() ? $('#BrandName').val() : '';
 
         // Clear existing searches
         table.columns().search('');
 
         // Apply individual column searches from input fields
-        table.column(2).search(location);
+        if (location) {
+            table.column(2).search(location);
+        }
 
-        table.column(2).search(brandName);
+        if (brandName) {
+            table.column(2).search(brandName);
+        }
 
         // Setup date filtering
         $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
@@ -28,12 +32,11 @@ $(function () {
         });
 
         // Perform a single draw after all search criteria have been applied
-        // Perform a single draw after all search criteria have been applied
         table.draw();
         $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
 
         // Reset the input values after search
-        $('#startdate, #datepickerend, #searchLocation').val('');
+        $('#startdate, #datepickerend, #searchLocation, #BrandName').val('');
     }
 
     $('#searchButton').on('click', function () {

@@ -146,6 +146,17 @@ $(function () {
 });
 
 
+$('#selectpaymentmethod').change(function () {
+
+    var selectedBank = $(this).val();
+
+    if ($(selectedBank === 'BANK') {
+        $('#bankSelection').show();
+    } else {
+        $('#bankSelection').hide();
+    }
+});
+
 $(function () {
     $('#selectpaymentmethod').change(function () {
         if ($(this).val() === 'BANK') {
@@ -154,6 +165,7 @@ $(function () {
             $('#bankSelection').hide();
         }
     });
+}
 
     $(function () {
         $('#isFullAmountReceive').change(function () {

@@ -53,7 +53,7 @@
                     <ul>
                         <li>
                             <form id="pdfExportForm" asp-action="SalesStatementPDF" asp-controller="Sale">
-                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download A/c PDF">
+                                <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                     <img src="~/img/icons/pdf.svg" alt="img">
                                 </button>
 
@@ -62,7 +62,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="SalesStatementEXCEL" asp-controller="Sale">
+                            <form id="excelExportForm" asp-action="SalesStatementEXCEL" asp-controller="Sale" onclick="return showToastNotification('excelExportForm')">
 
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Export Excel">
                                     <img src="~/img/icons/excel.svg" alt="img">
@@ -205,8 +205,7 @@
                                                    href="@Url.Action("SaleDetailsView", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })"
                                                    onclick="event.preventDefault();  { window.location.href = this.href; }" class="dropdown-item"><img src="~/img/icons/eye1.svg" class="me-2" alt="img">Sale Info</a>
                                             </li>
-
-                                        
+                                           
                                             <li>
                                                 <a role="button" onclick="confirmDeletion('@Url.Action("DeleteSale", "Sale", new { Sale_ID = UrlEncryptor.Encrypt(Convert.ToString(item.saleId)) })', '@Html.Encode(item.CustomerName)')" class="dropdown-item delete-stock">
                                                     <img src="~/img/icons/delete1.svg" class="me-2" alt="img">Delete Sale

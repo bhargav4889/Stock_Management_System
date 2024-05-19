@@ -171,7 +171,7 @@
                     <td>@Model.Remain_Payment_Method</td>
                 </tr>
 
-                @if (Model.Remain_Receive_Information_ID != 0)
+                @if (Model.Remain_Receive_Information_ID != 0 || Model.Remain_Receive_Information_ID != null)
                 {
                     string baseAddress = "https://stock-manage-api-shree-ganesh-agro-ind.somee.com/";
                     string Icon = Model.Remain_Bank_Icon;

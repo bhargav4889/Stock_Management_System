@@ -7,40 +7,35 @@ document.addEventListener("DOMContentLoaded", function () {
                 useCORS: true
             }).then(canvas => {
                 const ctx = canvas.getContext("2d");
-                const watermark = new Image();
 
-              
+                const x = 720;
+                const y = 415;
 
-                watermark.crossOrigin = "Anonymous";
-                watermark.src = 'https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Backimg.png';
+                // Ensure you have an image element or data to draw on the canvas
+                // For demonstration purposes, this part is commented out
+                // var image = new Image();
+                // image.src = 'path/to/your/image.png';
+                // image.onload = function() {
+                //     ctx.drawImage(image, x, y);
+                // }
 
-                watermark.onload = () => {
-                    const x = 720;
-                    const y = 415;
+                // Creating a link to download
+                const saleDate = document.getElementById('saleDate')?.innerText || '';
+                const customerName = document.getElementById('customerName')?.innerText.replace(/\s+/g, '-') || '';
+                const brandName = document.getElementById('brandName')?.innerText.replace(/\s+/g, '-') || '';
+                const fileName = `${saleDate}-${customerName}-${brandName}-Sale-Information.png`;
 
-                
-                    let watermarkWidth = 342;
-                    let watermarkHeight = 350;
-                    ctx.globalAlpha = 0.4; // 40% opacity
+                const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = image;
+                link.click();
 
-                    ctx.drawImage(watermark, x, y, watermarkHeight, watermarkWidth);
+                // Clean up the link element
+                link.remove();
 
-                    // Retrieve values using IDs
-                    const saleDate = document.getElementById('saleDate')?.innerText || '';
-                    const customerName = document.getElementById('customerName')?.innerText.replace(/\s+/g, '-') || '';
-                    const brandName = document.getElementById('brandName')?.innerText.replace(/\s+/g, '-') || '';
-                    const fileName = `${saleDate}-${customerName}-${brandName}-Sale-Information.png`;
-
-                    const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-                    let link = document.createElement('a');
-                    link.download = fileName;
-                    link.href = image;
-                    link.click();
-                };
-
-                watermark.onerror = () => {
-                    console.error("Failed to load watermark image.");
-                };
+            }).catch(error => {
+                console.error('Failed to capture canvas:', error);
             });
         });
     } else {

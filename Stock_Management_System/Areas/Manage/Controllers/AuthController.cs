@@ -96,7 +96,7 @@ namespace Stock_Management_System.Areas.Manage.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Login", "Auth");
+            return RedirectToAction("Login");
         }
 
 

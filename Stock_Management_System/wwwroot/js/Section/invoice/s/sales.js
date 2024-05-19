@@ -1,6 +1,6 @@
-
 $(document).ready(function () {
     var table = $('#data').DataTable();
+
     function applySearches() {
         var BrokerName = $("#searchBrokerName").val();
         var PartyName = $("#searchPartyName").val();
@@ -10,19 +10,18 @@ $(document).ready(function () {
         var startdate = $('#startdate').val();
         var enddate = $('#datepickerend').val();
 
-        // Clear existing searches and date filters
+        // Clear existing searches
         table.columns().search('');
-     
 
         // Apply dropdown search if selected
         if (selectedGrain) {
-            var productColumnIndex = 3; // Adjust according to your table structure
+            var productColumnIndex = 2; // Adjust according to your table structure
             table.column(productColumnIndex).search(selectedGrainText);
         }
 
         // Apply individual column searches from input fields
         table.column(1).search(BrokerName);
-        table.column(2).search(PartyName);
+        table.column(3).search(PartyName);
         table.column(4).search(Brand);
 
         // Setup date filtering
@@ -42,21 +41,28 @@ $(document).ready(function () {
 
         // Perform a single draw after all search criteria have been applied
         table.draw();
-        $.fn.dataTable.ext.search.pop(); // Remove the date filter after drawing
+
+        // Remove the date filter after drawing
+        $.fn.dataTable.ext.search.pop();
+
+        // Reset the input values after search
+        $("#searchPartyName, #searchBrokerName").val('');
+        $('#graintype').val('').trigger('change');
+       
+
+        // Reset date pickers
+        $('#startdate').val('');
+        $('#datepickerend').val('');
+
+
     }
 
-    // Reset input values after search
-    $("#searchBrokerName, #searchPartyName, #searchBrandName").val('');
-    $('#graintype').val('').trigger('change');
-
-
-    // Reset date pickers
-    $('#startdate').val('');
-    $('#datepickerend').val('');
-
+    // Reset input values
+    
 
     $('#searchButton').on('click', function () {
         applySearches();
+    
     });
 
     function parseDate(dateString) {
@@ -68,6 +74,8 @@ $(document).ready(function () {
         return new Date(year, month - 1, day); // Months are 0-based in JavaScript Date objects
     }
 });
+
+
 
 function confirmPurchaseInvoiceDeletion(deleteUrl, customerName) {
     Swal.fire({

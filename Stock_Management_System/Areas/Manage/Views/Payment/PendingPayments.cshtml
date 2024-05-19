@@ -40,7 +40,7 @@
                 <div class="wordset">
                     <ul>
                         <li>
-                        <form id="pdfExportForm" asp-action="Pending_Payments_PDF" asp-controller="Payment" method="get">
+                            <form id="pdfExportForm" asp-action="PendingPaymentsPDF" asp-controller="Payment">
                             <button type="submit" name="downloadType" value="PDF" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download PDF" onclick="return showToastNotification('pdfExportForm')">
                                 <img src="~/img/icons/pdf.svg" alt="img">
                             </button>
@@ -48,7 +48,7 @@
                         </li>
 
                         <li>
-                            <form id="excelExportForm" asp-action="Pending_Payments_EXCEL" asp-controller="Payment" method="get">
+                            <form id="excelExportForm" asp-action="PendingPaymentsEXCEL" asp-controller="Payment">
                                 <button type="submit" name="downloadType" value="EXCEL" class="btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Download Excel" onclick="return showToastNotification('excelExportForm')">
                                     <img src="~/img/icons/excel.svg" alt="img">
                                 </button>

@@ -23,7 +23,7 @@ namespace Stock_Management_System.Areas.Sales.Controllers
     {
         public IConfiguration Configuration;
 
-        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/");
+        Uri baseaddress = new Uri("https://stock-manage-api-shree-ganesh-agro-ind.somee.com/api");
 
         public readonly HttpClient _Client;
 

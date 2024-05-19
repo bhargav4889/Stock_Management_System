@@ -11,34 +11,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 useCORS: true // To handle external images if CORS policies allow
             }).then(function (canvas) {
                 const ctx = canvas.getContext('2d');
-                const watermark = new Image();
-                watermark.crossOrigin = "Anonymous";
-                watermark.src = 'https://stock-manage-api-shree-ganesh-agro-ind.somee.com/Images/Backimg.png';
 
-                watermark.onload = () => {
-                    const x = 730;
-                    const y = 275;
-                    const watermarkWidth = 342;
-                    const watermarkHeight = 350;
-                    ctx.globalAlpha = 0.4; // Setting opacity to 40%
+                // Position where you want to draw additional images or text on the canvas
+                const x = 730;
+                const y = 275;
 
-                    ctx.drawImage(watermark, x, y, watermarkHeight, watermarkWidth);
+                // Example: Drawing an image on the canvas (you need an image element)
+                // var image = new Image();
+                // image.src = 'path/to/your/image.png';
+                // image.onload = function() {
+                //     ctx.drawImage(image, x, y);
+                // }
 
-                    // Creating a link to download
-                    var link = document.createElement('a');
-                    var customerName = customerNameElement.textContent.trim().replace(/\s+/g, '-');
-                    var productName = productNameElement.textContent.trim().replace(/\s+/g, '-');
-                    var purchaseDate = purchaseDateElement.textContent.trim();
+                // Creating a link to download
+                var link = document.createElement('a');
+                var customerName = customerNameElement.textContent.trim().replace(/\s+/g, '-');
+                var productName = productNameElement.textContent.trim().replace(/\s+/g, '-');
+                var purchaseDate = purchaseDateElement.textContent.trim();
 
-                    link.download = `${purchaseDate}-${customerName}-${productName}-Stock-Information.png`;
-                    link.href = canvas.toDataURL();
-                    link.target = '_blank';
-                    link.click();
-                };
+                link.download = `${purchaseDate}-${customerName}-${productName}-Stock-Information.png`;
+                link.href = canvas.toDataURL();
+                link.target = '_blank';
+                link.click();
 
-                watermark.onerror = () => {
-                    console.error("Failed to load watermark image.");
-                };
             }).catch(function (error) {
                 console.log('Failed to capture canvas:', error);
             });

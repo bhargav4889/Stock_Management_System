@@ -192,7 +192,6 @@ $(function () {
 
     $(document).ready(function () {
         var isSuggestionSelected = false; // Flag to indicate if a suggestion has been selected.
-
         // Function to show or hide new customer fields and a message.
         function toggleNewCustomerFields(show) {
             $("#newCustomerMessage").toggle(show);
@@ -200,16 +199,14 @@ $(function () {
             $("#newcustomercity").toggle(show);
             $("#newcustomerphoneno").toggle(show);
         }
-
         // Initially hide the new customer message and fields.
         toggleNewCustomerFields(false);
-
         $("#Customer").autocomplete({
             source: function (request, response) {
                 $.ajax({
                     url: "/Sale/GetSellerCustomerData", // Correct URL to your controller action.
                     type: "POST",
-   
+                    dataType: "json",
                     data: {
                         CustomerName: request.term
                     },
@@ -227,7 +224,6 @@ $(function () {
             },
             minLength: 1, // Minimum length before searching.
             response: function (event, ui) {
-                // Check if there's an exact match.
                 var exactMatch = ui.content.some(item => item.value.toLowerCase() === $("#Customer").val().toLowerCase());
                 toggleNewCustomerFields(!exactMatch && !isSuggestionSelected);
             },
@@ -240,25 +236,23 @@ $(function () {
                 toggleNewCustomerFields(false); // Hide new customer fields as a selection has been made.
             }
         });
-
         // Reset the flag and potentially hide new customer fields if the input is cleared or changed.
         $("#Customer").on('input', function () {
             var enteredValue = $(this).val().trim();
-            isSuggestionSelected = false; // Reset the flag as we are entering new text.
-
             if (!enteredValue) {
                 toggleNewCustomerFields(false);
+                isSuggestionSelected = false;
             } else {
-                // Re-trigger the autocomplete search to find any matches and invoke the response event.
+                isSuggestionSelected = false;
+                // Since we are still typing, check if any item matches exactly from the last search.
                 $("#Customer").autocomplete("search", enteredValue);
             }
         });
-
         // Optionally, reset the form state when the page is refreshed or navigated away.
         $(window).on('beforeunload', function () {
             toggleNewCustomerFields(false);
         });
-    });
+    }); 
 
 
 
